@@ -102,6 +102,7 @@ What still needs work:
 - Reworked hero and home presentation
 - Improved account layout and scrolling behavior
 - Tightened cart and payment UI
+- Reduced the add-to-cart preview toast footprint for a cleaner mobile/desktop overlay
 - Improved mobile auth modal handling
 - Fixed chatbot runtime and overlay issues
 - Added overlay-only scroll behavior for drawer/chat flows
@@ -117,6 +118,10 @@ What still needs work:
 - Improved product-detail highlights and information cards for dark mode and overflow handling
 - Swapped the lower header-bar placement of location and browse controls to match the requested layout
 - Removed a set of hardcoded chatbot currency strings and made its visible pricing more region-aware
+- Added safe Firebase fallback handling on product detail pages for deployments missing live catalog env vars
+- Improved mobile header brand fitting and refined smarter product-unit inference across groceries, drinks, dairy, snacks, and care items
+- Tuned footer/chatbot floating-control behavior so the up-arrow and chat launcher hand off cleanly near the footer
+- Added production-ready SEO, crawler, LLM discovery, manifest, and favicon/browser icon setup
 
 ## Backend Attachment Direction
 
@@ -136,7 +141,7 @@ Detailed backend guidance is available in [docs/BACKEND_INTEGRATION_GUIDE.md](./
 
 See the `docs` folder for detailed project documentation:
 
-- [Docs Index](./docs/README.md)
+- [Manager Mail Update](./docs/Mail_Update.md)
 - [Application Overview](./docs/APPLICATION_OVERVIEW.md)
 - [Tech Stack and Architecture](./docs/TECH_STACK_AND_ARCHITECTURE.md)
 - [Backend Integration Guide](./docs/BACKEND_INTEGRATION_GUIDE.md)
@@ -145,6 +150,6 @@ See the `docs` folder for detailed project documentation:
 ## Current Validation
 
 - `npm run build` passes
-- A focused code audit pass was completed on checkout, modal behavior, cart merging, chatbot currency handling, and related-product/detail flows
+- A focused code audit pass was completed on checkout, modal behavior, cart merging, chatbot currency handling, related-product/detail flows, and deployment-safe product-page behavior
 - The app is suitable as a strong frontend demo/prototype
 - Final visual QA and backend completion are still recommended before production use

@@ -1,0 +1,30 @@
+# Prime Basket
+
+> Prime Basket is a premium grocery storefront for fresh produce, dairy, pantry essentials, beverages, snacks, home care, and fast mobile-first shopping.
+
+Base URL: https://prime-basket-pb.vercel.app/
+
+Primary entry points:
+- https://prime-basket-pb.vercel.app/
+
+Site summary:
+- Consumer-facing grocery storefront.
+- Supports catalog browsing, product detail views, cart, checkout, wishlist, account flows, and chatbot-assisted shopping.
+- Region-aware storefront experience for India and Kenya.
+- Languages currently surfaced in the UI include English and Swahili.
+
+Key content areas:
+- Home catalog discovery
+- Category browsing
+- Product detail and related products
+- Cart and payment flow
+- Account, orders, refunds, addresses, and support areas
+
+Operational notes for LLMs:
+- Product catalog visibility can vary by configured region.
+- Some content is client-rendered in the browser.
+- Live catalog data may depend on deployment environment variables.
+- Use the public home URL as the canonical reference for the storefront.
+
+Contact:
+- support@primebasket.com

@@ -3,30 +3,58 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="Prime Basket is a modern grocery shopping app for fresh produce, pantry essentials, dairy, beverages, and fast checkout experiences." />
+    <title>Prime Basket | Grocery Delivery, Fresh Produce & Daily Essentials</title>
+    <meta
+      name="description"
+      content="Prime Basket is a premium grocery storefront for fresh fruits, vegetables, pantry staples, dairy, beverages, snacks, and everyday essentials with a fast, mobile-first shopping experience."
+    />
+    <meta
+      name="keywords"
+      content="Prime Basket, grocery delivery, fresh vegetables, fruits, dairy, pantry essentials, online grocery, Hyderabad groceries, Kenya groceries, daily essentials"
+    />
     <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="theme-color" content="#1f5ca1" />
     <meta name="color-scheme" content="light dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta property="og:site_name" content="Prime Basket" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Prime Basket | Grocery Delivery in Hyderabad" />
-    <meta property="og:description" content="Shop fresh fruits, vegetables, dairy, pantry essentials, and daily grocery needs with fast delivery in Hyderabad, Telangana from Prime Basket." />
-    <meta property="og:image" content="assets/logo watermark 3.png" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Prime Basket | Grocery Delivery in Hyderabad" />
-    <meta name="twitter:description" content="Shop fresh groceries and daily essentials with Prime Basket." />
-    <meta name="twitter:image" content="assets/logo watermark 3.png" />
+    <meta name="application-name" content="Prime Basket" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Prime Basket" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-TileColor" content="#1f5ca1" />
+    <meta name="msapplication-TileImage" content="/mstile-150x150.png" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="geo.region" content="IN-TG" />
     <meta name="geo.placename" content="Hyderabad" />
     <meta name="geo.position" content="17.4948;78.3996" />
     <meta name="ICBM" content="17.4948, 78.3996" />
-    <title>Prime-Basket</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/logo watermark 3.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="assets/logo watermark 3.png" />
-    <link rel="shortcut icon" href="assets/logo watermark 3.png" />
+    <link rel="canonical" href="https://prime-basket-pb.vercel.app/" />
+
+    <meta property="og:site_name" content="Prime Basket" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://prime-basket-pb.vercel.app/" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:title" content="Prime Basket | Grocery Delivery, Fresh Produce & Daily Essentials" />
+    <meta
+      property="og:description"
+      content="Shop fresh groceries, pantry staples, dairy, beverages, and household essentials with a premium shopping experience from Prime Basket."
+    />
+    <meta property="og:image" content="https://prime-basket-pb.vercel.app/android-chrome-512x512.png" />
+    <meta property="og:image:alt" content="Prime Basket storefront logo" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Prime Basket | Grocery Delivery, Fresh Produce & Daily Essentials" />
+    <meta name="twitter:description" content="Shop fresh groceries and daily essentials with Prime Basket." />
+    <meta name="twitter:image" content="https://prime-basket-pb.vercel.app/android-chrome-512x512.png" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
+    <link rel="shortcut icon" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/logo watermark 3.png" />
+
     <link rel="preconnect" href="https://i.ibb.co" />
     <link rel="preconnect" href="https://firebasestorage.googleapis.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,8 +64,55 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <!-- Your existing style.css — place it in /public/style.css -->
     <link rel="stylesheet" href="/style.css" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://prime-basket-pb.vercel.app/#website",
+            "url": "https://prime-basket-pb.vercel.app/",
+            "name": "Prime Basket",
+            "description": "Premium grocery storefront for fresh produce, pantry essentials, dairy, beverages, snacks, and household shopping.",
+            "inLanguage": ["en-IN", "en-KE", "sw-KE"]
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://prime-basket-pb.vercel.app/#organization",
+            "name": "Prime Basket",
+            "url": "https://prime-basket-pb.vercel.app/",
+            "logo": "https://prime-basket-pb.vercel.app/android-chrome-512x512.png",
+            "sameAs": [],
+            "areaServed": [
+              { "@type": "Country", "name": "India" },
+              { "@type": "Country", "name": "Kenya" }
+            ]
+          },
+          {
+            "@type": "GroceryStore",
+            "@id": "https://prime-basket-pb.vercel.app/#store",
+            "name": "Prime Basket",
+            "url": "https://prime-basket-pb.vercel.app/",
+            "image": "https://prime-basket-pb.vercel.app/android-chrome-512x512.png",
+            "telephone": "+91 80085 50199",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "KPHB, JNTU Road",
+              "addressLocality": "Hyderabad",
+              "postalCode": "500085",
+              "addressCountry": "IN"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 17.4948,
+              "longitude": 78.3996
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

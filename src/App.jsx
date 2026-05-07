@@ -885,21 +885,21 @@ export default function App() {
         position: "fixed", top: "16px", right: "16px",
         transform: cartToast ? "translateY(0)" : "translateY(calc(-100% - 30px))",
         transition: "transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1)",
-        width: "min(320px, 88vw)",
+        width: "min(274px, 82vw)",
         background: "#fff",
-        borderRadius: "14px",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+        borderRadius: "12px",
+        boxShadow: "0 8px 26px rgba(0,0,0,0.16)",
         zIndex: 99999,
         overflow: "hidden",
       }}>
         {/* Header */}
         <div style={{
           display: "flex", alignItems: "center", gap: "8px",
-          padding: "12px 16px 10px",
+          padding: "10px 12px 8px",
           borderBottom: "1px solid #f0f0f0",
         }}>
-          <i className="fas fa-check-circle" style={{ color: "#2e7d32", fontSize: "18px" }}></i>
-          <span style={{ fontWeight: 700, fontSize: "15px", color: "#2e7d32" }}>Added to Cart</span>
+          <i className="fas fa-check-circle" style={{ color: "#2e7d32", fontSize: "16px" }}></i>
+          <span style={{ fontWeight: 700, fontSize: "13px", color: "#2e7d32" }}>Added to Cart</span>
         </div>
 
         {/* Product Row */}
@@ -912,10 +912,10 @@ export default function App() {
             : null;
           const unit = p.unit || p.weight || "";
           return (
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "11px 12px" }}>
               {/* Image */}
               <div style={{
-                width: "64px", height: "64px", flexShrink: 0,
+                width: "54px", height: "54px", flexShrink: 0,
                 borderRadius: "8px", border: "1px solid #eee",
                 overflow: "hidden", background: "#fafafa",
                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -930,20 +930,20 @@ export default function App() {
               {/* Details */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
-                  fontWeight: 600, fontSize: "14px", color: "#1a1a1a",
+                  fontWeight: 600, fontSize: "12.5px", color: "#1a1a1a",
                   overflow: "hidden", textOverflow: "ellipsis",
                   display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
-                  lineHeight: 1.35,
+                  lineHeight: 1.3,
                 }}>{name}</div>
-                {unit && <div style={{ fontSize: "12px", color: "#888", marginTop: "3px" }}>{unit} ×{cartToast.qty}</div>}
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "6px" }}>
+                {unit && <div style={{ fontSize: "11px", color: "#888", marginTop: "2px" }}>{unit} ×{cartToast.qty}</div>}
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "5px" }}>
                   <span style={{
                     background: "#2e7d32", color: "#fff",
-                    fontWeight: 700, fontSize: "14px",
-                    padding: "3px 10px", borderRadius: "6px",
+                    fontWeight: 700, fontSize: "12px",
+                    padding: "2px 8px", borderRadius: "6px",
                   }}>{formatCurrency(rawPrice, region)}</span>
                   {rawMrp != null && rawMrp > rawPrice && (
-                    <span style={{ fontSize: "13px", color: "#aaa", textDecoration: "line-through" }}>{formatCurrency(rawMrp, region)}</span>
+                    <span style={{ fontSize: "11px", color: "#aaa", textDecoration: "line-through" }}>{formatCurrency(rawMrp, region)}</span>
                   )}
                 </div>
               </div>
@@ -956,9 +956,9 @@ export default function App() {
           onClick={() => { setCartToast(null); goCart(); }}
           style={{
             borderTop: "1px solid #f0f0f0",
-            padding: "12px 16px",
+            padding: "10px 12px",
             textAlign: "center",
-            fontWeight: 700, fontSize: "14px",
+            fontWeight: 700, fontSize: "12px",
             color: "#052694ff",
             cursor: "pointer",
             userSelect: "none",
@@ -993,4 +993,5 @@ export default function App() {
     </>
   );
 }
+
 

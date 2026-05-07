@@ -1,0 +1,8 @@
+site=Prime Basket
+primary_region=IN-TG
+primary_city=Hyderabad
+latitude=17.4948
+longitude=78.3996
+secondary_market=Kenya
+timezone=Asia/Calcutta
+canonical_url=https://prime-basket-pb.vercel.app/
