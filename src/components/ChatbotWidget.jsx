@@ -130,14 +130,12 @@ export default function ChatbotWidget({
     let scrollStopTimer = null;
 
     const handleScroll = () => {
-      const nextScrollY = window.scrollY || 0;
       const viewportHeight = window.innerHeight || 0;
       const footer = document.querySelector(".footer");
       const footerRect = footer?.getBoundingClientRect();
       const isNearFooter = footerRect ? footerRect.top <= viewportHeight - 32 : false;
-      const shouldShowTopButton = nextScrollY > 520 || isNearFooter;
 
-      setShowScrollTop(shouldShowTopButton);
+      setShowScrollTop(isNearFooter);
       setNearFooter(isNearFooter);
       setIsUserScrolling(true);
       if (scrollStopTimer) clearTimeout(scrollStopTimer);
