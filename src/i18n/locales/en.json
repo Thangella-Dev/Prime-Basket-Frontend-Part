@@ -1,0 +1,56 @@
+{
+  "header": {
+    "browse": "Browse All Categories",
+    "notifications": "Notifications",
+    "wishlist": "Wishlist",
+    "basket": "Basket",
+    "login": "Login",
+    "account": "Account",
+    "language": "Language"
+  },
+  "home": {
+    "popular": "Popular Products",
+    "deals": "Deals Of The Day",
+    "allDeals": "All Deals",
+    "shopByCategory": "Shop by Categories",
+    "allCategories": "All Categories",
+    "shopNow": "Shop now",
+    "topSelling": "Top Selling",
+    "trending": "Trending",
+    "recentlyAdded": "Recently Added",
+    "topRated": "Top Rated",
+    "noProducts": "No products found.",
+    "add": "Add",
+    "added": "Added",
+    "category": "Category",
+    "productTags": "Product Tags",
+    "stayHome": "Stay home & get your daily needs from our shop",
+    "startShopping": "Start Your Daily Shopping with",
+    "subscribe": "Subscribe",
+    "emailPlaceholder": "Your email address"
+  },
+  "categories": {
+    "freshFruits": "Fresh Fruits",
+    "vegetables": "Vegetables",
+    "dairyProducts": "Dairy Products",
+    "chipsNamkeens": "Chips & Namkeens",
+    "coolDrinks": "Cool Drinks",
+    "instantFood": "Instant Food",
+    "babyCare": "Baby Care",
+    "bodyCare": "Body Care",
+    "milksDairies": "Milks & Dairies",
+    "biscuitsCookies": "Biscuits & Cookies"
+  },
+  "features": {
+    "bestPrices": "Best prices & offers",
+    "bestPricesSub": "Orders $50 or more",
+    "freeDelivery": "Free delivery",
+    "freeDeliverySub": "24/7 amazing services",
+    "greatDeal": "Great daily deal",
+    "greatDealSub": "When you sign up",
+    "wideAssortment": "Wide assortment",
+    "wideAssortmentSub": "Mega Discounts",
+    "easyReturns": "Easy returns",
+    "easyReturnsSub": "Within 30 days"
+  }
+}

@@ -1,0 +1,2295 @@
+{
+  "country": "kenya",
+  "language": "sw",
+  "currency": "KES",
+  "homepage": {
+    "featured_products": [
+      {
+        "id": "ke_b_001",
+        "image": "https://i.ibb.co/Znc7fNN/Manji-Shortcake-Biscuit.jpg",
+        "badge": "bestseller",
+        "brand": "Manji",
+        "name": "Biskuti ya Manji Shortcake",
+        "english_name": "Manji Shortcake Biscuit",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Krimu",
+        "rating": {
+          "value": 4.3,
+          "count": 312
+        },
+        "price": {
+          "current": 75,
+          "original": 95,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Vitafunwa",
+          "Manji"
+        ]
+      },
+      {
+        "id": "ke_b_002",
+        "image": "https://i.ibb.co/PGwJMn3K/bisconni-cocomo-biscuits.jpg",
+        "badge": "sale",
+        "brand": "Bisconni",
+        "name": "Biskuti za Bisconni Cocomo",
+        "english_name": "Bisconni Cocomo Biscuits",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Chokoleti",
+        "rating": {
+          "value": 4.5,
+          "count": 487
+        },
+        "price": {
+          "current": 120,
+          "original": 150,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Chokoleti",
+          "Ofa"
+        ]
+      },
+      {
+        "id": "ke_b_003",
+        "image": "https://i.ibb.co/jZ6QvD3J/Bisconni-Cocomo-Chocolate-Filled-Biscuits.jpg",
+        "badge": "new",
+        "brand": "Bisconni",
+        "name": "Biskuti za Bisconni Cocomo na Chokoleti",
+        "english_name": "Bisconni Cocomo Chocolate Filled Biscuits",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Chokoleti",
+        "rating": {
+          "value": 4.6,
+          "count": 203
+        },
+        "price": {
+          "current": 140,
+          "original": 180,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Chokoleti",
+          "Mpya"
+        ]
+      },
+      {
+        "id": "ke_b_004",
+        "image": "https://i.ibb.co/8L0b9PP9/Lotus-Biscoff-Caramel-Biscuits.jpg",
+        "badge": "premium",
+        "brand": "Lotus",
+        "name": "Biskuti za Lotus Biscoff Karameli",
+        "english_name": "Lotus Biscoff Caramel Biscuits",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Karameli",
+        "rating": {
+          "value": 4.8,
+          "count": 156
+        },
+        "price": {
+          "current": 480,
+          "original": 550,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Premium",
+          "Karameli",
+          "Bora"
+        ]
+      },
+      {
+        "id": "ke_b_005",
+        "image": "https://i.ibb.co/8nzSYVjz/Manji-Assorted-Cream-Biscuits.jpg",
+        "badge": "bestseller",
+        "brand": "Manji",
+        "name": "Biskuti za Manji Krimu Mchanganyiko",
+        "english_name": "Manji Assorted Cream Biscuits",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Krimu",
+        "rating": {
+          "value": 4.4,
+          "count": 278
+        },
+        "price": {
+          "current": 95,
+          "original": 110,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Krimu",
+          "Mchanganyiko"
+        ]
+      },
+      {
+        "id": "ke_b_006",
+        "image": "https://i.ibb.co/5zHGbq3/Manji-Orange-Cream-Biscuit.jpg",
+        "badge": null,
+        "brand": "Manji",
+        "name": "Biskuti za Manji Krimu ya Machungwa",
+        "english_name": "Manji Orange Cream Biscuit",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Krimu",
+        "rating": {
+          "value": 4.2,
+          "count": 145
+        },
+        "price": {
+          "current": 80,
+          "original": 95,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Machungwa",
+          "Krimu"
+        ]
+      },
+      {
+        "id": "ke_b_007",
+        "image": "https://i.ibb.co/DD5VyBW6/Manji-Custard-Cream-Biscuits.jpg",
+        "badge": null,
+        "brand": "Manji",
+        "name": "Biskuti za Manji Krimu ya Kastad",
+        "english_name": "Manji Custard Cream Biscuits",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Krimu",
+        "rating": {
+          "value": 4.1,
+          "count": 198
+        },
+        "price": {
+          "current": 85,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Kastad",
+          "Krimu"
+        ]
+      },
+      {
+        "id": "ke_b_008",
+        "image": "https://i.ibb.co/RGZd8Jnb/Honeycomb-Cinnamon-Squars-Biscuits.jpg",
+        "badge": "new",
+        "brand": "Honeycomb",
+        "name": "Biskuti za Mraba wa Dalasini",
+        "english_name": "Honeycomb Cinnamon Squares Biscuits",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti Maalum",
+        "rating": {
+          "value": 4,
+          "count": 89
+        },
+        "price": {
+          "current": 110,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Dalasini",
+          "Mpya"
+        ]
+      },
+      {
+        "id": "ke_b_009",
+        "image": "https://i.ibb.co/FbY3TLg0/Oreo-Biscuit.jpg",
+        "badge": "sale",
+        "brand": "Nabisco",
+        "name": "Biskuti za Oreo",
+        "english_name": "Oreo Biscuit",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Chokoleti",
+        "rating": {
+          "value": 4.7,
+          "count": 623
+        },
+        "price": {
+          "current": 280,
+          "original": 350,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Oreo",
+          "Chokoleti",
+          "Ofa"
+        ]
+      },
+      {
+        "id": "ke_b_010",
+        "image": "https://i.ibb.co/v6LmpftZ/Britannia-Cashew-Biscuits.jpg",
+        "badge": null,
+        "brand": "Britannia",
+        "name": "Biskuti za Britannia Korosho",
+        "english_name": "Britannia Cashew Biscuits",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Korosho",
+        "rating": {
+          "value": 4.3,
+          "count": 167
+        },
+        "price": {
+          "current": 130,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Korosho",
+          "Britannia"
+        ]
+      },
+      {
+        "id": "ke_b_011",
+        "image": "https://i.ibb.co/LWGtg8C/Nu-Vita-Digestive-Biscuits.jpg",
+        "badge": "healthy",
+        "brand": "Nu Vita",
+        "name": "Biskuti za Nu Vita Digestive",
+        "english_name": "Nu Vita Digestive Biscuits",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Afya",
+        "rating": {
+          "value": 4.4,
+          "count": 234
+        },
+        "price": {
+          "current": 115,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Afya",
+          "Digestive"
+        ]
+      },
+      {
+        "id": "ke_b_012",
+        "image": "https://i.ibb.co/rR0yxhY5/Manji-Digestive-Biscuit.jpg",
+        "badge": null,
+        "brand": "Manji",
+        "name": "Biskuti za Manji Digestive",
+        "english_name": "Manji Digestive Biscuit",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Afya",
+        "rating": {
+          "value": 4.2,
+          "count": 189
+        },
+        "price": {
+          "current": 90,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Digestive",
+          "Manji"
+        ]
+      },
+      {
+        "id": "ke_b_013",
+        "image": "https://i.ibb.co/p6rPtbjS/Britannia-Digestive-Biscuits.jpg",
+        "badge": "bestseller",
+        "brand": "Britannia",
+        "name": "Biskuti za Britannia Digestive",
+        "english_name": "Britannia Digestive Biscuits",
+        "category": "Biskuti na Kuki",
+        "subcategory": "Biskuti za Afya",
+        "rating": {
+          "value": 4.5,
+          "count": 312
+        },
+        "price": {
+          "current": 125,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Biskuti",
+          "Digestive",
+          "Britannia"
+        ]
+      },
+      {
+        "id": "ke_d_001",
+        "image": "https://i.ibb.co/JR5PgTyk/Sting-Gold-Rush-Energy-Drink.jpg",
+        "badge": "new",
+        "brand": "Sting",
+        "name": "Kinywaji cha Nguvu Sting Gold",
+        "english_name": "Sting Gold Rush Energy Drink",
+        "category": "Vinywaji Baridi",
+        "subcategory": "Vinywaji vya Nguvu",
+        "rating": {
+          "value": 4.3,
+          "count": 198
+        },
+        "price": {
+          "current": 130,
+          "original": 160,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Kinywaji",
+          "Nguvu",
+          "Baridi"
+        ]
+      },
+      {
+        "id": "ke_d_002",
+        "image": "https://i.ibb.co/C53jjF76/Mirinda-Fruity-Soft-Drink.jpg",
+        "badge": "sale",
+        "brand": "Mirinda",
+        "name": "Mirinda ya Matunda",
+        "english_name": "Mirinda Fruity Soft Drink",
+        "category": "Vinywaji Baridi",
+        "subcategory": "Soda",
+        "rating": {
+          "value": 4.2,
+          "count": 321
+        },
+        "price": {
+          "current": 80,
+          "original": 100,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Soda",
+          "Matunda",
+          "Baridi"
+        ]
+      },
+      {
+        "id": "ke_d_003",
+        "image": "https://i.ibb.co/R4HjG6hn/Coca-Cola-Pet.jpg",
+        "badge": "bestseller",
+        "brand": "Coca-Cola",
+        "name": "Coca Cola",
+        "english_name": "Coca Cola Pet",
+        "category": "Vinywaji Baridi",
+        "subcategory": "Soda",
+        "rating": {
+          "value": 4.7,
+          "count": 854
+        },
+        "price": {
+          "current": 90,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Soda",
+          "Cola",
+          "Baridi"
+        ]
+      },
+      {
+        "id": "ke_d_004",
+        "image": "https://i.ibb.co/WWQfQPHb/Fanta-Orange-Pet.jpg",
+        "badge": "sale",
+        "brand": "Fanta",
+        "name": "Fanta ya Machungwa",
+        "english_name": "Fanta Orange Pet",
+        "category": "Vinywaji Baridi",
+        "subcategory": "Soda",
+        "rating": {
+          "value": 4.5,
+          "count": 467
+        },
+        "price": {
+          "current": 85,
+          "original": 105,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Soda",
+          "Machungwa",
+          "Baridi"
+        ]
+      },
+      {
+        "id": "ke_d_005",
+        "image": "https://i.ibb.co/zTrs57WM/Schweppes-Tonic-Water.jpg",
+        "badge": "premium",
+        "brand": "Schweppes",
+        "name": "Maji ya Schweppes Tonic",
+        "english_name": "Schweppes Tonic Water",
+        "category": "Vinywaji Baridi",
+        "subcategory": "Maji ya Ladha",
+        "rating": {
+          "value": 4.4,
+          "count": 142
+        },
+        "price": {
+          "current": 135,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Maji",
+          "Tonic",
+          "Premium"
+        ]
+      },
+      {
+        "id": "ke_d_006",
+        "image": "https://i.ibb.co/kbcZGCw/Coca-Cola-Zero-Drink-5.jpg",
+        "badge": "new",
+        "brand": "Coca-Cola",
+        "name": "Coca Cola Zero",
+        "english_name": "Coca Cola Zero",
+        "category": "Vinywaji Baridi",
+        "subcategory": "Soda",
+        "rating": {
+          "value": 4.6,
+          "count": 289
+        },
+        "price": {
+          "current": 95,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Soda",
+          "Cola",
+          "Zero",
+          "Afya"
+        ]
+      },
+      {
+        "id": "ke_f_001",
+        "image": "https://i.ibb.co/FkWCV713/watermelon.jpg",
+        "badge": "fresh",
+        "brand": "Soko Fresh",
+        "name": "Tikiti Maji",
+        "english_name": "Watermelon",
+        "category": "Matunda Mapya",
+        "subcategory": "Watermelon",
+        "rating": {
+          "value": 4.5,
+          "count": 423
+        },
+        "price": {
+          "current": 60,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_002",
+        "image": "https://i.ibb.co/BKN9vp07/tender-coconut.jpg",
+        "badge": "fresh",
+        "brand": "Soko Fresh",
+        "name": "Nazi Mchanga",
+        "english_name": "Tender Coconut",
+        "category": "Matunda Mapya",
+        "subcategory": "Tender Coconut",
+        "rating": {
+          "value": 4.4,
+          "count": 198
+        },
+        "price": {
+          "current": 90,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_003",
+        "image": "https://i.ibb.co/JjhTVg3F/tota-puri-mango.jpg",
+        "badge": "fresh",
+        "brand": "Soko Fresh",
+        "name": "Embe la Tota Puri",
+        "english_name": "Tota Puri Mango",
+        "category": "Matunda Mapya",
+        "subcategory": "Tota Puri Mango",
+        "rating": {
+          "value": 4.6,
+          "count": 312
+        },
+        "price": {
+          "current": 100,
+          "original": 130,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_004",
+        "image": "https://i.ibb.co/qYYyBL1r/sugercane.jpg",
+        "badge": null,
+        "brand": "Soko Fresh",
+        "name": "Miwa",
+        "english_name": "Sugarcane",
+        "category": "Matunda Mapya",
+        "subcategory": "Sugarcane",
+        "rating": {
+          "value": 4.2,
+          "count": 134
+        },
+        "price": {
+          "current": 50,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_005",
+        "image": "https://i.ibb.co/YBFhNfFD/straw-berry.jpg",
+        "badge": "premium",
+        "brand": "Soko Fresh",
+        "name": "Strawberi",
+        "english_name": "Strawberry",
+        "category": "Matunda Mapya",
+        "subcategory": "Strawberry",
+        "rating": {
+          "value": 4.7,
+          "count": 267
+        },
+        "price": {
+          "current": 180,
+          "original": 220,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_006",
+        "image": "https://i.ibb.co/qLks4jgp/sapota.jpg",
+        "badge": null,
+        "brand": "Soko Fresh",
+        "name": "Sapota",
+        "english_name": "Sapota",
+        "category": "Matunda Mapya",
+        "subcategory": "Sapota",
+        "rating": {
+          "value": 4.1,
+          "count": 89
+        },
+        "price": {
+          "current": 130,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_007",
+        "image": "https://i.ibb.co/Jwtt05VD/red-grapes.jpg",
+        "badge": "sale",
+        "brand": "Soko Fresh",
+        "name": "Zabibu Nyekundu",
+        "english_name": "Red Grapes",
+        "category": "Matunda Mapya",
+        "subcategory": "Red Grapes",
+        "rating": {
+          "value": 4.5,
+          "count": 345
+        },
+        "price": {
+          "current": 220,
+          "original": 280,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_008",
+        "image": "https://i.ibb.co/hF7Tk6mZ/raw-mango.jpg",
+        "badge": "fresh",
+        "brand": "Soko Fresh",
+        "name": "Embe Bichi",
+        "english_name": "Raw Mango",
+        "category": "Matunda Mapya",
+        "subcategory": "Raw Mango",
+        "rating": {
+          "value": 4.3,
+          "count": 178
+        },
+        "price": {
+          "current": 80,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_009",
+        "image": "https://i.ibb.co/ZprZg2f0/pomegranate.jpg",
+        "badge": "healthy",
+        "brand": "Soko Fresh",
+        "name": "Komamanga",
+        "english_name": "Pomegranate",
+        "category": "Matunda Mapya",
+        "subcategory": "Pomegranate",
+        "rating": {
+          "value": 4.6,
+          "count": 289
+        },
+        "price": {
+          "current": 160,
+          "original": 200,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Afya"
+        ]
+      },
+      {
+        "id": "ke_f_010",
+        "image": "https://i.ibb.co/C34cH3zc/plum.jpg",
+        "badge": null,
+        "brand": "Soko Fresh",
+        "name": "Plamu",
+        "english_name": "Plum",
+        "category": "Matunda Mapya",
+        "subcategory": "Plum",
+        "rating": {
+          "value": 4.2,
+          "count": 112
+        },
+        "price": {
+          "current": 200,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_011",
+        "image": "https://i.ibb.co/prZMpPKQ/pine-apple.jpg",
+        "badge": "fresh",
+        "brand": "Soko Fresh",
+        "name": "Nanasi",
+        "english_name": "Pineapple",
+        "category": "Matunda Mapya",
+        "subcategory": "Pineapple",
+        "rating": {
+          "value": 4.5,
+          "count": 398
+        },
+        "price": {
+          "current": 100,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_012",
+        "image": "https://i.ibb.co/Z1JMfbZy/papaya.jpg",
+        "badge": "fresh",
+        "brand": "Soko Fresh",
+        "name": "Papai",
+        "english_name": "Papaya",
+        "category": "Matunda Mapya",
+        "subcategory": "Papaya",
+        "rating": {
+          "value": 4.4,
+          "count": 234
+        },
+        "price": {
+          "current": 70,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_013",
+        "image": "https://i.ibb.co/Hfy43qYG/pear.jpg",
+        "badge": null,
+        "brand": "Soko Fresh",
+        "name": "Pea",
+        "english_name": "Pear",
+        "category": "Matunda Mapya",
+        "subcategory": "Pear",
+        "rating": {
+          "value": 4.1,
+          "count": 98
+        },
+        "price": {
+          "current": 230,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_014",
+        "image": "https://i.ibb.co/v6r7pKwL/orange.jpg",
+        "badge": "fresh",
+        "brand": "Soko Fresh",
+        "name": "Chungwa",
+        "english_name": "Orange",
+        "category": "Matunda Mapya",
+        "subcategory": "Orange",
+        "rating": {
+          "value": 4.5,
+          "count": 456
+        },
+        "price": {
+          "current": 120,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_015",
+        "image": "https://i.ibb.co/fG4v9ryR/musk-melon.jpg",
+        "badge": null,
+        "brand": "Soko Fresh",
+        "name": "Tikiti ya Harufu",
+        "english_name": "Musk Melon",
+        "category": "Matunda Mapya",
+        "subcategory": "Musk Melon",
+        "rating": {
+          "value": 4.3,
+          "count": 167
+        },
+        "price": {
+          "current": 80,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_016",
+        "image": "https://i.ibb.co/Y4rL4sX4/Kiwi-fruit.jpg",
+        "badge": "premium",
+        "brand": "Soko Fresh",
+        "name": "Tunda la Kiwi",
+        "english_name": "Kiwi Fruit",
+        "category": "Matunda Mapya",
+        "subcategory": "Kiwi Fruit",
+        "rating": {
+          "value": 4.6,
+          "count": 213
+        },
+        "price": {
+          "current": 290,
+          "original": 350,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_017",
+        "image": "https://i.ibb.co/xn1Ch3W/apple.jpg",
+        "badge": "fresh",
+        "brand": "Soko Fresh",
+        "name": "Tofaa",
+        "english_name": "Apple",
+        "category": "Matunda Mapya",
+        "subcategory": "Apple",
+        "rating": {
+          "value": 4.4,
+          "count": 512
+        },
+        "price": {
+          "current": 240,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_f_018",
+        "image": "https://i.ibb.co/WNzCytbc/Avocado.jpg",
+        "badge": "healthy",
+        "brand": "Soko Fresh",
+        "name": "Avokado",
+        "english_name": "Avocado",
+        "category": "Matunda Mapya",
+        "subcategory": "Avocado",
+        "rating": {
+          "value": 4.7,
+          "count": 389
+        },
+        "price": {
+          "current": 100,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Afya"
+        ]
+      },
+      {
+        "id": "ke_f_019",
+        "image": "https://i.ibb.co/G34S6qvb/apricots.jpg",
+        "badge": null,
+        "brand": "Soko Fresh",
+        "name": "Aprikoti",
+        "english_name": "Apricots",
+        "category": "Matunda Mapya",
+        "subcategory": "Apricots",
+        "rating": {
+          "value": 4,
+          "count": 76
+        },
+        "price": {
+          "current": 250,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Matunda",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_001",
+        "image": "https://i.ibb.co/BHy4q3f5/mushroom.jpg",
+        "badge": "fresh",
+        "brand": "Shamba Fresh",
+        "name": "Uyoga",
+        "english_name": "Mushroom",
+        "category": "Mboga",
+        "subcategory": "Mushroom",
+        "rating": {
+          "value": 4.4,
+          "count": 198
+        },
+        "price": {
+          "current": 150,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_002",
+        "image": "https://i.ibb.co/FqCsxN76/carrot.jpg",
+        "badge": "fresh",
+        "brand": "Shamba Fresh",
+        "name": "Karoti",
+        "english_name": "Carrot",
+        "category": "Mboga",
+        "subcategory": "Carrot",
+        "rating": {
+          "value": 4.5,
+          "count": 345
+        },
+        "price": {
+          "current": 60,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_003",
+        "image": "https://i.ibb.co/ymSDyHq7/capsicum.jpg",
+        "badge": "fresh",
+        "brand": "Shamba Fresh",
+        "name": "Pilipili Hoho",
+        "english_name": "Capsicum",
+        "category": "Mboga",
+        "subcategory": "Capsicum",
+        "rating": {
+          "value": 4.3,
+          "count": 267
+        },
+        "price": {
+          "current": 80,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_004",
+        "image": "https://i.ibb.co/zWHhFHKB/bitter-gourd.jpg",
+        "badge": null,
+        "brand": "Shamba Fresh",
+        "name": "Karela (Boga Chungu)",
+        "english_name": "Bitter Gourd",
+        "category": "Mboga",
+        "subcategory": "Bitter Gourd",
+        "rating": {
+          "value": 4,
+          "count": 134
+        },
+        "price": {
+          "current": 55,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_005",
+        "image": "https://i.ibb.co/m3qGxrQ/amarnath-leaves.jpg",
+        "badge": "healthy",
+        "brand": "Shamba Fresh",
+        "name": "Mchicha wa Amaranth",
+        "english_name": "Amarnath Leaves",
+        "category": "Mboga",
+        "subcategory": "Amarnath Leaves",
+        "rating": {
+          "value": 4.3,
+          "count": 89
+        },
+        "price": {
+          "current": 40,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Afya"
+        ]
+      },
+      {
+        "id": "ke_v_006",
+        "image": "https://i.ibb.co/VWrM3Xyw/tomatoes.jpg",
+        "badge": "fresh",
+        "brand": "Shamba Fresh",
+        "name": "Nyanya",
+        "english_name": "Tomatoes",
+        "category": "Mboga",
+        "subcategory": "Tomatoes",
+        "rating": {
+          "value": 4.5,
+          "count": 512
+        },
+        "price": {
+          "current": 65,
+          "original": 85,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_007",
+        "image": "https://i.ibb.co/BKB8Vt8W/potato.jpg",
+        "badge": "bestseller",
+        "brand": "Shamba Fresh",
+        "name": "Viazi",
+        "english_name": "Potato",
+        "category": "Mboga",
+        "subcategory": "Potato",
+        "rating": {
+          "value": 4.4,
+          "count": 423
+        },
+        "price": {
+          "current": 70,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_008",
+        "image": "https://i.ibb.co/Hf1XKfjr/onions.jpg",
+        "badge": "bestseller",
+        "brand": "Shamba Fresh",
+        "name": "Vitunguu",
+        "english_name": "Onions",
+        "category": "Mboga",
+        "subcategory": "Onions",
+        "rating": {
+          "value": 4.3,
+          "count": 378
+        },
+        "price": {
+          "current": 80,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_009",
+        "image": "https://i.ibb.co/5X3sRhHC/brocoli.jpg",
+        "badge": "healthy",
+        "brand": "Shamba Fresh",
+        "name": "Brokoli",
+        "english_name": "Broccoli",
+        "category": "Mboga",
+        "subcategory": "Broccoli",
+        "rating": {
+          "value": 4.5,
+          "count": 234
+        },
+        "price": {
+          "current": 150,
+          "original": 190,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Afya"
+        ]
+      },
+      {
+        "id": "ke_v_010",
+        "image": "https://i.ibb.co/Crrg72b/cauliflower.jpg",
+        "badge": "fresh",
+        "brand": "Shamba Fresh",
+        "name": "Kolifulawa",
+        "english_name": "Cauliflower",
+        "category": "Mboga",
+        "subcategory": "Cauliflower",
+        "rating": {
+          "value": 4.2,
+          "count": 198
+        },
+        "price": {
+          "current": 100,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_011",
+        "image": "https://i.ibb.co/ccNtsBhR/baby-corn.jpg",
+        "badge": "new",
+        "brand": "Shamba Fresh",
+        "name": "Mahindi Madogo",
+        "english_name": "Baby Corn",
+        "category": "Mboga",
+        "subcategory": "Baby Corn",
+        "rating": {
+          "value": 4.4,
+          "count": 156
+        },
+        "price": {
+          "current": 140,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_012",
+        "image": "https://i.ibb.co/fGxBC68y/garlic.jpg",
+        "badge": null,
+        "brand": "Shamba Fresh",
+        "name": "Kitunguu Saumu",
+        "english_name": "Garlic",
+        "category": "Mboga",
+        "subcategory": "Garlic",
+        "rating": {
+          "value": 4.3,
+          "count": 289
+        },
+        "price": {
+          "current": 80,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_013",
+        "image": "https://i.ibb.co/wrJsW2Nx/spinach.jpg",
+        "badge": "healthy",
+        "brand": "Shamba Fresh",
+        "name": "Mchicha",
+        "english_name": "Spinach",
+        "category": "Mboga",
+        "subcategory": "Spinach",
+        "rating": {
+          "value": 4.4,
+          "count": 312
+        },
+        "price": {
+          "current": 45,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Afya"
+        ]
+      },
+      {
+        "id": "ke_v_014",
+        "image": "https://i.ibb.co/W40cg8Zn/raw-banana.jpg",
+        "badge": null,
+        "brand": "Shamba Fresh",
+        "name": "Ndizi Mbichi",
+        "english_name": "Raw Banana",
+        "category": "Mboga",
+        "subcategory": "Raw Banana",
+        "rating": {
+          "value": 4.1,
+          "count": 167
+        },
+        "price": {
+          "current": 80,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_015",
+        "image": "https://i.ibb.co/FQ9BvBt/lady-s-finger.jpg",
+        "badge": "fresh",
+        "brand": "Shamba Fresh",
+        "name": "Bamia",
+        "english_name": "Lady s Finger",
+        "category": "Mboga",
+        "subcategory": "Lady s Finger",
+        "rating": {
+          "value": 4.2,
+          "count": 198
+        },
+        "price": {
+          "current": 75,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_v_016",
+        "image": "https://i.ibb.co/xSh4Yk06/pumpkin-diced.jpg",
+        "badge": null,
+        "brand": "Shamba Fresh",
+        "name": "Boga (Liwa)",
+        "english_name": "Pumpkin Diced",
+        "category": "Mboga",
+        "subcategory": "Pumpkin Diced",
+        "rating": {
+          "value": 4.3,
+          "count": 145
+        },
+        "price": {
+          "current": 60,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mboga",
+          "Mbichi"
+        ]
+      },
+      {
+        "id": "ke_h_001",
+        "image": "https://i.ibb.co/YBW1SfFj/Dadacare-Cotton-Regular-Tampon-Green.avif",
+        "badge": "new",
+        "brand": "Dada Care",
+        "name": "Tampon za Dada Care (Kawaida)",
+        "english_name": "Dada Care 100% Cotton Tampons Regular",
+        "category": "Usafi wa Wanawake",
+        "subcategory": "Tampon",
+        "rating": {
+          "value": 4.8,
+          "count": 124
+        },
+        "price": {
+          "current": 450,
+          "original": 550,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Usafi",
+          "Wanawake",
+          "Tampon"
+        ]
+      },
+      {
+        "id": "ke_h_002",
+        "image": "https://i.ibb.co/xV7gRYt/Dadacare-Cotton-Superplus-Tampon-Premium.avif",
+        "badge": "premium",
+        "brand": "Dada Care",
+        "name": "Tampon za Dada Care (Ziada)",
+        "english_name": "Dada Care 100% Cotton Tampons Super Plus",
+        "category": "Usafi wa Wanawake",
+        "subcategory": "Tampon",
+        "rating": {
+          "value": 4.9,
+          "count": 89
+        },
+        "price": {
+          "current": 480,
+          "original": 580,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Usafi",
+          "Wanawake",
+          "Tampon",
+          "Premium"
+        ]
+      },
+      {
+        "id": "ke_h_003",
+        "image": "https://i.ibb.co/YF7SKSNw/Kotex-Woman-Tampons-Regular.avif",
+        "badge": "bestseller",
+        "brand": "Kotex",
+        "name": "Tampon za Kotex (Kawaida)",
+        "english_name": "Kotex Woman Tampons Regular",
+        "category": "Usafi wa Wanawake",
+        "subcategory": "Tampon",
+        "rating": {
+          "value": 4.7,
+          "count": 342
+        },
+        "price": {
+          "current": 420,
+          "original": 500,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Usafi",
+          "Wanawake",
+          "Kotex"
+        ]
+      },
+      {
+        "id": "ke_h_004",
+        "image": "https://i.ibb.co/tp876ss7/Kotex-Woman-Tampons-Super.avif",
+        "badge": null,
+        "brand": "Kotex",
+        "name": "Tampon za Kotex (Ziada)",
+        "english_name": "Kotex Woman Tampons Super",
+        "category": "Usafi wa Wanawake",
+        "subcategory": "Tampon",
+        "rating": {
+          "value": 4.8,
+          "count": 215
+        },
+        "price": {
+          "current": 440,
+          "original": 520,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Usafi",
+          "Wanawake",
+          "Kotex"
+        ]
+      },
+      {
+        "id": "ke_h_005",
+        "image": "https://i.ibb.co/4gX8PRRH/Beauty-Formulas-Feminine-Intimate-Hygiene-Wipes.avif",
+        "badge": "new",
+        "brand": "Beauty Formulas",
+        "name": "Karatasi za Usafi wa Kike (Beauty Formulas)",
+        "english_name": "Beauty Formulas Feminine Intimate Hygiene Wipes",
+        "category": "Usafi wa Wanawake",
+        "subcategory": "Karatasi za Usafi",
+        "rating": {
+          "value": 4.6,
+          "count": 156
+        },
+        "price": {
+          "current": 350,
+          "original": 420,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Usafi",
+          "Wanawake",
+          "Karatasi"
+        ]
+      },
+      {
+        "id": "ke_bo_001",
+        "image": "https://i.ibb.co/ns60Qnfg/L-Oreal-Paris-Elvive-Conditioner.avif",
+        "badge": "new",
+        "brand": "L'Oreal",
+        "name": "Kiyoyozi cha L'Oreal Paris Elvive",
+        "english_name": "L'Oreal Paris Elvive Conditioner",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Kiyoyozi",
+        "rating": {
+          "value": 4.7,
+          "count": 142
+        },
+        "price": {
+          "current": 850,
+          "original": 950,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Nywele",
+          "Kiyoyozi",
+          "L'Oreal"
+        ]
+      },
+      {
+        "id": "ke_bo_002",
+        "image": "https://i.ibb.co/wNq7sfJ1/ORS-Olive-Oil-Hold-And-Shine-Wrap-And-Set-Moussey-Hair.avif",
+        "badge": null,
+        "brand": "ORS",
+        "name": "Mousse ya ORS Olive Oil kwa Nywele",
+        "english_name": "ORS Olive Oil Wrap and Set Mousse",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Huduma ya Nywele",
+        "rating": {
+          "value": 4.5,
+          "count": 89
+        },
+        "price": {
+          "current": 1200,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Nywele",
+          "Mousse",
+          "Olive Oil"
+        ]
+      },
+      {
+        "id": "ke_bo_003",
+        "image": "https://i.ibb.co/WN3Hk4pz/C-O-N-Hair-Col-Burgundy-Blaze.avif",
+        "badge": "sale",
+        "brand": "C.O.N",
+        "name": "Rangi ya Nywele ya C.O.N (Burgundy)",
+        "english_name": "C.O.N Hair Color Burgundy Blaze",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Rangi ya Nywele",
+        "rating": {
+          "value": 4.4,
+          "count": 67
+        },
+        "price": {
+          "current": 950,
+          "original": 1100,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Nywele",
+          "Rangi",
+          "Burgundy"
+        ]
+      },
+      {
+        "id": "ke_bo_004",
+        "image": "https://i.ibb.co/n868Fkg1/Dettol-Bar-Soap-Original.avif",
+        "badge": "bestseller",
+        "brand": "Dettol",
+        "name": "Sabuni ya Dettol (Original)",
+        "english_name": "Dettol Bar Soap Original",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Sabuni",
+        "rating": {
+          "value": 4.8,
+          "count": 534
+        },
+        "price": {
+          "current": 120,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Sabuni",
+          "Usafi",
+          "Dettol"
+        ]
+      },
+      {
+        "id": "ke_bo_005",
+        "image": "https://i.ibb.co/XxWcQ0Jr/Dove-Bodywash-Deep-Nourish.avif",
+        "badge": "new",
+        "brand": "Dove",
+        "name": "Sabuni ya Maji ya Dove (Deep Nourish)",
+        "english_name": "Dove Bodywash Deep Nourish",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Sabuni ya Maji",
+        "rating": {
+          "value": 4.7,
+          "count": 213
+        },
+        "price": {
+          "current": 850,
+          "original": 1000,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Sabuni ya Maji",
+          "Dove",
+          "Mwili"
+        ]
+      },
+      {
+        "id": "ke_bo_006",
+        "image": "https://i.ibb.co/Lz3f29y3/Dove-Beauty-Cream-Bar.avif",
+        "badge": null,
+        "brand": "Dove",
+        "name": "Sabuni ya Dove Beauty Cream",
+        "english_name": "Dove Beauty Cream Bar",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Sabuni",
+        "rating": {
+          "value": 4.6,
+          "count": 421
+        },
+        "price": {
+          "current": 150,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Sabuni",
+          "Dove",
+          "Krimu"
+        ]
+      },
+      {
+        "id": "ke_bo_007",
+        "image": "https://i.ibb.co/RTkJJZfZ/Nivea-Repair-care-Body-Lotion.avif",
+        "badge": "healthy",
+        "brand": "Nivea",
+        "name": "Losheni ya Nivea Repair & Care",
+        "english_name": "Nivea Repair Care Body Lotion",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Losheni",
+        "rating": {
+          "value": 4.5,
+          "count": 189
+        },
+        "price": {
+          "current": 750,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Losheni",
+          "Nivea",
+          "Mwili"
+        ]
+      },
+      {
+        "id": "ke_bo_008",
+        "image": "https://i.ibb.co/N6JLRVs1/Garnier-Vitamin-C-Booster-Serum.avif",
+        "badge": "premium",
+        "brand": "Garnier",
+        "name": "Seramu ya Garnier Vitamin C",
+        "english_name": "Garnier Vitamin C Booster Serum",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Seramu",
+        "rating": {
+          "value": 4.9,
+          "count": 267
+        },
+        "price": {
+          "current": 1500,
+          "original": 1800,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Seramu",
+          "Garnier",
+          "Vitamini C"
+        ]
+      },
+      {
+        "id": "ke_bo_009",
+        "image": "https://i.ibb.co/xKJvpG4h/Vaseline-Cocoa-Butter-Glow-Body-Lotion.avif",
+        "badge": "bestseller",
+        "brand": "Vaseline",
+        "name": "Losheni ya Vaseline Cocoa Butter Glow",
+        "english_name": "Vaseline Cocoa Butter Glow Body Lotion",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Losheni",
+        "rating": {
+          "value": 4.6,
+          "count": 312
+        },
+        "price": {
+          "current": 650,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Losheni",
+          "Vaseline",
+          "Cocoa Butter"
+        ]
+      },
+      {
+        "id": "ke_bo_010",
+        "image": "https://i.ibb.co/xthxSJdP/Nice-Lovely-Jelly-in-Cream-Shea-Butter-Ultra-Moisturizin.avif",
+        "badge": null,
+        "brand": "Nice & Lovely",
+        "name": "Jelly ya Nice & Lovely Shea Butter",
+        "english_name": "Nice & Lovely Shea Butter Jelly in Cream",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Krimu",
+        "rating": {
+          "value": 4.4,
+          "count": 156
+        },
+        "price": {
+          "current": 450,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Krimu",
+          "Shea Butter",
+          "Nice & Lovely"
+        ]
+      },
+      {
+        "id": "ke_bo_011",
+        "image": "https://i.ibb.co/4w7vrKFv/Nice-And-Lovely-New-Flawless-Bio-Body-Oil.avif",
+        "badge": "new",
+        "brand": "Nice & Lovely",
+        "name": "Mafuta ya Mwili ya Nice & Lovely Bio Oil",
+        "english_name": "Nice & Lovely Flawless Bio Body Oil",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Mafuta ya Mwili",
+        "rating": {
+          "value": 4.5,
+          "count": 98
+        },
+        "price": {
+          "current": 850,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Mafuta",
+          "Bio Oil",
+          "Nice & Lovely"
+        ]
+      },
+      {
+        "id": "ke_bo_012",
+        "image": "https://i.ibb.co/LdZ5K3md/Vaseline-Cooling-Petroleum-Jelly.avif",
+        "badge": null,
+        "brand": "Vaseline",
+        "name": "Mafuta ya Mgando ya Vaseline (Cooling)",
+        "english_name": "Vaseline Cooling Petroleum Jelly",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Mafuta ya Mgando",
+        "rating": {
+          "value": 4.3,
+          "count": 167
+        },
+        "price": {
+          "current": 250,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Vaseline",
+          "Petroleum Jelly",
+          "Cooling"
+        ]
+      },
+      {
+        "id": "ke_bo_013",
+        "image": "https://i.ibb.co/M5nC9LJC/Vaseline-Cocoa-Butter-Petroleum-Jelly.avif",
+        "badge": "sale",
+        "brand": "Vaseline",
+        "name": "Mafuta ya Mgando ya Vaseline (Cocoa)",
+        "english_name": "Vaseline Cocoa Butter Petroleum Jelly",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Mafuta ya Mgando",
+        "rating": {
+          "value": 4.6,
+          "count": 213
+        },
+        "price": {
+          "current": 280,
+          "original": 350,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Vaseline",
+          "Petroleum Jelly",
+          "Cocoa"
+        ]
+      },
+      {
+        "id": "ke_bo_014",
+        "image": "https://i.ibb.co/cXbY5QDN/Vaseline-Original-Petroleum-Jelly.avif",
+        "badge": "bestseller",
+        "brand": "Vaseline",
+        "name": "Mafuta ya Mgando ya Vaseline (Asili)",
+        "english_name": "Vaseline Original Petroleum Jelly",
+        "category": "Huduma ya Mwili",
+        "subcategory": "Mafuta ya Mgando",
+        "rating": {
+          "value": 4.7,
+          "count": 456
+        },
+        "price": {
+          "current": 220,
+          "original": null,
+          "currency": "KES"
+        },
+        "cta": "Ongeza",
+        "tags": [
+          "Vaseline",
+          "Petroleum Jelly",
+          "Asili"
+        ]
+      }
+    ],
+    "deals_of_the_day": [
+      {
+        "id": "ke_b_002",
+        "image": "https://i.ibb.co/PGwJMn3K/bisconni-cocomo-biscuits.jpg",
+        "name": "Biskuti za Bisconni Cocomo",
+        "price": {
+          "current": 120,
+          "original": 150,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_bo_008",
+        "image": "https://i.ibb.co/N6JLRVs1/Garnier-Vitamin-C-Booster-Serum.avif",
+        "name": "Seramu ya Garnier Vitamin C",
+        "brand": "Garnier",
+        "rating": {
+          "value": 4.9,
+          "count": 267
+        },
+        "price": {
+          "current": 1500,
+          "original": 1800,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_bo_013",
+        "image": "https://i.ibb.co/M5nC9LJC/Vaseline-Cocoa-Butter-Petroleum-Jelly.avif",
+        "name": "Mafuta ya Mgando ya Vaseline (Cocoa)",
+        "brand": "Vaseline",
+        "rating": {
+          "value": 4.6,
+          "count": 213
+        },
+        "price": {
+          "current": 280,
+          "original": 350,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_b_009",
+        "image": "https://i.ibb.co/FbY3TLg0/Oreo-Biscuit.jpg",
+        "name": "Biskuti za Oreo",
+        "price": {
+          "current": 280,
+          "original": 350,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_d_001",
+        "image": "https://i.ibb.co/JR5PgTyk/Sting-Gold-Rush-Energy-Drink.jpg",
+        "name": "Kinywaji cha Nguvu Sting Gold",
+        "price": {
+          "current": 130,
+          "original": 160,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_d_004",
+        "image": "https://i.ibb.co/WWQfQPHb/Fanta-Orange-Pet.jpg",
+        "name": "Fanta ya Machungwa",
+        "price": {
+          "current": 85,
+          "original": 105,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_f_003",
+        "image": "https://i.ibb.co/JjhTVg3F/tota-puri-mango.jpg",
+        "name": "Embe la Tota Puri",
+        "price": {
+          "current": 100,
+          "original": 130,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_f_005",
+        "image": "https://i.ibb.co/YBFhNfFD/straw-berry.jpg",
+        "name": "Strawberi",
+        "price": {
+          "current": 180,
+          "original": 220,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_f_007",
+        "image": "https://i.ibb.co/Jwtt05VD/red-grapes.jpg",
+        "name": "Zabibu Nyekundu",
+        "price": {
+          "current": 220,
+          "original": 280,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_f_009",
+        "image": "https://i.ibb.co/ZprZg2f0/pomegranate.jpg",
+        "name": "Komamanga",
+        "price": {
+          "current": 160,
+          "original": 200,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_f_016",
+        "image": "https://i.ibb.co/Y4rL4sX4/Kiwi-fruit.jpg",
+        "name": "Tunda la Kiwi",
+        "price": {
+          "current": 290,
+          "original": 350,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_v_006",
+        "image": "https://i.ibb.co/VWrM3Xyw/tomatoes.jpg",
+        "name": "Nyanya",
+        "price": {
+          "current": 65,
+          "original": 85,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_v_009",
+        "image": "https://i.ibb.co/5X3sRhHC/brocoli.jpg",
+        "name": "Brokoli",
+        "price": {
+          "current": 150,
+          "original": 190,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_h_001",
+        "image": "https://i.ibb.co/YBW1SfFj/Dadacare-Cotton-Regular-Tampon-Green.avif",
+        "name": "Tampon za Dada Care (Kawaida)",
+        "price": {
+          "current": 450,
+          "original": 550,
+          "currency": "KES"
+        }
+      },
+      {
+        "id": "ke_h_005",
+        "image": "https://i.ibb.co/4gX8PRRH/Beauty-Formulas-Feminine-Intimate-Hygiene-Wipes.avif",
+        "name": "Karatasi za Usafi wa Kike (Beauty Formulas)",
+        "price": {
+          "current": 350,
+          "original": 420,
+          "currency": "KES"
+        }
+      }
+    ],
+    "categories": [
+      {
+        "name": "Biskuti na Kuki",
+        "icon": "🍪",
+        "slug": "biscuitsAndCookies"
+      },
+      {
+        "name": "Vinywaji Baridi",
+        "icon": "🥤",
+        "slug": "coolDrinks"
+      },
+      {
+        "name": "Bidhaa za Maziwa",
+        "icon": "🥛",
+        "slug": "dairyProducts"
+      },
+      {
+        "name": "Matunda Mapya",
+        "icon": "🍎",
+        "slug": "fruits"
+      },
+      {
+        "name": "Mboga",
+        "icon": "🥬",
+        "slug": "vegetables"
+      },
+      {
+        "name": "Chakula cha Haraka",
+        "icon": "⚡",
+        "slug": "instantFood"
+      },
+      {
+        "name": "Huduma ya Mtoto",
+        "icon": "👶",
+        "slug": "babyCare"
+      },
+      {
+        "name": "Huduma ya Mwili",
+        "icon": "🧴",
+        "slug": "bodyCare"
+      },
+      {
+        "name": "Usafi wa Wanawake",
+        "icon": "🌸",
+        "slug": "feminineHygiene"
+      }
+    ],
+    "product_tags": [
+      "Biskuti",
+      "Vitafunwa",
+      "Vinywaji",
+      "Baridi",
+      "Chokoleti",
+      "Krimu",
+      "Afya",
+      "Premium",
+      "Ofa",
+      "Mpya",
+      "Wanawake",
+      "Usafi",
+      "Mwili",
+      "Uzuri",
+      "Losheni",
+      "Sabuni"
+    ],
+    "sections": {
+      "top_selling": [
+        {
+          "id": "ke_v_006",
+          "image": "https://i.ibb.co/VWrM3Xyw/tomatoes.jpg",
+          "name": "Nyanya",
+          "brand": "Shamba Fresh",
+          "rating": {
+            "value": 4.5,
+            "count": 512
+          },
+          "price": {
+            "current": 65,
+            "original": 85,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_f_017",
+          "image": "https://i.ibb.co/xn1Ch3W/apple.jpg",
+          "name": "Tofaa",
+          "brand": "Soko Fresh",
+          "rating": {
+            "value": 4.4,
+            "count": 512
+          },
+          "price": {
+            "current": 240,
+            "original": null,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_b_009",
+          "image": "https://i.ibb.co/FbY3TLg0/Oreo-Biscuit.jpg",
+          "name": "Biskuti za Oreo",
+          "brand": "Nabisco",
+          "rating": {
+            "value": 4.7,
+            "count": 623
+          },
+          "price": {
+            "current": 280,
+            "original": 350,
+            "currency": "KES"
+          }
+        }
+      ],
+      "trending": [
+        {
+          "id": "ke_f_018",
+          "image": "https://i.ibb.co/WNzCytbc/Avocado.jpg",
+          "name": "Avokado",
+          "brand": "Soko Fresh",
+          "rating": {
+            "value": 4.7,
+            "count": 389
+          },
+          "price": {
+            "current": 100,
+            "original": null,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_b_003",
+          "image": "https://i.ibb.co/jZ6QvD3J/Bisconni-Cocomo-Chocolate-Filled-Biscuits.jpg",
+          "name": "Biskuti za Bisconni Cocomo na Chokoleti",
+          "brand": "Bisconni",
+          "rating": {
+            "value": 4.6,
+            "count": 203
+          },
+          "price": {
+            "current": 140,
+            "original": 180,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_b_004",
+          "image": "https://i.ibb.co/8L0b9PP9/Lotus-Biscoff-Caramel-Biscuits.jpg",
+          "name": "Biskuti za Lotus Biscoff Karameli",
+          "brand": "Lotus",
+          "rating": {
+            "value": 4.8,
+            "count": 156
+          },
+          "price": {
+            "current": 480,
+            "original": null,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_h_002",
+          "image": "https://i.ibb.co/xV7gRYt/Dadacare-Cotton-Superplus-Tampon-Premium.avif",
+          "name": "Tampon za Dada Care (Ziada)",
+          "brand": "Dada Care",
+          "rating": {
+            "value": 4.9,
+            "count": 89
+          },
+          "price": {
+            "current": 480,
+            "original": 580,
+            "currency": "KES"
+          }
+        }
+      ],
+      "recently_added": [
+        {
+          "id": "ke_v_011",
+          "image": "https://i.ibb.co/ccNtsBhR/baby-corn.jpg",
+          "name": "Mahindi Madogo",
+          "brand": "Shamba Fresh",
+          "rating": {
+            "value": 4.4,
+            "count": 156
+          },
+          "price": {
+            "current": 140,
+            "original": null,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_f_016",
+          "image": "https://i.ibb.co/Y4rL4sX4/Kiwi-fruit.jpg",
+          "name": "Tunda la Kiwi",
+          "brand": "Soko Fresh",
+          "rating": {
+            "value": 4.6,
+            "count": 213
+          },
+          "price": {
+            "current": 290,
+            "original": 350,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_b_011",
+          "image": "https://i.ibb.co/LWGtg8C/Nu-Vita-Digestive-Biscuits.jpg",
+          "name": "Biskuti za Nu Vita Digestive",
+          "brand": "Nu Vita",
+          "rating": {
+            "value": 4.4,
+            "count": 234
+          },
+          "price": {
+            "current": 115,
+            "original": null,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_h_001",
+          "image": "https://i.ibb.co/YBW1SfFj/Dadacare-Cotton-Regular-Tampon-Green.avif",
+          "name": "Tampon za Dada Care (Kawaida)",
+          "brand": "Dada Care",
+          "rating": {
+            "value": 4.8,
+            "count": 124
+          },
+          "price": {
+            "current": 450,
+            "original": 550,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_h_005",
+          "image": "https://i.ibb.co/4gX8PRRH/Beauty-Formulas-Feminine-Intimate-Hygiene-Wipes.avif",
+          "name": "Karatasi za Usafi wa Kike (Beauty Formulas)",
+          "brand": "Beauty Formulas",
+          "rating": {
+            "value": 4.6,
+            "count": 156
+          },
+          "price": {
+            "current": 350,
+            "original": 420,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_bo_008",
+          "image": "https://i.ibb.co/N6JLRVs1/Garnier-Vitamin-C-Booster-Serum.avif",
+          "name": "Seramu ya Garnier Vitamin C",
+          "brand": "Garnier",
+          "rating": {
+            "value": 4.9,
+            "count": 267
+          },
+          "price": {
+            "current": 1500,
+            "original": 1800,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_bo_011",
+          "image": "https://i.ibb.co/4w7vrKFv/Nice-And-Lovely-New-Flawless-Bio-Body-Oil.avif",
+          "name": "Mafuta ya Mwili ya Nice & Lovely Bio Oil",
+          "brand": "Nice & Lovely",
+          "rating": {
+            "value": 4.5,
+            "count": 98
+          },
+          "price": {
+            "current": 850,
+            "original": null,
+            "currency": "KES"
+          }
+        }
+      ],
+      "top_rated": [
+        {
+          "id": "ke_f_018",
+          "image": "https://i.ibb.co/WNzCytbc/Avocado.jpg",
+          "name": "Avokado",
+          "brand": "Soko Fresh",
+          "rating": {
+            "value": 4.7,
+            "count": 389
+          },
+          "price": {
+            "current": 100,
+            "original": null,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_b_004",
+          "image": "https://i.ibb.co/8L0b9PP9/Lotus-Biscoff-Caramel-Biscuits.jpg",
+          "name": "Biskuti za Lotus Biscoff Karameli",
+          "brand": "Lotus",
+          "rating": {
+            "value": 4.8,
+            "count": 156
+          },
+          "price": {
+            "current": 480,
+            "original": null,
+            "currency": "KES"
+          }
+        },
+        {
+          "id": "ke_d_003",
+          "image": "https://i.ibb.co/R4HjG6hn/Coca-Cola-Pet.jpg",
+          "name": "Coca Cola",
+          "brand": "Coca-Cola",
+          "rating": {
+            "value": 4.7,
+            "count": 854
+          },
+          "price": {
+            "current": 90,
+            "original": null,
+            "currency": "KES"
+          }
+        }
+      ]
+    }
+  }
+}

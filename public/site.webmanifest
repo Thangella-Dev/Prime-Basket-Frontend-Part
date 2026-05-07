@@ -1,0 +1,23 @@
+{
+  "name": "Prime Basket",
+  "short_name": "Prime Basket",
+  "description": "Prime Basket grocery storefront for fresh produce, pantry essentials, dairy, beverages, and everyday shopping.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f8fc",
+  "theme_color": "#1f5ca1",
+  "icons": [
+    {
+      "src": "/assets/logo%20watermark%203.png",
+      "sizes": "2048x2048",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/logo%20watermark%203.png",
+      "sizes": "2048x2048",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "header": {
+    "browse": "Angalia Kategoria Zote",
+    "notifications": "Arifa",
+    "wishlist": "Orodha ya Matakwa",
+    "basket": "Kikapu",
+    "login": "Ingia",
+    "account": "Akaunti",
+    "language": "Lugha"
+  },
+  "home": {
+    "popular": "Bidhaa Maarufu",
+    "deals": "Ofa za Leo",
+    "allDeals": "Ofa Zote",
+    "shopByCategory": "Nunua kwa Aina",
+    "allCategories": "Kategoria Zote",
+    "shopNow": "Nunua sasa",
+    "topSelling": "Zinazoibwa Zaidi",
+    "trending": "Zinazopendwa",
+    "recentlyAdded": "Zilizoongezwa Hivi Karibuni",
+    "topRated": "Zilizopata Alama Juu",
+    "noProducts": "Hakuna bidhaa zilizopatikana.",
+    "add": "Ongeza",
+    "added": "Imeongezwa",
+    "category": "Aina",
+    "productTags": "Vitambulisho vya Bidhaa",
+    "stayHome": "Kaa nyumbani na upate mahitaji yako ya kila siku kutoka kwenye duka letu",
+    "startShopping": "Anza Ununuzi Wako wa Kila Siku na",
+    "subscribe": "Jiandikishe",
+    "emailPlaceholder": "Anwani yako ya barua pepe"
+  },
+  "categories": {
+    "freshFruits": "Matunda Mapya",
+    "vegetables": "Mboga",
+    "dairyProducts": "Bidhaa za Maziwa",
+    "chipsNamkeens": "Chips na Vitafunwa",
+    "coolDrinks": "Vinywaji Baridi",
+    "instantFood": "Chakula cha Haraka",
+    "babyCare": "Huduma ya Mtoto",
+    "bodyCare": "Huduma ya Mwili",
+    "milksDairies": "Maziwa na Bidhaa",
+    "biscuitsCookies": "Biskuti na Kuki"
+  },
+  "features": {
+    "bestPrices": "Bei bora na ofa",
+    "bestPricesSub": "Maagizo ya zaidi ya 5,000",
+    "freeDelivery": "Utoaji wa bure",
+    "freeDeliverySub": "Huduma 24/7",
+    "greatDeal": "Ofa nzuri ya kila siku",
+    "greatDealSub": "Unapojiandikisha",
+    "wideAssortment": "Uchaguzi mpana",
+    "wideAssortmentSub": "Punguzo Kubwa",
+    "easyReturns": "Urejeshaji rahisi",
+    "easyReturnsSub": "Ndani ya siku 30"
+  }
+}
