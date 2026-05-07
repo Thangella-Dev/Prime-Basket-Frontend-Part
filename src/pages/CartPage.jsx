@@ -502,10 +502,10 @@ export default function CartPage({
         }
         .cart-item-row {
           display: grid;
-          grid-template-columns: 70px minmax(0, 1fr) auto;
-          gap: 12px;
-          align-items: start;
-          padding: 14px 16px;
+          grid-template-columns: 96px minmax(0, 1fr) 146px;
+          gap: 18px;
+          align-items: center;
+          padding: 18px 20px;
           border-top: 1px solid rgba(148,163,184,0.1);
           transition: background 0.22s ease;
         }
@@ -513,15 +513,15 @@ export default function CartPage({
           background: rgba(15,91,215,0.03);
         }
         .cart-item-thumb {
-          width: 70px;
-          height: 70px;
-          border-radius: 14px;
+          width: 96px;
+          height: 96px;
+          border-radius: 20px;
           border: 1px solid rgba(148,163,184,0.12);
           background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,250,255,0.98));
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 7px;
+          padding: 10px;
           cursor: pointer;
           box-shadow: 0 14px 24px rgba(15,23,42,0.05);
           transition: transform 0.22s ease, box-shadow 0.22s ease;
@@ -542,34 +542,40 @@ export default function CartPage({
           color: #1d5ba0;
           text-transform: uppercase;
           letter-spacing: 0.06em;
-          font-size: 0.58rem;
+          font-size: 0.62rem;
           font-weight: 800;
         }
         .cart-item-name {
-          margin-top: 4px;
+          margin-top: 6px;
           color: var(--navy);
-          font-size: 0.88rem;
+          font-size: 1rem;
           font-weight: 800;
-          line-height: 1.24;
+          line-height: 1.26;
           cursor: pointer;
         }
+        .cart-item-subline {
+          margin-top: 8px;
+          color: var(--body);
+          font-size: 0.94rem;
+          line-height: 1.35;
+        }
         .cart-item-badges {
-          margin-top: 7px;
+          margin-top: 10px;
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
           flex-wrap: wrap;
         }
         .cart-item-chip {
           display: inline-flex;
           align-items: center;
-          min-height: 22px;
-          padding: 0 8px;
+          min-height: 24px;
+          padding: 0 9px;
           border-radius: 999px;
           background: rgba(15,91,215,0.08);
           border: 1px solid rgba(15,91,215,0.12);
           color: #1d5ba0;
-          font-size: 0.66rem;
+          font-size: 0.7rem;
           font-weight: 800;
           letter-spacing: 0.01em;
         }
@@ -583,14 +589,14 @@ export default function CartPage({
           border-color: rgba(22,163,74,0.18);
           color: #15803d;
         }
+        .cart-item-badges .cart-item-chip:not(.save) {
+          display: none;
+        }
         .cart-item-meta {
-          margin-top: 7px;
-          color: var(--body);
-          font-size: 0.76rem;
-          line-height: 1.4;
+          display: none;
         }
         .cart-item-actions {
-          margin-top: 8px;
+          margin-top: 10px;
           display: flex;
           align-items: center;
           gap: 12px;
@@ -603,27 +609,28 @@ export default function CartPage({
           color: var(--body);
           padding: 0;
           font-family: inherit;
-          font-size: 0.8rem;
+          font-size: 0.86rem;
           cursor: pointer;
         }
         .cart-item-side {
           display: flex;
           flex-direction: column;
           align-items: flex-end;
-          gap: 8px;
-          min-width: 106px;
+          gap: 10px;
+          min-width: 146px;
+          justify-content: center;
         }
         .cart-qty-pill {
           display: inline-flex;
           align-items: center;
           justify-content: space-between;
-          gap: 8px;
-          min-width: 104px;
-          height: 38px;
-          border-radius: 14px;
+          gap: 10px;
+          min-width: 138px;
+          height: 48px;
+          border-radius: 16px;
           background: linear-gradient(180deg, #1d5ba0 0%, #174a84 100%);
           color: #fff;
-          padding: 0 10px;
+          padding: 0 12px;
           box-shadow: 0 14px 28px rgba(29,91,160,0.22);
           transition: transform 0.22s ease, box-shadow 0.22s ease;
         }
@@ -632,12 +639,13 @@ export default function CartPage({
           box-shadow: 0 18px 34px rgba(29,91,160,0.28);
         }
         .cart-qty-pill button {
-          width: 22px;
-          height: 22px;
+          width: 28px;
+          height: 28px;
           border: none;
           background: transparent;
           color: #fff;
-          font-size: 1rem;
+          font-size: 1.5rem;
+          font-weight: 700;
           line-height: 1;
           cursor: pointer;
           display: inline-flex;
@@ -645,29 +653,30 @@ export default function CartPage({
           justify-content: center;
         }
         .cart-qty-pill span {
-          font-size: 0.82rem;
+          font-size: 1rem;
           font-weight: 800;
         }
         .cart-price-block {
           text-align: right;
-          line-height: 1.3;
+          line-height: 1.2;
         }
         .cart-price-block small {
           display: block;
           color: var(--body);
-          font-size: 0.66rem;
-          margin-bottom: 3px;
+          font-size: 0.76rem;
+          margin-bottom: 5px;
         }
         .cart-price-block strong {
           color: var(--navy);
-          font-size: 0.92rem;
+          font-size: 1.12rem;
           font-weight: 800;
         }
         .cart-price-block span {
           display: block;
           color: var(--body);
           text-decoration: line-through;
-          font-size: 0.68rem;
+          font-size: 0.9rem;
+          margin-bottom: 2px;
         }
         .cart-empty {
           padding: 60px 24px;
@@ -1171,25 +1180,29 @@ export default function CartPage({
             height: 62px;
           }
           .cart-item-row {
-            grid-template-columns: 68px minmax(0,1fr);
-            gap: 10px;
+            grid-template-columns: 76px minmax(0,1fr);
+            gap: 12px;
             padding: 14px 16px;
           }
           .cart-item-thumb {
-            width: 68px;
-            height: 68px;
-            border-radius: 14px;
-            padding: 7px;
+            width: 76px;
+            height: 76px;
+            border-radius: 16px;
+            padding: 8px;
           }
           .cart-item-brand {
-            font-size: 0.58rem;
+            font-size: 0.56rem;
           }
           .cart-item-name {
             margin-top: 4px;
-            font-size: 0.9rem;
+            font-size: 0.94rem;
+          }
+          .cart-item-subline {
+            margin-top: 6px;
+            font-size: 0.82rem;
           }
           .cart-item-badges {
-            margin-top: 7px;
+            margin-top: 8px;
             gap: 6px;
           }
           .cart-item-chip {
@@ -1197,9 +1210,8 @@ export default function CartPage({
             padding: 0 8px;
             font-size: 0.66rem;
           }
-          .cart-item-meta,
           .cart-item-link {
-            font-size: 0.76rem;
+            font-size: 0.8rem;
           }
           .cart-item-actions {
             margin-top: 8px;
@@ -1213,26 +1225,26 @@ export default function CartPage({
             min-width: 0;
           }
           .cart-qty-pill {
-            min-width: 102px;
-            height: 40px;
+            min-width: 118px;
+            height: 42px;
             border-radius: 12px;
             gap: 6px;
             padding: 0 8px;
           }
           .cart-qty-pill button {
-            width: 20px;
-            height: 20px;
-            font-size: 1rem;
+            width: 24px;
+            height: 24px;
+            font-size: 1.35rem;
           }
           .cart-qty-pill span {
-            font-size: 0.86rem;
+            font-size: 0.92rem;
           }
           .cart-price-block strong {
-            font-size: 0.92rem;
+            font-size: 1rem;
           }
           .cart-price-block small,
           .cart-price-block span {
-            font-size: 0.72rem;
+            font-size: 0.74rem;
           }
           .cart-address-body {
             padding: 0 16px 16px;
@@ -1254,9 +1266,10 @@ export default function CartPage({
             grid-template-columns: 1fr;
           }
           .cart-item-side {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 10px;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
           }
           .cart-price-block {
             text-align: left;
@@ -1361,6 +1374,7 @@ export default function CartPage({
                       const lineTotal = unitPrice * item.quantity;
                       const lineSavings = oldUnitPrice > unitPrice ? (oldUnitPrice - unitPrice) * item.quantity : 0;
                       const translatedName = getTranslatedName(item.name);
+                      const unitLabel = item.selectedUnit || item.standard || item.unit || "1 unit";
 
                       return (
                         <article key={`${item._uid}_${item.selectedUnit || "default"}`} className="cart-item-row">
@@ -1373,6 +1387,7 @@ export default function CartPage({
                             <div className="cart-item-name" onClick={() => onOpenProduct?.(item)}>
                               {translatedName}
                             </div>
+                            <div className="cart-item-subline">{unitLabel}</div>
                             <div className="cart-item-badges">
                               {item.selectedUnit ? <span className="cart-item-chip">{item.selectedUnit}</span> : null}
                               <span className="cart-item-chip subtle">{item.quantity} {item.quantity === 1 ? "item" : "items"}</span>
