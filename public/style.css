@@ -3212,6 +3212,7 @@ body[data-theme="light"] .nav-search-row {
   .nav-inner {
     min-height: 64px;
     padding: 0 16px;
+    gap: 8px;
   }
 
   .nav-left {
@@ -3222,39 +3223,37 @@ body[data-theme="light"] .nav-search-row {
   .brand-link {
     flex: 1 1 auto;
     min-width: 0;
-    max-width: 100%;
-    gap: 8px;
+    max-width: calc(100vw - 196px);
+    gap: 6px;
   }
 
   .logo-icon {
-    width: 52px;
-    height: 52px;
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
   }
 
   .logo-text {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    display: block;
     overflow: hidden;
-    text-overflow: clip;
-    white-space: normal;
-    max-width: 9.8ch;
-    font-size: 1rem;
-    letter-spacing: 0.02em;
-    line-height: 0.92;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    font-size: 0.84rem;
+    letter-spacing: 0.01em;
+    line-height: 1;
   }
 
   .mobile-header-actions {
-    gap: 6px;
+    gap: 4px;
     flex-shrink: 0;
   }
 
   .mobile-header-icon-btn,
   .mobile-search-launch {
-    width: 42px;
-    height: 42px;
-    border-radius: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 15px;
   }
 
   .mobile-header-icon-btn::before,
@@ -3490,33 +3489,33 @@ body[data-theme="light"] .nav-search-row {
 
   .brand-link {
     min-width: 0;
-    max-width: 100%;
+    max-width: calc(100vw - 168px);
     gap: 6px;
     padding: 4px 2px 4px 0;
   }
 
   .logo-icon {
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     flex-shrink: 0;
   }
 
   .logo-text {
-    max-width: 9.4ch;
-    font-size: 0.8rem;
-    letter-spacing: 0.015em;
-    line-height: 0.9;
+    max-width: 100%;
+    font-size: 0.72rem;
+    letter-spacing: 0.01em;
+    line-height: 1;
   }
 
   .mobile-header-actions {
-    gap: 4px;
+    gap: 3px;
   }
 
   .mobile-header-icon-btn,
   .mobile-search-launch,
   .hamburger {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
   }
 
   .mobile-header-icon-btn i,
