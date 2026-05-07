@@ -8,7 +8,14 @@ This folder contains the main handoff, architecture, backend, and improvement re
 
 Hi [Manager Name],
 
-Today's Prime Basket frontend work focused on deployment safety, mobile polish, product-unit clarity, SEO readiness, and final UX cleanup.
+Please find today's Prime Basket frontend update below.
+
+Project links:
+
+- GitHub: https://github.com/Thangella-Dev/Prime-Basket-Frontend-Part.git
+- Vercel: https://prime-basket-prb.vercel.app/
+
+Today's Prime Basket frontend work focused on deployment safety, mobile polish, product-unit clarity, SEO readiness, documentation readiness, and final UX cleanup.
 
 Completed today:
 
@@ -20,7 +27,9 @@ Completed today:
 6. Added a more production-ready SEO setup in `index.html`, including stronger title/description metadata, Open Graph/Twitter tags, canonical URL, and JSON-LD structured data.
 7. Added crawler and AI discovery files including `robots.txt`, `sitemap.xml`, `llms.txt`, `llm.txt`, `geo.txt`, and `browserconfig.xml`.
 8. Standardized favicon, Apple touch icon, Android web-app icon, and browser tile icon references for more reliable production branding.
-9. Verified the application still builds successfully after these updates.
+9. Updated documentation so the root README and manager mail reflect the latest deployment, SEO, UI, and reliability work.
+10. Replaced the previous Vercel deployment URL references with the latest live deployment URL across production metadata and crawler files.
+11. Verified the application still builds successfully after these updates.
 
 Current status:
 
@@ -28,6 +37,7 @@ Current status:
 - Mobile navigation and floating utility controls feel cleaner.
 - Product quantities and units are more trustworthy from a shopping UX perspective.
 - SEO, crawler, and browser identity setup is much closer to production-ready.
+- Documentation and manager handoff links now point to the current repository and deployment.
 - Build verification is passing.
 
 Recommended next steps:
