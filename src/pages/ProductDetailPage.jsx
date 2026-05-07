@@ -1,6 +1,6 @@
 // src/pages/ProductDetailPage.jsx
 import { useState, useEffect, useMemo } from "react";
-import { database } from "../firebase";
+import { database, hasFirebaseConfig } from "../firebase";
 import { ref, get } from "firebase/database";
 import { useT } from "../i18n/translations";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
@@ -115,11 +115,21 @@ export default function ProductDetailPage({
   useEffect(() => {
     setLoadingSimilar(true);
     const relCats = RELATED[product._cat] || ["fruits", "vegetables", "dairyProducts"];
+    const fallbackRelated = () => {
+      const allRelated = KENYA_ALL_PRODUCTS
+        .filter((p) => relCats.includes(p._cat) && p._uid !== product._uid)
+        .slice(0, 10);
+      setSimilar(allRelated.map((p) => enhanceProduct(p, region)));
+      setLoadingSimilar(false);
+    };
 
     if (region === "ke") {
-      const allRelated = KENYA_ALL_PRODUCTS.filter(p => relCats.includes(p._cat)).slice(0, 10);
-      setSimilar(allRelated.map(p => enhanceProduct(p, region)));
-      setLoadingSimilar(false);
+      fallbackRelated();
+      return;
+    }
+
+    if (!hasFirebaseConfig || !database) {
+      fallbackRelated();
       return;
     }
 
@@ -133,11 +143,19 @@ export default function ProductDetailPage({
           }));
         })
       )
-    ).then((res) => { 
-      const flattened = res.flat().slice(0, 10);
-      setSimilar(flattened.map(p => enhanceProduct(p, region)));
-      setLoadingSimilar(false); 
-    });
+    )
+      .then((res) => { 
+        const flattened = res.flat().slice(0, 10);
+        if (!flattened.length) {
+          fallbackRelated();
+          return;
+        }
+        setSimilar(flattened.map(p => enhanceProduct(p, region)));
+        setLoadingSimilar(false); 
+      })
+      .catch(() => {
+        fallbackRelated();
+      });
   }, [product._uid, region]);
 
   const handleShare = async () => {
