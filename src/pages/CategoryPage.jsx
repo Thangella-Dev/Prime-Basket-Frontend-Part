@@ -1373,28 +1373,17 @@ export default function CategoryPage({
                       <div className={`pstock ${stockInfo.klass}`}>{stockInfo.text}</div>
                       <div className="p-action-row" onClick={(e) => e.stopPropagation()}>
                         {qty > 0 ? (
-                          <div className="qty-control" style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            background: "var(--green)",
-                            borderRadius: "8px",
-                            padding: "4px 8px",
-                            marginTop: "8px",
-                            height: "38px",
-                            color: "white",
-                            fontWeight: 700
-                          }}>
+                          <div className="qty-control catalog-qty-control">
                             <button
+                              className="qty-control-btn"
                               onClick={() => onDecreaseCart && onDecreaseCart(item._uid)}
-                              style={{ background: "transparent", border: "none", color: "white", fontSize: "18px", cursor: "pointer", width: "30px" }}
                             >
                               -
                             </button>
-                            <span style={{ fontSize: "14px" }}>{qty}</span>
+                            <span className="qty-control-value">{qty}</span>
                             <button
+                              className="qty-control-btn"
                               onClick={() => onAddCart && onAddCart(item)}
-                              style={{ background: "transparent", border: "none", color: "white", fontSize: "18px", cursor: "pointer", width: "30px" }}
                             >
                               +
                             </button>

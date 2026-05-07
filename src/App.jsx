@@ -649,7 +649,7 @@ export default function App() {
           onRemove={removeFromCart}
           onOpenProduct={openProduct}
           onContinueShopping={goHome}
-          onGoAccount={() => { if (isAuthenticated) setPage("account"); else setIsLoginModalOpen(true); }}
+          onGoAccount={() => { if (isAuthenticated) { setAccountSection("profile"); setPage("account"); } else setIsLoginModalOpen(true); }}
           onCheckout={goCheckout}
           onAddCart={addToCart}
           language={language}
@@ -848,7 +848,7 @@ export default function App() {
         currentPage={page}
         cartCount={cartCount}
         wishlistCount={wishlistCount}
-        onAccountClick={() => { if (isAuthenticated) setPage("account"); else setIsLoginModalOpen(true); }}
+        onAccountClick={() => { if (isAuthenticated) { setAccountSection("profile"); setPage("account"); } else setIsLoginModalOpen(true); }}
         onCartClick={goCart}
         onWishlistClick={goWishlist}
         isLoggedIn={isAuthenticated}

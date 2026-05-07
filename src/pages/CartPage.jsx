@@ -502,10 +502,10 @@ export default function CartPage({
         }
         .cart-item-row {
           display: grid;
-          grid-template-columns: 80px minmax(0, 1fr) auto;
-          gap: 14px;
+          grid-template-columns: 70px minmax(0, 1fr) auto;
+          gap: 12px;
           align-items: start;
-          padding: 16px 18px;
+          padding: 14px 16px;
           border-top: 1px solid rgba(148,163,184,0.1);
           transition: background 0.22s ease;
         }
@@ -513,15 +513,15 @@ export default function CartPage({
           background: rgba(15,91,215,0.03);
         }
         .cart-item-thumb {
-          width: 80px;
-          height: 80px;
-          border-radius: 16px;
+          width: 70px;
+          height: 70px;
+          border-radius: 14px;
           border: 1px solid rgba(148,163,184,0.12);
           background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,250,255,0.98));
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 8px;
+          padding: 7px;
           cursor: pointer;
           box-shadow: 0 14px 24px rgba(15,23,42,0.05);
           transition: transform 0.22s ease, box-shadow 0.22s ease;
@@ -542,34 +542,34 @@ export default function CartPage({
           color: #1d5ba0;
           text-transform: uppercase;
           letter-spacing: 0.06em;
-          font-size: 0.64rem;
+          font-size: 0.58rem;
           font-weight: 800;
         }
         .cart-item-name {
           margin-top: 4px;
           color: var(--navy);
-          font-size: 0.96rem;
+          font-size: 0.88rem;
           font-weight: 800;
-          line-height: 1.28;
+          line-height: 1.24;
           cursor: pointer;
         }
         .cart-item-badges {
-          margin-top: 8px;
+          margin-top: 7px;
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           flex-wrap: wrap;
         }
         .cart-item-chip {
           display: inline-flex;
           align-items: center;
-          min-height: 24px;
-          padding: 0 10px;
+          min-height: 22px;
+          padding: 0 8px;
           border-radius: 999px;
           background: rgba(15,91,215,0.08);
           border: 1px solid rgba(15,91,215,0.12);
           color: #1d5ba0;
-          font-size: 0.72rem;
+          font-size: 0.66rem;
           font-weight: 800;
           letter-spacing: 0.01em;
         }
@@ -584,16 +584,16 @@ export default function CartPage({
           color: #15803d;
         }
         .cart-item-meta {
-          margin-top: 8px;
+          margin-top: 7px;
           color: var(--body);
-          font-size: 0.82rem;
-          line-height: 1.45;
+          font-size: 0.76rem;
+          line-height: 1.4;
         }
         .cart-item-actions {
-          margin-top: 10px;
+          margin-top: 8px;
           display: flex;
           align-items: center;
-          gap: 14px;
+          gap: 12px;
           flex-wrap: wrap;
         }
         .cart-item-link {
@@ -603,27 +603,27 @@ export default function CartPage({
           color: var(--body);
           padding: 0;
           font-family: inherit;
-          font-size: 0.88rem;
+          font-size: 0.8rem;
           cursor: pointer;
         }
         .cart-item-side {
           display: flex;
           flex-direction: column;
           align-items: flex-end;
-          gap: 10px;
-          min-width: 124px;
+          gap: 8px;
+          min-width: 106px;
         }
         .cart-qty-pill {
           display: inline-flex;
           align-items: center;
           justify-content: space-between;
-          gap: 10px;
-          min-width: 120px;
-          height: 46px;
-          border-radius: 16px;
+          gap: 8px;
+          min-width: 104px;
+          height: 38px;
+          border-radius: 14px;
           background: linear-gradient(180deg, #1d5ba0 0%, #174a84 100%);
           color: #fff;
-          padding: 0 12px;
+          padding: 0 10px;
           box-shadow: 0 14px 28px rgba(29,91,160,0.22);
           transition: transform 0.22s ease, box-shadow 0.22s ease;
         }
@@ -632,12 +632,12 @@ export default function CartPage({
           box-shadow: 0 18px 34px rgba(29,91,160,0.28);
         }
         .cart-qty-pill button {
-          width: 24px;
-          height: 24px;
+          width: 22px;
+          height: 22px;
           border: none;
           background: transparent;
           color: #fff;
-          font-size: 1.2rem;
+          font-size: 1rem;
           line-height: 1;
           cursor: pointer;
           display: inline-flex;
@@ -645,7 +645,7 @@ export default function CartPage({
           justify-content: center;
         }
         .cart-qty-pill span {
-          font-size: 0.94rem;
+          font-size: 0.82rem;
           font-weight: 800;
         }
         .cart-price-block {
@@ -655,19 +655,19 @@ export default function CartPage({
         .cart-price-block small {
           display: block;
           color: var(--body);
-          font-size: 0.74rem;
+          font-size: 0.66rem;
           margin-bottom: 3px;
         }
         .cart-price-block strong {
           color: var(--navy);
-          font-size: 1rem;
+          font-size: 0.92rem;
           font-weight: 800;
         }
         .cart-price-block span {
           display: block;
           color: var(--body);
           text-decoration: line-through;
-          font-size: 0.76rem;
+          font-size: 0.68rem;
         }
         .cart-empty {
           padding: 60px 24px;
@@ -911,14 +911,14 @@ export default function CartPage({
         .cart-rec-grid {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 14px;
-          padding: 0 24px 24px;
+          gap: 12px;
+          padding: 0 20px 20px;
         }
         .cart-rec-card {
-          border-radius: 20px;
+          border-radius: 18px;
           border: 1px solid rgba(148,163,184,0.14);
           background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,251,255,0.98));
-          padding: 14px;
+          padding: 12px;
           cursor: pointer;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -928,13 +928,14 @@ export default function CartPage({
         }
         .cart-rec-thumb {
           position: relative;
-          height: 132px;
-          border-radius: 18px;
+          aspect-ratio: 1 / 1;
+          height: auto;
+          border-radius: 16px;
           background: #f7fbff;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 14px;
+          padding: 12px;
         }
         .cart-rec-thumb img {
           max-width: 100%;
@@ -956,40 +957,40 @@ export default function CartPage({
           box-shadow: 0 8px 18px rgba(15,23,42,0.08);
         }
         .cart-rec-name {
-          margin-top: 12px;
+          margin-top: 10px;
           color: var(--navy);
-          font-size: 0.9rem;
+          font-size: 0.84rem;
           font-weight: 800;
-          line-height: 1.38;
+          line-height: 1.32;
           min-height: 2.5em;
         }
         .cart-rec-price {
-          margin-top: 10px;
+          margin-top: 8px;
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           flex-wrap: wrap;
         }
         .cart-rec-price strong {
           color: #1d5ba0;
-          font-size: 0.96rem;
+          font-size: 0.9rem;
           font-weight: 800;
         }
         .cart-rec-price span {
           color: var(--body);
           text-decoration: line-through;
-          font-size: 0.8rem;
+          font-size: 0.74rem;
         }
         .cart-rec-btn {
           width: 100%;
-          min-height: 44px;
-          margin-top: 12px;
+          min-height: 38px;
+          margin-top: 10px;
           border: none;
-          border-radius: 14px;
+          border-radius: 12px;
           background: rgba(15,91,215,0.08);
           color: #1d5ba0;
           font-family: inherit;
-          font-size: 0.88rem;
+          font-size: 0.8rem;
           font-weight: 800;
           cursor: pointer;
         }

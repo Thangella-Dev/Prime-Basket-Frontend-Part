@@ -96,6 +96,13 @@ export default function ProductCard({
       {/* Content */}
       <div className="pbrand-v2">{p.brand}</div>
       <div className="pname-v2">{getTranslatedName(p.name)}</div>
+      {(p.stars != null || p.reviews != null) && (
+        <div className="prating-v2">
+          <i className="fas fa-star"></i>
+          <span>{p.stars || "4.0"}</span>
+          {p.reviews != null ? <small>({p.reviews})</small> : null}
+        </div>
+      )}
 
       {/* Unit Selector */}
       <div className="unit-selector-btn" onClick={openUnitModal}>

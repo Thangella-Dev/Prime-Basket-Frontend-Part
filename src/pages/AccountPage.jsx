@@ -146,12 +146,60 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
   const t = useT(language);
   const { logout, user, updateUser } = useAuth();
   const currSym = region === "ke" ? "KES " : "\u20b9";
-  const [section, setSection] = useState(initialSection);
+  const shouldOpenInitialDetail = initialSection && initialSection !== "profile";
+  const [section, setSection] = useState(shouldOpenInitialDetail ? initialSection : "profile");
+  const [viewMode, setViewMode] = useState(shouldOpenInitialDetail ? "detail" : "menu");
+
+  const menuItems = useMemo(() => ([
+    { key: "profile", icon: "fa-user", label: t.account.profile, subtitle: "Manage your personal details" },
+    { key: "orders", icon: "fa-box", label: t.account.orders, subtitle: "Track and manage your purchases" },
+    { key: "refunds", icon: "fa-rotate-left", label: t.account.myRefunds, subtitle: "Review returns and refund requests" },
+    { key: "addresses", icon: "fa-location-dot", label: t.account.addresses, subtitle: "Saved delivery locations" },
+    { key: "giftcards", icon: "fa-gift", label: t.account.giftCards, subtitle: "Rewards, balances, and gift cards" },
+    { key: "notifications", icon: "fa-bell", label: t.header.notifications, subtitle: "Latest alerts and updates" },
+    { key: "payments", icon: "fa-credit-card", label: t.footer.paymentMethods, subtitle: "Cards, wallets, and secure payments" },
+    { key: "help", icon: "fa-circle-question", label: t.links.helpTicket, subtitle: "Support and help tickets" },
+    { key: "logout", icon: "fa-right-from-bracket", label: t.account.logout, subtitle: "Sign out of your account", tone: "logout" },
+  ]), [t]);
+
+  const sectionMeta = useMemo(() => ({
+    profile: { title: t.account.profile, subtitle: "Update your profile, phone, and email details." },
+    orders: { title: t.account.orders, subtitle: "See placed orders, reorder items, and rate deliveries." },
+    refunds: { title: t.account.myRefunds, subtitle: "Track refunds, return progress, and request updates." },
+    addresses: { title: t.account.addresses, subtitle: "Manage saved delivery addresses and location details." },
+    giftcards: { title: t.account.giftCards, subtitle: "Handle rewards, promo balances, and gift card activity." },
+    notifications: { title: t.header.notifications, subtitle: "Review recent account, order, and offer notifications." },
+    payments: { title: t.footer.paymentMethods, subtitle: "Manage secure payment methods, wallets, and payment info." },
+    help: { title: t.links.helpTicket, subtitle: "Open support requests and browse help resources." },
+  }), [t]);
 
   // Sync when parent changes initialSection (e.g. navigating from OrderSuccessPage)
-  useEffect(() => { setSection(initialSection); }, [initialSection]);
+  useEffect(() => {
+    const nextSection = initialSection || "profile";
+    const nextIsDetail = nextSection !== "profile";
+    setSection(nextIsDetail ? nextSection : "profile");
+    setViewMode(nextIsDetail ? "detail" : "menu");
+  }, [initialSection]);
 
-  const changeSection = (s) => { setSection(s); onSectionChange && onSectionChange(s); };
+  const openSection = (nextSection) => {
+    if (nextSection === "logout") {
+      handleLogout();
+      return;
+    }
+    setSection(nextSection);
+    setViewMode("detail");
+    onSectionChange && onSectionChange(nextSection);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const backToMenu = () => {
+    setViewMode("menu");
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   const handleLogout = () => {
     if (onLogout) {
@@ -163,75 +211,60 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
   };
 
   return (
-    <div className="account-container reveal">
+    <div className={`account-container reveal ${viewMode === "detail" ? "detail-open" : "menu-open"}`}>
+      {viewMode === "menu" ? (
+        <div className="account-menu-stage">
+          <div className="account-menu-hero">
+            <div className="account-menu-eyebrow">{t.account.title}</div>
+            <h2>{user?.name ? `${user.name.split(" ")[0]}, choose what you want to manage` : "Choose what you want to manage"}</h2>
+            <p>Open one section at a time for a cleaner, full-screen account experience.</p>
+          </div>
 
-      {/* Sidebar */}
-      <div className="account-sidebar">
-        <div className="account-sidebar-header">
-          <h2>{t.account.title}</h2>
+          <div className="account-menu-grid">
+            {menuItems.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                className={`account-menu-card${item.tone === "logout" ? " logout" : ""}`}
+                onClick={() => openSection(item.key)}
+              >
+                <div className="account-menu-card-icon">
+                  <i className={`fas ${item.icon}`}></i>
+                </div>
+                <div className="account-menu-card-copy">
+                  <strong>{item.label}</strong>
+                  <span>{item.subtitle}</span>
+                </div>
+                <i className={`fas ${item.tone === "logout" ? "fa-arrow-right-from-bracket" : "fa-chevron-right"} account-menu-card-arrow`}></i>
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="account-menu">
+      ) : (
+        <div className="account-detail-stage">
+          <div className="account-detail-bar">
+            <button type="button" className="account-back-btn" onClick={backToMenu}>
+              <i className="fas fa-arrow-left"></i>
+              <span>Back</span>
+            </button>
+            <div className="account-detail-copy">
+              <h2>{sectionMeta[section]?.title || t.account.title}</h2>
+              <p>{sectionMeta[section]?.subtitle || "Manage your account section details."}</p>
+            </div>
+          </div>
 
-          <button type="button" className={`account-item ${section === "profile" ? "active" : ""}`} onClick={() => changeSection("profile")} aria-pressed={section === "profile"}>
-            <i className="fas fa-user"></i>
-            <span>{t.account.profile}</span>
-          </button>
-
-          <button type="button" className={`account-item ${section === "orders" ? "active" : ""}`} onClick={() => changeSection("orders")} aria-pressed={section === "orders"}>
-            <i className="fas fa-box"></i>
-            <span>{t.account.orders}</span>
-          </button>
-
-          <button type="button" className={`account-item ${section === "refunds" ? "active" : ""}`} onClick={() => changeSection("refunds")} aria-pressed={section === "refunds"}>
-            <i className="fas fa-undo"></i>
-            <span>{t.account.myRefunds}</span>
-          </button>
-
-          <button type="button" className={`account-item ${section === "addresses" ? "active" : ""}`} onClick={() => changeSection("addresses")} aria-pressed={section === "addresses"}>
-            <i className="fas fa-map-marker-alt"></i>
-            <span>{t.account.addresses}</span>
-          </button>
-
-          <button type="button" className={`account-item ${section === "giftcards" ? "active" : ""}`} onClick={() => changeSection("giftcards")} aria-pressed={section === "giftcards"}>
-            <i className="fas fa-gift"></i>
-            <span>{t.account.giftCards}</span>
-          </button>
-
-          <button type="button" className={`account-item ${section === "notifications" ? "active" : ""}`} onClick={() => changeSection("notifications")} aria-pressed={section === "notifications"}>
-            <i className="fas fa-bell"></i>
-            <span>{t.header.notifications}</span>
-          </button>
-
-          <button type="button" className={`account-item ${section === "payments" ? "active" : ""}`} onClick={() => changeSection("payments")} aria-pressed={section === "payments"}>
-            <i className="fas fa-credit-card"></i>
-            <span>{t.footer.paymentMethods}</span>
-          </button>
-
-          <button type="button" className={`account-item ${section === "help" ? "active" : ""}`} onClick={() => changeSection("help")} aria-pressed={section === "help"}>
-            <i className="fas fa-question-circle"></i>
-            <span>{t.links.helpTicket}</span>
-          </button>
-
-          <button type="button" className="account-item logout" onClick={handleLogout}>
-            <i className="fas fa-sign-out-alt"></i>
-            <span>{t.account.logout}</span>
-          </button>
-
+          <div className="account-detail-content">
+            {section === "profile" && <Profile user={user} updateUser={updateUser} t={t} language={language} region={region} />}
+            {section === "orders" && <OrdersSection orders={propOrders} t={t} currSym={currSym} onOrderSummary={onOrderSummary} onRateOrder={onRateOrder} onOrderAgain={onOrderAgain} onDeleteOrder={onDeleteOrder} language={language} />}
+            {section === "addresses" && <AddressSection t={t} language={language} region={region} />}
+            {section === "refunds" && <RefundsDemoSection t={t} currSym={currSym} region={region} language={language} />}
+            {section === "giftcards" && <GiftCardsSection t={t} currSym={currSym} language={language} />}
+            {section === "notifications" && <NotificationsSection t={t} language={language} />}
+            {section === "payments" && <PaymentsSection t={t} region={region} language={language} />}
+            {section === "help" && <HelpSection t={t} language={language} />}
+          </div>
         </div>
-      </div>
-
-      {/* Content Area */}
-      <div className="account-content">
-        {section === "profile" && <Profile user={user} updateUser={updateUser} t={t} language={language} region={region} />}
-        {section === "orders" && <OrdersSection orders={propOrders} t={t} currSym={currSym} onOrderSummary={onOrderSummary} onRateOrder={onRateOrder} onOrderAgain={onOrderAgain} onDeleteOrder={onDeleteOrder} language={language} />}
-        {section === "addresses" && <AddressSection t={t} language={language} region={region} />}
-        {section === "refunds" && <RefundsDemoSection t={t} currSym={currSym} region={region} language={language} />}
-        {section === "giftcards" && <GiftCardsSection t={t} currSym={currSym} language={language} />}
-        {section === "notifications" && <NotificationsSection t={t} language={language} />}
-        {section === "payments" && <PaymentsSection t={t} region={region} language={language} />}
-        {section === "help" && <HelpSection t={t} language={language} />}
-      </div>
-
+      )}
     </div>
   );
 }
