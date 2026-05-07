@@ -9,16 +9,15 @@ const UNIT_TEMPLATES = {
     { label: "5kg", multiplier: 5 }
   ],
   bulk_weight: [
+    { label: "1kg", multiplier: 1 },
     { label: "5kg", multiplier: 5 },
     { label: "10kg", multiplier: 10 },
-    { label: "25kg", multiplier: 25 },
-    { label: "50kg", multiplier: 50 }
+    { label: "25kg", multiplier: 25 }
   ],
   volume: [
     { label: "500ml", multiplier: 0.5 },
     { label: "1L", multiplier: 1 },
     { label: "2L", multiplier: 2 },
-    { label: "3L", multiplier: 3 },
     { label: "5L", multiplier: 5 }
   ],
   small_volume: [
@@ -26,28 +25,57 @@ const UNIT_TEMPLATES = {
     { label: "500ml", multiplier: 1 },
     { label: "1L", multiplier: 2 }
   ],
+  beverage: [
+    { label: "300ml", multiplier: 0.6 },
+    { label: "500ml", multiplier: 1 },
+    { label: "1L", multiplier: 2 }
+  ],
+  spice: [
+    { label: "100g", multiplier: 0.1 },
+    { label: "250g", multiplier: 0.25 },
+    { label: "500g", multiplier: 0.5 },
+    { label: "1kg", multiplier: 1 }
+  ],
+  dairy_solid: [
+    { label: "200g", multiplier: 0.2 },
+    { label: "500g", multiplier: 0.5 },
+    { label: "1kg", multiplier: 1 }
+  ],
+  milk: [
+    { label: "500ml", multiplier: 0.5 },
+    { label: "1L", multiplier: 1 },
+    { label: "2L", multiplier: 2 }
+  ],
   count: [
     { label: "1 pc", multiplier: 1 },
-    { label: "6 pcs", multiplier: 6 },
-    { label: "12 pcs", multiplier: 12 }
+    { label: "2 pcs", multiplier: 2 },
+    { label: "4 pcs", multiplier: 4 }
   ],
   eggs: [
-    { label: "6 pcs", multiplier: 0.2 }, // Base is 30 pack? No, let's assume price is for 30.
-    // Actually, if we use multiplier 1 for the most common unit (e.g. 1kg or 1 tray).
-    // Let's assume multiplier 1 = 1 piece/kg/L for simplicity in calculations.
-    { label: "6 pcs", multiplier: 6 },
-    { label: "12 pcs", multiplier: 12 },
-    { label: "32 pcs", multiplier: 32 }
+    { label: "6 pcs", multiplier: 1 },
+    { label: "12 pcs", multiplier: 2 },
+    { label: "30 pcs", multiplier: 5 }
   ],
   pack: [
     { label: "1 pack", multiplier: 1 },
-    { label: "3 packs", multiplier: 3 },
-    { label: "6 packs", multiplier: 6 }
+    { label: "2 packs", multiplier: 2 },
+    { label: "4 packs", multiplier: 4 }
   ],
   flour: [
     { label: "1kg", multiplier: 1 },
     { label: "2kg", multiplier: 2 },
-    { label: "12x2kg", multiplier: 24 }
+    { label: "5kg", multiplier: 5 },
+    { label: "10kg", multiplier: 10 }
+  ],
+  household_pack: [
+    { label: "1 pack", multiplier: 1 },
+    { label: "2 packs", multiplier: 2 },
+    { label: "3 packs", multiplier: 3 }
+  ],
+  care_volume: [
+    { label: "100ml", multiplier: 0.2 },
+    { label: "250ml", multiplier: 0.5 },
+    { label: "500ml", multiplier: 1 }
   ]
 };
 
@@ -59,24 +87,96 @@ const CATEGORY_TO_TEMPLATE = {
   sugar: "weight",
   salt: "weight",
   "wheat-flour": "flour",
-  "turmeric-powder": "weight",
-  "chilli-powder": "weight",
-  masala: "weight",
+  "turmeric-powder": "spice",
+  "chilli-powder": "spice",
+  masala: "spice",
   milkPowders: "weight",
   meat: "weight",
-  coolDrinks: "small_volume",
+  coolDrinks: "beverage",
   oil: "volume",
-  dairyProducts: "volume",
+  dairyProducts: "milk",
   eggs: "eggs",
   biscuitsAndCookies: "pack",
   instantFood: "pack",
   chipsAndNamkeens: "pack",
-  homeNeeds: "count",
+  homeNeeds: "household_pack",
   oralCare: "count",
-  babyCare: "count",
-  bodyCare: "count",
-  feminineHygiene: "count"
+  babyCare: "household_pack",
+  bodyCare: "care_volume",
+  feminineHygiene: "household_pack"
 };
+
+const UNIT_FIELDS = ["selectedUnit", "baseUnit", "standard", "unit", "quantityLabel", "weight", "size", "volume", "packSize"];
+
+function normalizeDetectedUnit(value, unit) {
+  const quantity = Number(value);
+  if (!Number.isFinite(quantity) || quantity <= 0) return null;
+
+  const normalizedUnit = String(unit || "").toLowerCase();
+  const normalizedValue = Number.isInteger(quantity) ? String(quantity) : String(quantity);
+
+  if (["kg", "g", "ml"].includes(normalizedUnit)) return `${normalizedValue}${normalizedUnit}`;
+  if (normalizedUnit === "l") return `${normalizedValue}L`;
+  if (["pc", "piece", "pieces", "pcs"].includes(normalizedUnit)) return `${normalizedValue} pcs`;
+  if (["pack", "packs", "packet", "packets", "sachet", "sachets", "bottle", "bottles", "can", "cans", "tray", "trays"].includes(normalizedUnit)) {
+    const labelUnit =
+      normalizedUnit === "packets" ? "packets" :
+      normalizedUnit === "packet" ? "packet" :
+      normalizedUnit === "packs" ? "packs" :
+      normalizedUnit === "sachets" ? "sachets" :
+      normalizedUnit === "sachet" ? "sachet" :
+      normalizedUnit === "bottles" ? "bottles" :
+      normalizedUnit === "bottle" ? "bottle" :
+      normalizedUnit === "cans" ? "cans" :
+      normalizedUnit === "can" ? "can" :
+      normalizedUnit === "trays" ? "trays" :
+      normalizedUnit === "tray" ? "tray" :
+      quantity > 1 ? "packs" : "pack";
+    return `${normalizedValue} ${labelUnit}`;
+  }
+
+  return null;
+}
+
+function detectExplicitUnit(product) {
+  const sourceText = UNIT_FIELDS.map((field) => product?.[field]).find(Boolean) || product?.name || "";
+  const normalizedSource = String(sourceText);
+  const unitMatch = normalizedSource.match(/(\d+(?:\.\d+)?)\s*(kg|g|ml|l|pc|pcs|piece|pieces|pack|packs|packet|packets|tray|trays|bottle|bottles|can|cans|sachet|sachets)\b/i);
+  if (!unitMatch) return null;
+  return normalizeDetectedUnit(unitMatch[1], unitMatch[2]);
+}
+
+function inferTemplateKey(cat, nameLower, imgLower) {
+  const text = `${nameLower} ${imgLower}`;
+
+  if (cat === "rice") return "bulk_weight";
+  if (cat === "wheat-flour") return "flour";
+  if (["turmeric-powder", "chilli-powder", "masala"].includes(cat)) return "spice";
+  if (cat === "oil") return "volume";
+  if (cat === "coolDrinks") return "beverage";
+  if (["fruits", "vegetables", "pulses", "sugar", "salt", "milkPowders", "meat"].includes(cat)) return "weight";
+  if (["biscuitsAndCookies", "instantFood", "chipsAndNamkeens"].includes(cat)) return "pack";
+
+  if (cat === "dairyProducts") {
+    if (/(milk|lassi|buttermilk|drink|yoghurt drink|yogurt drink)/.test(text)) return "milk";
+    if (/(cheese|butter|paneer|ghee|curd|yogurt|yoghurt|cream|whitener)/.test(text)) return "dairy_solid";
+    if (/egg/.test(text)) return "eggs";
+    return "milk";
+  }
+
+  if (["homeNeeds", "babyCare", "feminineHygiene"].includes(cat)) {
+    if (/(liquid|wash|cleaner|detergent|oil|lotion|shampoo|conditioner|gel|cream)/.test(text)) return "care_volume";
+    return "household_pack";
+  }
+
+  if (["bodyCare", "oralCare"].includes(cat)) {
+    if (/(soap|bar)/.test(text)) return "count";
+    if (/(lotion|shampoo|conditioner|toothpaste|gel|wash|cream|oil|serum)/.test(text)) return "care_volume";
+    return "count";
+  }
+
+  return CATEGORY_TO_TEMPLATE[cat] || "weight";
+}
 
 /**
  * Parses price string like "₹45.00" or "KES 60" → number
@@ -97,53 +197,17 @@ export function enhanceProduct(p, region = "in", isDeal = false) {
   if (p.units && p.units.length > 0) return p;
 
   const cat = p._cat || "";
-  let templateKey = CATEGORY_TO_TEMPLATE[cat] || "weight";
-
-  // Dynamic template overrides based on product name and image
   const nameLower = (p.name || "").toLowerCase();
   const imgLower = (p.imageUrl || "").toLowerCase();
-  
-  const isSolidDairy = nameLower.includes("powder") || nameLower.includes("whitener") || nameLower.includes("cheese") || nameLower.includes("butter") || nameLower.includes("paneer") || nameLower.includes("ghee") || nameLower.includes("curd") || nameLower.includes("yogurt") || imgLower.includes("cheese") || imgLower.includes("butter") || imgLower.includes("paneer");
-  
-  const isMeat = nameLower.includes("chicken") || nameLower.includes("meat") || nameLower.includes("beef") || nameLower.includes("mutton") || nameLower.includes("pork") || nameLower.includes("fish") || imgLower.includes("meat") || imgLower.includes("beef") || imgLower.includes("chicken") || imgLower.includes("mutton") || imgLower.includes("fish");
-  
-  const isEgg = nameLower.includes("egg") || imgLower.includes("egg");
-
-  if (cat.toLowerCase().includes("dairy") || cat.toLowerCase().includes("meat")) {
-    if (isSolidDairy || isMeat) {
-      templateKey = "weight";
-    }
-    if (isEgg) {
-      templateKey = "eggs";
-    }
-  }
+  const templateKey = inferTemplateKey(cat, nameLower, imgLower);
 
   let units = [...(UNIT_TEMPLATES[templateKey] || UNIT_TEMPLATES["weight"])];
   let baseUnitObj = null;
 
-  // Attempt to parse explicit unit from name (e.g. "500ml", "1kg", "200g")
-  const unitMatch = nameLower.match(/(\d+(?:\.\d+)?)\s*(kg|g|ml|l|pc|pcs|pack|tin)\b/i);
-  if (unitMatch) {
-    const value = parseFloat(unitMatch[1]);
-    let unitString = unitMatch[2].toLowerCase();
-    
-    if (unitString === "l") unitString = "L";
-    if (unitString === "pc") unitString = "pcs";
-    
-    const detectedLabel = `${value}${unitString}`;
-    
-    // Check if detected unit exists in our current template
-    baseUnitObj = units.find(u => u.label.toLowerCase() === detectedLabel.toLowerCase());
-    
-    // If not found in template, create a custom unit list for this specific SKU
-    if (!baseUnitObj) {
-       baseUnitObj = { label: detectedLabel, multiplier: 1 };
-       units = [baseUnitObj]; // Restrict to only the detected unit!
-    } else {
-       // If it is found, restrict the options to just this one, because the unit is hardcoded in the product name!
-       // This prevents confusing UI where the name says "500ml" but the dropdown says "1L".
-       units = [baseUnitObj];
-    }
+  const detectedLabel = detectExplicitUnit(p);
+  if (detectedLabel) {
+    baseUnitObj = units.find((u) => u.label.toLowerCase() === detectedLabel.toLowerCase()) || { label: detectedLabel, multiplier: 1 };
+    units = [baseUnitObj];
   }
 
   if (!baseUnitObj) {

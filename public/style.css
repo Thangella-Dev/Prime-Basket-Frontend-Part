@@ -3214,18 +3214,40 @@ body[data-theme="light"] .nav-search-row {
     padding: 0 16px;
   }
 
+  .nav-left {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .brand-link {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    gap: 8px;
+  }
+
   .logo-icon {
     width: 52px;
     height: 52px;
+    flex-shrink: 0;
   }
 
   .logo-text {
-    font-size: 1.18rem;
-    letter-spacing: 0.03em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: clip;
+    white-space: normal;
+    max-width: 9.8ch;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    line-height: 0.92;
   }
 
   .mobile-header-actions {
     gap: 6px;
+    flex-shrink: 0;
   }
 
   .mobile-header-icon-btn,
@@ -3480,11 +3502,10 @@ body[data-theme="light"] .nav-search-row {
   }
 
   .logo-text {
-    font-size: 0.88rem;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    max-width: 9.4ch;
+    font-size: 0.8rem;
+    letter-spacing: 0.015em;
+    line-height: 0.9;
   }
 
   .mobile-header-actions {
