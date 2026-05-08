@@ -1446,8 +1446,8 @@ body.prime-drawer-open .hamburger * {
 
 /* ── HERO SLIDER ── */
 .slider {
-  position: relative; width: 100%; height: clamp(500px, 58vh, 590px); min-height: 500px; overflow: hidden;
-  border-radius: 26px;
+  position: relative; width: 100%; height: clamp(540px, 62vh, 650px); min-height: 540px; overflow: hidden;
+  border-radius: 30px;
   border: 1px solid rgba(148,163,184,0.16);
   box-shadow: 0 28px 54px rgba(15,23,42,0.08);
   background:
@@ -1462,8 +1462,9 @@ body.prime-drawer-open .hamburger * {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(120deg, rgba(255,255,255,0.72), transparent 40%),
-    radial-gradient(circle at bottom right, rgba(15, 91, 215, 0.08), transparent 28%);
+    linear-gradient(118deg, rgba(255,255,255,0.76), transparent 36%),
+    radial-gradient(circle at 84% 24%, rgba(255,255,255,0.22), transparent 18%),
+    radial-gradient(circle at 78% 80%, rgba(15, 91, 215, 0.08), transparent 24%);
   pointer-events: none;
 }
 .slider-track {
@@ -1478,13 +1479,17 @@ body.prime-drawer-open .hamburger * {
   align-items: flex-start;
   padding: clamp(20px, 2.8vh, 28px) clamp(20px, 3.2vw, 42px) 68px;
   opacity: 0;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  transform: translateY(10px);
-  will-change: transform, opacity;
+  transition:
+    opacity 0.78s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate3d(0, 20px, 0) scale(1.018);
+  filter: blur(10px);
+  will-change: transform, opacity, filter;
   pointer-events: none;
 }
 .slide.active { opacity: 1; }
-.slide.active { transform: translateY(0); pointer-events: auto; }
+.slide.active { transform: translate3d(0, 0, 0) scale(1); filter: none; pointer-events: auto; }
 .content {
   width: 100%;
   max-width: 100%;
@@ -1507,18 +1512,19 @@ body.prime-drawer-open .hamburger * {
   align-items: stretch;
   min-width: 0;
   max-width: 560px;
+  position: relative;
 }
 .hero-copy-surface {
   width: 100%;
   display: grid;
   gap: 14px;
-  padding: 18px 18px 16px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.62), rgba(255,255,255,0.38));
-  border: 1px solid rgba(255,255,255,0.44);
-  box-shadow: 0 22px 38px rgba(15,23,42,0.08);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  padding: 12px 0 10px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 .hero-copy-main {
   display: grid;
@@ -1598,21 +1604,41 @@ body.prime-drawer-open .hamburger * {
   z-index: 1;
   filter: drop-shadow(0 28px 30px rgba(15, 23, 42, 0.16));
 }
+.slide .hero-eyebrow,
+.slide .hero-copy-main,
+.slide .hero-copy-meta,
+.slide .image-container {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition:
+    opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.slide.active .hero-eyebrow,
+.slide.active .hero-copy-main,
+.slide.active .hero-copy-meta,
+.slide.active .image-container {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+.slide.active .hero-copy-main { transition-delay: 0.06s; }
+.slide.active .hero-copy-meta { transition-delay: 0.14s; }
+.slide.active .image-container { transition-delay: 0.1s; }
 .dots { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; background: rgba(255,255,255,0.75); border: 1px solid rgba(148,163,184,0.15); box-shadow: 0 18px 30px rgba(15,23,42,0.08); border-radius: 999px; padding: 8px 12px; }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(15,91,215,0.25); cursor: pointer; transition: all 0.3s; }
 .dot.active { background: var(--green); transform: scale(1.25); box-shadow: 0 0 0 6px rgba(15,91,215,0.12); }
 
 @media (max-width: 768px) {
   .slider {
-    height: clamp(520px, 74vh, 620px);
-    min-height: 520px;
+    height: clamp(560px, 76vh, 680px);
+    min-height: 560px;
     overflow: hidden;
     border-radius: 22px;
   }
   .slider-track {
     display: flex;
     height: 100%;
-    transition: transform 0.46s ease;
+    transition: transform 0.86s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform;
     transform: translateX(calc(var(--active-slide, 0) * -100%));
   }
@@ -1622,6 +1648,7 @@ body.prime-drawer-open .hamburger * {
     display: block;
     opacity: 1;
     transform: none;
+    filter: none;
     flex: 0 0 100%;
     min-width: 100%;
     min-height: 100%;
@@ -5446,15 +5473,32 @@ body[data-theme="dark"] .cat-mobile-products .pstars span {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 78% 52%, rgba(255,255,255,0.18), transparent 22%),
-    var(--hero-art) no-repeat right clamp(20px, 4vw, 54px) center / min(29vw, 330px);
-  opacity: 0.24;
+    radial-gradient(circle at 82% 30%, rgba(255,255,255,0.34), transparent 18%),
+    radial-gradient(circle at 18% 76%, rgba(68,196,212,0.12), transparent 22%),
+    radial-gradient(circle at 86% 80%, rgba(15,91,215,0.1), transparent 18%);
+  opacity: 1;
   pointer-events: none;
   z-index: 0;
 }
 
 .hero-copy-surface {
-  background: linear-gradient(180deg, rgba(255,255,255,0.56), rgba(255,255,255,0.3));
+  background: transparent;
+}
+
+.hero-copy-block::before {
+  content: "";
+  position: absolute;
+  inset: 10% 32% 14% -4%;
+  border-radius: 999px;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.3), rgba(255,255,255,0));
+  filter: blur(12px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-copy-surface > * {
+  position: relative;
+  z-index: 1;
 }
 
 .image-container {
@@ -5466,13 +5510,18 @@ body[data-theme="dark"] .cat-mobile-products .pstars span {
 .image-container::before {
   content: "";
   position: absolute;
-  inset: 12% 0 10% 10%;
-  border-radius: 42px;
+  width: min(100%, 288px);
+  aspect-ratio: 1 / 1;
+  right: 2%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
   background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.76), transparent 34%),
-    radial-gradient(circle at 72% 70%, rgba(68,196,212,0.26), transparent 36%),
-    linear-gradient(135deg, rgba(255,255,255,0.26), rgba(255,255,255,0.04));
-  opacity: 0.95;
+    radial-gradient(circle at 42% 38%, rgba(255,255,255,0.76), transparent 36%),
+    radial-gradient(circle at 72% 70%, rgba(68,196,212,0.24), transparent 34%),
+    radial-gradient(circle at 56% 54%, rgba(15,91,215,0.12), transparent 48%);
+  opacity: 0.8;
+  filter: blur(10px);
   pointer-events: none;
 }
 
@@ -5534,19 +5583,26 @@ body[data-theme="dark"] .cat-mobile-products .pstars span {
 }
 
 body[data-theme="dark"] .slide::after {
-  opacity: 0.18;
+  background:
+    radial-gradient(circle at 80% 28%, rgba(255,255,255,0.1), transparent 16%),
+    radial-gradient(circle at 18% 76%, rgba(68,196,212,0.1), transparent 20%),
+    radial-gradient(circle at 88% 82%, rgba(15,91,215,0.14), transparent 18%);
 }
 
 body[data-theme="dark"] .hero-copy-surface {
-  background: linear-gradient(180deg, rgba(10,18,31,0.52), rgba(12,21,35,0.26));
-  border-color: rgba(111,176,255,0.16);
+  background: transparent;
+  border-color: transparent;
 }
 
 body[data-theme="dark"] .image-container::before {
   background:
-    radial-gradient(circle at 32% 30%, rgba(255,255,255,0.08), transparent 34%),
-    radial-gradient(circle at 70% 68%, rgba(68,196,212,0.16), transparent 38%),
-    linear-gradient(135deg, rgba(18,31,50,0.38), rgba(18,31,50,0.06));
+    radial-gradient(circle at 36% 34%, rgba(255,255,255,0.08), transparent 28%),
+    radial-gradient(circle at 70% 68%, rgba(68,196,212,0.14), transparent 34%),
+    radial-gradient(circle at 56% 58%, rgba(15,91,215,0.18), transparent 42%);
+}
+
+body[data-theme="dark"] .hero-copy-block::before {
+  background: radial-gradient(circle at center, rgba(58,114,196,0.18), rgba(9,18,30,0));
 }
 
 body[data-theme="dark"] .slider-nav-btn {
@@ -5564,14 +5620,15 @@ body[data-theme="dark"] .slider-nav-btn:hover {
 @media (max-width: 768px) {
   .slide::after {
     background:
-      radial-gradient(circle at 82% 48%, rgba(255,255,255,0.14), transparent 20%),
-      var(--hero-art) no-repeat right 8px center / 176px;
-    opacity: 0.18;
+      radial-gradient(circle at 84% 34%, rgba(255,255,255,0.28), transparent 16%),
+      radial-gradient(circle at 16% 80%, rgba(68,196,212,0.12), transparent 18%),
+      radial-gradient(circle at 88% 82%, rgba(15,91,215,0.12), transparent 16%);
   }
 
   .image-container::before {
-    inset: 10% 0 8% 0;
-    border-radius: 30px;
+    width: 160px;
+    right: 0;
+    filter: blur(8px);
   }
 
   .image-container img {
@@ -5589,8 +5646,9 @@ body[data-theme="dark"] .slider-nav-btn:hover {
 @media (max-width: 600px) {
   .slide::after {
     background:
-      radial-gradient(circle at 84% 46%, rgba(255,255,255,0.12), transparent 18%),
-      var(--hero-art) no-repeat right 4px center / 148px;
+      radial-gradient(circle at 86% 34%, rgba(255,255,255,0.24), transparent 15%),
+      radial-gradient(circle at 14% 82%, rgba(68,196,212,0.1), transparent 16%),
+      radial-gradient(circle at 90% 84%, rgba(15,91,215,0.1), transparent 14%);
   }
 
   .image-container img {
