@@ -4024,6 +4024,23 @@ body[data-theme="dark"] .footer-divider {
   padding: 18px;
   background: linear-gradient(180deg, #f8fbff 0%, #f3f7fd 100%);
   border-bottom: 1px solid #edf2fb;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 961px) {
+  .notes-head {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  
+  .notes-head > div:first-child {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .notes-actions {
+    flex-shrink: 0;
+  }
 }
 
 .notes-head h4 {
@@ -4064,6 +4081,7 @@ body[data-theme="dark"] .footer-divider {
   white-space: nowrap;
   max-width: 100%;
   flex-shrink: 0;
+  width: auto;
 }
 
 .notes-clear {

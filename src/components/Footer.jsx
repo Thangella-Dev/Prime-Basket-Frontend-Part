@@ -129,19 +129,6 @@ export default function Footer({ language = "en", region = "in" }) {
           </ul>
         </div>
 
-        <div className="footer-col">
-          <h4>{t.footer?.popular || "Popular"}</h4>
-          <ul>
-            <li><FooterLink page="cat:dairyProducts">{t.links.dairyMilk}</FooterLink></li>
-            <li><FooterLink page="cat:dairyProducts">{t.links.butterMargarine}</FooterLink></li>
-            <li><FooterLink page="cat:dairyProducts">{t.links.eggSubstitutes}</FooterLink></li>
-            <li><FooterLink page="cat:fruits">{t.links.marmalades}</FooterLink></li>
-            <li><FooterLink page="cat:dairyProducts">{t.links.sourCream}</FooterLink></li>
-            <li><FooterLink page="cat:coolDrinks">{t.links.teaKombucha}</FooterLink></li>
-            <li><FooterLink page="cat:dairyProducts">{t.links.cheese}</FooterLink></li>
-          </ul>
-        </div>
-
         <div className="footer-col app-col">
           <h4>{t.footer?.installApp || "Install App"}</h4>
           <p className="app-sub">{t.footer?.appStoreHint || "From App Store or Google Play"}</p>
