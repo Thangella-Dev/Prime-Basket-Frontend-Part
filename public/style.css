@@ -3982,29 +3982,47 @@ body[data-theme="dark"] .footer-divider {
   font-size: 0.78rem;
 }
 
+.notes-head > div:first-child {
+  min-width: 0;
+}
+
 .notes-mark-read {
   border: none;
   background: rgba(15,91,215,0.08);
   color: var(--green);
   border-radius: 999px;
-  padding: 8px 12px;
-  font-size: 0.74rem;
+  padding: 6px 10px;
+  font-size: 0.68rem;
   font-weight: 800;
   cursor: pointer;
+  line-height: 1.2;
 }
 
 .notes-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: nowrap;
   white-space: nowrap;
+  max-width: 100%;
+  flex-shrink: 0;
 }
 
 .notes-clear {
   background: rgba(239,68,68,0.08);
   color: #dc2626;
+}
+
+@media (max-width: 600px) {
+  .notes-head {
+    flex-wrap: wrap;
+  }
+
+  .notes-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 .notes-list {

@@ -68,6 +68,8 @@ export default function HeroSlider({ language = "en" }) {
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const autoSlideRef = useRef(null);
+  const touchStartRef = useRef({ x: 0, y: 0 });
+  const touchDeltaRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     setCurrent(0);
@@ -96,12 +98,47 @@ export default function HeroSlider({ language = "en" }) {
     setCurrent((prev) => (prev + 1) % slides.length);
   };
 
+  const handleTouchStart = (event) => {
+    const touch = event.touches?.[0];
+    if (!touch) return;
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    touchDeltaRef.current = { x: 0, y: 0 };
+    setIsPaused(true);
+  };
+
+  const handleTouchMove = (event) => {
+    const touch = event.touches?.[0];
+    if (!touch) return;
+    touchDeltaRef.current = {
+      x: touch.clientX - touchStartRef.current.x,
+      y: touch.clientY - touchStartRef.current.y,
+    };
+  };
+
+  const handleTouchEnd = () => {
+    const { x, y } = touchDeltaRef.current;
+    const isHorizontalSwipe = Math.abs(x) > 36 && Math.abs(x) > Math.abs(y);
+
+    if (isHorizontalSwipe) {
+      if (x < 0) goToNext();
+      else goToPrevious();
+    }
+
+    touchStartRef.current = { x: 0, y: 0 };
+    touchDeltaRef.current = { x: 0, y: 0 };
+    setIsPaused(false);
+  };
+
   return (
     <div
       className="slider"
       style={{ "--active-slide": current }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
     >
       <div
         className="slider-track"

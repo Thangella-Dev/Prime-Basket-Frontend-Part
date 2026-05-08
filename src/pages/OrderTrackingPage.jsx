@@ -151,15 +151,15 @@ export default function OrderTrackingPage({ order, onGoHome, onGoOrders, addNoti
 
         .ot-steps {
           position: relative;
-          padding-left: 40px;
+          padding-left: 42px;
         }
         /* Vertical line */
         .ot-steps::before {
           content: "";
           position: absolute;
-          left: 19px;
-          top: 0;
-          bottom: 0;
+          left: 20px;
+          top: 20px;
+          bottom: 20px;
           width: 3px;
           background: #e8ecf2;
           border-radius: 2px;
@@ -167,8 +167,8 @@ export default function OrderTrackingPage({ order, onGoHome, onGoOrders, addNoti
         /* Animated progress line */
         .ot-steps-progress {
           position: absolute;
-          left: 19px;
-          top: 0;
+          left: 20px;
+          top: 20px;
           width: 3px;
           background: linear-gradient(180deg, #1d5ba0, #16a34a);
           border-radius: 2px;
@@ -177,13 +177,17 @@ export default function OrderTrackingPage({ order, onGoHome, onGoOrders, addNoti
 
         .ot-step {
           position: relative;
+          display: grid;
+          grid-template-columns: 40px minmax(0, 1fr);
+          align-items: start;
+          column-gap: 14px;
           padding-bottom: 36px;
         }
         .ot-step:last-child { padding-bottom: 0; }
 
         .ot-step-dot {
-          position: absolute;
-          left: -40px;
+          position: relative;
+          left: auto;
           top: 0;
           width: 40px;
           height: 40px;
@@ -220,7 +224,8 @@ export default function OrderTrackingPage({ order, onGoHome, onGoOrders, addNoti
         }
 
         .ot-step-content {
-          padding-left: 16px;
+          padding-left: 0;
+          min-width: 0;
         }
         .ot-step-label {
           font-weight: 800;
@@ -445,9 +450,12 @@ export default function OrderTrackingPage({ order, onGoHome, onGoOrders, addNoti
           .ot-header-sub { font-size: 13px; }
           .ot-order-id { padding: 10px 14px; font-size: 13px; }
           .ot-timeline { padding: 24px 22px; }
-          .ot-steps { padding-left: 30px; }
-          .ot-step-dot { left: -36px; width: 36px; height: 36px; }
-          .ot-step-content { padding-left: 12px; }
+          .ot-steps { padding-left: 38px; }
+          .ot-steps::before,
+          .ot-steps-progress { left: 18px; top: 18px; bottom: 18px; }
+          .ot-step { grid-template-columns: 36px minmax(0, 1fr); column-gap: 12px; }
+          .ot-step-dot { width: 36px; height: 36px; }
+          .ot-step-content { padding-left: 0; }
           .ot-step-label { font-size: 14px; }
           .ot-step-desc { font-size: 13px; }
           .ot-feedback-card { padding: 28px 22px; }
@@ -463,8 +471,12 @@ export default function OrderTrackingPage({ order, onGoHome, onGoOrders, addNoti
           .ot-page { padding: 20px 12px; }
           .ot-header-card { padding: 20px 18px; }
           .ot-timeline { padding: 20px 18px; }
-          .ot-step-dot { left: -34px; width: 34px; height: 34px; }
-          .ot-step-content { padding-left: 10px; }
+          .ot-steps { padding-left: 36px; }
+          .ot-steps::before,
+          .ot-steps-progress { left: 17px; top: 17px; bottom: 17px; }
+          .ot-step { grid-template-columns: 34px minmax(0, 1fr); column-gap: 10px; }
+          .ot-step-dot { width: 34px; height: 34px; }
+          .ot-step-content { padding-left: 0; }
           .ot-live-dot { width: 6px; height: 6px; }
           .ot-feedback-submit { width: 100%; padding: 14px 20px; }
           .ot-partner-card { padding: 16px 18px; }
