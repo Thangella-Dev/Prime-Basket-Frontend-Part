@@ -140,6 +140,13 @@ export default function CategoryPage({
         sort: "Panga",
         price: "Bei",
         brand: "Chapa",
+        filterTitle: "Chuja matokeo",
+        filterSubtitle: "Tafuta bidhaa, chapa, bei na punguzo kwa urahisi.",
+        searchProducts: "Tafuta bidhaa au chapa",
+        popularBrands: "Chapa maarufu",
+        selected: "zimechaguliwa",
+        showing: "Inaonyesha",
+        results: "matokeo",
       }
     : {
         deliveringTo: "Delivering to your area",
@@ -147,6 +154,13 @@ export default function CategoryPage({
         sort: "Sort",
         price: "Price",
         brand: "Brand",
+        filterTitle: "Refine results",
+        filterSubtitle: "Search products faster and narrow by brand, price, and discount.",
+        searchProducts: "Search products or brands",
+        popularBrands: "Popular brands",
+        selected: "selected",
+        showing: "Showing",
+        results: "results",
       };
 
   const resetCategoryScrollPosition = (behavior = "auto") => {
@@ -359,6 +373,9 @@ export default function CategoryPage({
   // ── Active filter tags ────────────────────────────────────────────────────
   const activeTags = useMemo(() => {
     const tags = [];
+    if (searchQuery.trim()) {
+      tags.push({ key: "search", label: `Search: ${searchQuery.trim()}`, onRemove: () => setSearchQuery("") });
+    }
     if (selectedBrands.length > 0) {
       selectedBrands.forEach((b) => tags.push({ key: `brand_${b}`, label: b, onRemove: () => setSelectedBrands((prev) => prev.filter((x) => x !== b)) }));
     }
@@ -371,9 +388,13 @@ export default function CategoryPage({
       tags.push({ key: "discount", label: `${effectiveDiscountRange[0]}%–${effectiveDiscountRange[1]}% off`, onRemove: () => setDiscountRange(discountBounds) });
     }
     return tags;
-  }, [selectedBrands, effectivePriceRange, effectiveDiscountRange, priceBounds, discountBounds, language]);
+  }, [searchQuery, selectedBrands, effectivePriceRange, effectiveDiscountRange, priceBounds, discountBounds, language]);
+
+  const activeFilterCount = activeTags.length;
+  const highlightedBrands = brandList.slice(0, 6);
 
   const clearAllFilters = () => {
+    setSearchQuery("");
     setSelectedBrands([]);
     setBrandSearch("");
     setPriceRange(priceBounds);
@@ -457,81 +478,154 @@ export default function CategoryPage({
   }
 
   // ── Filter Sidebar panel ──────────────────────────────────────────────────
-  const FilterPanel = () => (
-    <div style={{ background: palette.sectionBg, borderRadius: 12, border: `1px solid ${palette.border}`, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,.06)" }}>
-
-      {/* Header */}
-      <div style={{ padding: "14px 18px", borderBottom: `1px solid ${palette.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: palette.sectionMutedBg }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 7, fontWeight: 800, fontSize: 14, color: palette.text }}>
-          <i className="fas fa-sliders-h" style={{ color: palette.accent }}></i> {t.home.category}
+  const renderFilterPanel = () => (
+    <div style={{ background: palette.sectionBg, borderRadius: 20, border: `1px solid ${palette.border}`, overflow: "hidden", boxShadow: isDark ? "0 24px 40px rgba(0,0,0,.24)" : "0 24px 42px rgba(15,23,42,.08)" }}>
+      <div style={{ padding: "18px 18px 16px", borderBottom: `1px solid ${palette.borderSoft}`, background: palette.sectionMutedBg, display: "grid", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 800, fontSize: 15, color: palette.text }}>
+              <i className="fas fa-sliders-h" style={{ color: palette.accent }}></i>
+              {mobileUi.filterTitle}
+            </div>
+            <p style={{ margin: "7px 0 0", fontSize: 12, lineHeight: 1.6, color: palette.muted }}>
+              {mobileUi.filterSubtitle}
+            </p>
+          </div>
+          <div style={{ display: "grid", gap: 8, justifyItems: "end", flexShrink: 0 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 34, height: 34, padding: "0 10px", borderRadius: 999, background: palette.accentBg, color: palette.accent, fontSize: 13, fontWeight: 800, border: `1px solid ${palette.border}` }}>
+              {activeFilterCount}
+            </span>
+            {activeFilterCount > 0 && (
+              <button onClick={clearAllFilters} style={{ background: "none", border: "none", color: "#e63946", fontSize: 12, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
+                {t.filters.clearAll}
+              </button>
+            )}
+          </div>
         </div>
-        {activeTags.length > 0 && (
-          <button onClick={clearAllFilters} style={{ background: "none", border: "none", color: "#e63946", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-            {t.filters.clearAll}
-          </button>
-        )}
-      </div>
 
-      {/* BRAND */}
-      <div style={{ padding: "14px 18px", borderBottom: `1px solid ${palette.borderSoft}` }}>
-        <div style={{ fontSize: 12, fontWeight: 800, color: palette.text, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 10 }}>{t.filters.brand}</div>
-        <div style={{ position: "relative", marginBottom: 10 }}>
-          <i className="fas fa-search" style={{ position: "absolute", left: 9, top: "50%", transform: "translateY(-50%)", color: palette.mutedSoft, fontSize: 11 }}></i>
+        <div style={{ position: "relative" }}>
+          <i className="fas fa-search" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: palette.mutedSoft, fontSize: 12 }}></i>
           <input
             type="text"
-            placeholder={t.filters.searchBrand}
-            value={brandSearch}
-            onChange={(e) => setBrandSearch(e.target.value)}
-            style={{ width: "100%", padding: "7px 10px 7px 28px", border: `1.5px solid ${palette.border}`, borderRadius: 8, fontSize: 12, outline: "none", fontFamily: "inherit", boxSizing: "border-box", background: isDark ? "#0f1a2c" : "#fff", color: palette.text }}
+            placeholder={mobileUi.searchProducts}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: "100%", padding: "11px 14px 11px 34px", border: `1.5px solid ${palette.border}`, borderRadius: 12, fontSize: 12.5, outline: "none", fontFamily: "inherit", boxSizing: "border-box", background: isDark ? "#0f1a2c" : "#fff", color: palette.text, boxShadow: isDark ? "none" : "0 10px 20px rgba(15,23,42,.04)" }}
           />
         </div>
-        <div className="cat-brand-list" style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {filteredBrands.length === 0 ? (
-            <div style={{ fontSize: 12, color: palette.mutedSoft, padding: "6px 0" }}>{t.filters.noBrands}</div>
-          ) : (
-            filteredBrands.map(({ name, count }) => (
-              <label key={name} style={{ display: "flex", alignItems: "center", gap: 9, padding: "5px 4px", cursor: "pointer", borderRadius: 6, transition: ".12s" }}
-                onMouseEnter={(e) => e.currentTarget.style.background = palette.hoverBg}
-                onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedBrands.includes(name)}
-                  onChange={() => toggleBrand(name)}
-                  style={{ accentColor: palette.accent, width: 14, height: 14, cursor: "pointer", flexShrink: 0 }}
-                />
-                <span style={{ flex: 1, fontSize: 13, color: palette.textStrong, fontWeight: selectedBrands.includes(name) ? 700 : 400 }}>{name}</span>
-                <span style={{ fontSize: 11, color: palette.mutedSoft, background: palette.sectionMutedBg, padding: "1px 7px", borderRadius: 20, fontWeight: 600 }}>{count}</span>
-              </label>
-            ))
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 12, color: palette.muted, fontWeight: 700 }}>
+            {mobileUi.showing} <strong style={{ color: palette.accent }}>{filteredProducts.length}</strong> / {products.length} {mobileUi.results}
+          </span>
+          {selectedBrands.length > 0 && (
+            <span style={{ fontSize: 11, fontWeight: 800, color: palette.accent, background: isDark ? "rgba(15,91,215,0.18)" : "#edf4ff", borderRadius: 999, padding: "5px 10px" }}>
+              {selectedBrands.length} {mobileUi.selected}
+            </span>
           )}
         </div>
       </div>
 
-      {/* PRICE RANGE */}
-      <div style={{ padding: "14px 18px", borderBottom: `1px solid ${palette.borderSoft}` }}>
-        <div style={{ fontSize: 12, fontWeight: 800, color: palette.text, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 6 }}>{t.filters.priceRange}</div>
-        <RangeSlider
-          min={priceBounds[0]} max={priceBounds[1]}
-          value={effectivePriceRange} onChange={setPriceRange}
-          prefix={isKenya ? "KES " : "₹"}
-        />
-      </div>
+      <div style={{ padding: 16, display: "grid", gap: 14 }}>
+        {highlightedBrands.length > 0 && (
+          <div style={{ padding: 14, borderRadius: 16, border: `1px solid ${palette.borderSoft}`, background: palette.sectionMutedBg }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: palette.text, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 10 }}>
+              {mobileUi.popularBrands}
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {highlightedBrands.map(({ name }) => {
+                const active = selectedBrands.includes(name);
+                return (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => toggleBrand(name)}
+                    style={{
+                      border: `1px solid ${active ? palette.accent : palette.border}`,
+                      background: active ? palette.accentBg : (isDark ? "rgba(15,26,44,0.88)" : "#fff"),
+                      color: active ? palette.accent : palette.textStrong,
+                      borderRadius: 999,
+                      padding: "8px 12px",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    {name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
-      {/* DISCOUNT RANGE */}
-      <div style={{ padding: "14px 18px" }}>
-        <div style={{ fontSize: 12, fontWeight: 800, color: palette.text, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 6 }}>{t.filters.discountRange}</div>
-        <RangeSlider
-          min={discountBounds[0]} max={discountBounds[1]}
-          value={effectiveDiscountRange} onChange={setDiscountRange}
-          suffix="%"
-        />
+        <div style={{ padding: 14, borderRadius: 16, border: `1px solid ${palette.borderSoft}`, background: palette.sectionBg }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: palette.text, textTransform: "uppercase", letterSpacing: ".6px" }}>{t.filters.brand}</div>
+            <span style={{ fontSize: 11, color: palette.mutedSoft, fontWeight: 700 }}>{brandList.length} total</span>
+          </div>
+          <div style={{ position: "relative", marginBottom: 10 }}>
+            <i className="fas fa-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: palette.mutedSoft, fontSize: 11 }}></i>
+            <input
+              type="text"
+              placeholder={t.filters.searchBrand}
+              value={brandSearch}
+              onChange={(e) => setBrandSearch(e.target.value)}
+              style={{ width: "100%", padding: "9px 10px 9px 30px", border: `1.5px solid ${palette.border}`, borderRadius: 10, fontSize: 12, outline: "none", fontFamily: "inherit", boxSizing: "border-box", background: isDark ? "#0f1a2c" : "#fff", color: palette.text }}
+            />
+          </div>
+          <div className="cat-brand-list" style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 220, overflowY: "auto", paddingRight: 4 }}>
+            {filteredBrands.length === 0 ? (
+              <div style={{ fontSize: 12, color: palette.mutedSoft, padding: "8px 0" }}>{t.filters.noBrands}</div>
+            ) : (
+              filteredBrands.map(({ name, count }) => {
+                const active = selectedBrands.includes(name);
+                return (
+                  <label
+                    key={name}
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 8px", cursor: "pointer", borderRadius: 10, transition: ".12s", background: active ? palette.hoverBg : "transparent" }}
+                    onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = palette.hoverBg; }}
+                    onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={active}
+                      onChange={() => toggleBrand(name)}
+                      style={{ accentColor: palette.accent, width: 14, height: 14, cursor: "pointer", flexShrink: 0 }}
+                    />
+                    <span style={{ flex: 1, fontSize: 13, color: palette.textStrong, fontWeight: active ? 700 : 500 }}>{name}</span>
+                    <span style={{ fontSize: 11, color: active ? palette.accent : palette.mutedSoft, background: active ? palette.accentBg : palette.sectionMutedBg, padding: "2px 8px", borderRadius: 20, fontWeight: 700 }}>{count}</span>
+                  </label>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        <div style={{ padding: 14, borderRadius: 16, border: `1px solid ${palette.borderSoft}`, background: palette.sectionBg }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: palette.text, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 6 }}>{t.filters.priceRange}</div>
+          <RangeSlider
+            min={priceBounds[0]} max={priceBounds[1]}
+            value={effectivePriceRange} onChange={setPriceRange}
+            prefix={isKenya ? "KES " : "₹"}
+          />
+        </div>
+
+        <div style={{ padding: 14, borderRadius: 16, border: `1px solid ${palette.borderSoft}`, background: palette.sectionBg }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: palette.text, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 6 }}>{t.filters.discountRange}</div>
+          <RangeSlider
+            min={discountBounds[0]} max={discountBounds[1]}
+            value={effectiveDiscountRange} onChange={setDiscountRange}
+            suffix="%"
+          />
+        </div>
       </div>
     </div>
   );
 
   // ── Sort dropdown ─────────────────────────────────────────────────────────
-  const SortDropdown = () => (
+  const renderSortDropdown = () => (
     <div style={{ position: "relative" }}>
       <button
         onClick={() => setSortOpen((v) => !v)}
@@ -780,8 +874,23 @@ export default function CategoryPage({
             background:linear-gradient(180deg, rgba(36,47,64,0.98), rgba(27,35,49,0.98));
           }
           .cat-mobile-chip-accent{
-            border-color:rgba(37,99,235,0.3) !important;
-            color:#d4e4ff !important;
+            border-color:rgba(111,176,255,0.62) !important;
+            background:linear-gradient(135deg, rgba(37,99,235,0.98), rgba(59,130,246,0.9)) !important;
+            color:#f8fbff !important;
+            box-shadow:0 18px 28px rgba(37,99,235,0.28);
+          }
+          .cat-mobile-chip-badge{
+            min-width:22px;
+            height:22px;
+            border-radius:999px;
+            background:rgba(255,255,255,0.92);
+            color:#1d4ed8;
+            font-size:0.74rem;
+            font-weight:800;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            padding:0 6px;
           }
           .cat-mobile-sort-sheet{
             display:grid;
@@ -990,8 +1099,10 @@ export default function CategoryPage({
             color:#1d5ba0 !important;
           }
           .cat-mobile-chip-accent{
-            color:#d4e4ff !important;
-            border-color:rgba(37,99,235,0.3) !important;
+            color:#f8fbff !important;
+            border-color:rgba(37,99,235,0.34) !important;
+            background:linear-gradient(135deg, #1d5ba0 0%, #2f76c7 100%) !important;
+            box-shadow:0 18px 28px rgba(29,91,160,0.2) !important;
           }
           .cat-mobile-sort-option{
             background:rgba(29,91,160,0.03) !important;
@@ -1182,6 +1293,7 @@ export default function CategoryPage({
             <button type="button" className="cat-mobile-chip cat-mobile-chip-accent" onClick={() => setFilterOpen(true)}>
               <i className="fas fa-sliders-h"></i>
               <span>{mobileUi.filters}</span>
+              {activeFilterCount > 0 ? <span className="cat-mobile-chip-badge">{activeFilterCount}</span> : null}
             </button>
             <button type="button" className="cat-mobile-chip" onClick={() => setSortOpen((open) => !open)}>
               <i className="fas fa-arrow-down-wide-short"></i>
@@ -1273,15 +1385,15 @@ export default function CategoryPage({
                 <button
                   className="mobile-filter-btn"
                   onClick={(e) => { e.stopPropagation(); setFilterOpen(true); }}
-                  style={{ display: "none", alignItems: "center", gap: 6, padding: "8px 14px", background: palette.accent, color: isDark ? "#08111f" : "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                  style={{ display: "none", alignItems: "center", gap: 8, padding: "10px 14px", background: isDark ? "linear-gradient(135deg, #8fc2ff, #6cb7ff)" : "linear-gradient(135deg, #1d5ba0, #3a86da)", color: isDark ? "#08111f" : "#fff", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", boxShadow: isDark ? "0 16px 28px rgba(15,91,215,.22)" : "0 14px 24px rgba(29,91,160,.24)" }}
                 >
                   <i className="fas fa-sliders-h"></i> {t.home.filter}
-                  {activeTags.length > 0 && (
-                    <span style={{ background: isDark ? "#08111f" : "#fff", color: palette.accent, borderRadius: 20, padding: "1px 7px", fontSize: 11, fontWeight: 800 }}>{activeTags.length}</span>
+                  {activeFilterCount > 0 && (
+                    <span style={{ background: isDark ? "#08111f" : "#fff", color: palette.accent, borderRadius: 20, padding: "1px 7px", fontSize: 11, fontWeight: 800 }}>{activeFilterCount}</span>
                   )}
                 </button>
                 <div onClick={(e) => e.stopPropagation()}>
-                  <SortDropdown />
+                  {renderSortDropdown()}
                 </div>
               </div>
             </div>
@@ -1438,7 +1550,7 @@ export default function CategoryPage({
 
           {/* ── RIGHT COLUMN: Filters ── */}
           <div className="cat-right-col" style={{ position: "sticky", top: 88 }}>
-            {!loading && <FilterPanel />}
+            {!loading && renderFilterPanel()}
           </div>
 
         </div>
@@ -1452,12 +1564,12 @@ export default function CategoryPage({
         <div style={{ width: 300, background: isDark ? "#0f1a2c" : "#f8faff", overflowY: "auto", boxShadow: "-4px 0 20px rgba(0,0,0,.15)", display: "flex", flexDirection: "column" }}>
           <div style={{ padding: "16px 18px", background: palette.accent, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ color: isDark ? "#08111f" : "#fff", fontWeight: 800, fontSize: 15 }}>
-              <i className="fas fa-sliders-h" style={{ marginRight: 8 }}></i>Filters
+              <i className="fas fa-sliders-h" style={{ marginRight: 8 }}></i>{mobileUi.filterTitle}
             </span>
             <button onClick={() => setFilterOpen(false)} style={{ background: isDark ? "rgba(8,17,31,.2)" : "rgba(255,255,255,.2)", border: "none", color: isDark ? "#08111f" : "#fff", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontSize: 14 }}>✕</button>
           </div>
           <div style={{ padding: 14 }}>
-            <FilterPanel />
+            {renderFilterPanel()}
           </div>
           <div style={{ padding: "12px 18px", borderTop: `1px solid ${palette.border}`, display: "flex", gap: 10, marginTop: "auto" }}>
             <button onClick={() => { clearAllFilters(); setFilterOpen(false); }} style={{ flex: 1, padding: "10px", background: palette.sectionBg, border: `1.5px solid ${palette.border}`, borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", color: palette.textStrong }}>{t.filters.clearAll}</button>

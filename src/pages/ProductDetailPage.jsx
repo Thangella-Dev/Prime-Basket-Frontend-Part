@@ -592,11 +592,11 @@ export default function ProductDetailPage({
               <button onClick={() => onCategorySelect && onCategorySelect(product._cat)} style={{ color: "#1d5ba0", fontWeight: 700, fontSize: 14, background: "none", border: "none", cursor: "pointer" }}>View All</button>
             </div>
             {loadingSimilar ? (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
+              <div className="pdp-related-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(168px, 1fr))", gap: 14 }}>
                 {Array.from({ length: 5 }).map((_, i) => <div key={i} style={{ height: 280, background: isDark ? "rgba(15, 23, 42, 0.9)" : "#fff", borderRadius: 16, border: `1px solid ${isDark ? "rgba(71,85,105,0.52)" : "rgba(241,245,249,1)"}`, animation: "pulse 1.5s infinite" }} />)}
               </div>
             ) : (
-              <div className="products-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 }}>
+              <div className="products-grid pdp-related-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(168px, 1fr))", gap: 14 }}>
                 {similar.map((item) => (
                   <ProductCard 
                     key={item._uid} 

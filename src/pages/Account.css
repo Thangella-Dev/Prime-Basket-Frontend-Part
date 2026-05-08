@@ -2223,6 +2223,16 @@ body[data-theme="dark"] .faq-title {
   text-transform: uppercase;
 }
 
+.account-title-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .account-menu-hero h2,
 .account-detail-copy h2 {
   position: relative;
@@ -2350,6 +2360,16 @@ body[data-theme="dark"] .faq-title {
   padding: 18px 22px;
 }
 
+.account-detail-actions,
+.account-hero-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .account-back-btn {
   position: relative;
   z-index: 1;
@@ -2373,6 +2393,10 @@ body[data-theme="dark"] .faq-title {
 .account-back-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 18px 28px rgba(29, 91, 160, 0.14);
+}
+
+.account-home-btn {
+  background: linear-gradient(180deg, #ffffff 0%, #f4f9ff 100%);
 }
 
 .account-detail-content {

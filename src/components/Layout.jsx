@@ -27,6 +27,7 @@ export default function Layout({
   onClearCart,
   notifications = [],
   markAllRead,
+  clearNotifications,
   currentPage = "home",
   showFooter = true,
 }) {
@@ -53,6 +54,7 @@ export default function Layout({
         onThemeToggle={onThemeToggle}
         notifications={notifications}
         markAllRead={markAllRead}
+        clearNotifications={clearNotifications}
       />
       <main className="page-shell">{children}</main>
       {showFooter && <Footer onNavigate={onFooterNavigate} language={language} region={region} wishlistCount={wishlistCount} onWishlistClick={onWishlistClick} />}

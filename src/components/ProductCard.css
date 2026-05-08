@@ -476,3 +476,78 @@ body[data-theme="dark"] .unit-modal-content {
 body[data-theme="dark"] .unit-item-price {
   color: #7fc0ff;
 }
+
+.pdp-related-grid .pcard-v2 {
+  min-height: 282px;
+  padding: 10px;
+  border-radius: 18px;
+}
+
+.pdp-related-grid .pcard-v2 .pwish-v2 {
+  width: 30px;
+  height: 30px;
+  top: 10px;
+  right: 10px;
+}
+
+.pdp-related-grid .pcard-v2 .pimg-v2 {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 16px;
+}
+
+.pdp-related-grid .pcard-v2 .pbrand-v2 {
+  font-size: 10px;
+  margin-bottom: 3px;
+}
+
+.pdp-related-grid .pcard-v2 .pname-v2 {
+  font-size: 12.5px;
+  min-height: 2.5em;
+  margin-bottom: 4px;
+}
+
+.pdp-related-grid .pcard-v2 .prating-v2 {
+  margin-bottom: 6px;
+}
+
+.pdp-related-grid .pcard-v2 .unit-selector-btn {
+  margin-bottom: 8px;
+  padding: 5px 9px;
+  font-size: 11px;
+}
+
+.pdp-related-grid .pcard-v2 .pnew-v2 {
+  font-size: 14px;
+}
+
+.pdp-related-grid .pcard-v2 .pold-v2 {
+  font-size: 10px;
+}
+
+.pdp-related-grid .pcard-v2 .padd-v2,
+.pdp-related-grid .pcard-v2 .qty-v2 {
+  margin-top: 8px;
+}
+
+.pdp-related-grid .pcard-v2 .padd-v2 {
+  padding: 9px;
+  font-size: 11.5px;
+  border-radius: 11px;
+}
+
+.pdp-related-grid .pcard-v2 .qty-v2 {
+  height: 34px;
+  border-radius: 11px;
+}
+
+.pdp-related-grid .pcard-v2 .qty-btn-v2 {
+  width: 30px;
+  font-size: 15px;
+}
+
+@media (max-width: 640px) {
+  .pdp-related-grid .pcard-v2 {
+    min-height: 268px;
+  }
+}

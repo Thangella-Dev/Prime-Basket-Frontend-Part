@@ -92,6 +92,11 @@ export default function App() {
     localStorage.setItem("pb_notifications", JSON.stringify(updated));
   };
 
+  const clearNotifications = () => {
+    setNotifications([]);
+    localStorage.removeItem("pb_notifications");
+  };
+
   // ── Global Tracking & Rating Logic ──
   const lastNotifiedStatusRef = useRef(null);
   useEffect(() => {
@@ -636,6 +641,8 @@ export default function App() {
             user={user}
             onGoHome={goHome}
             orders={orders}
+            notifications={notifications}
+            onClearNotifications={clearNotifications}
             initialSection={accountSection}
             onSectionChange={setAccountSection}
             language={language}
@@ -881,6 +888,7 @@ export default function App() {
         onOpenProduct={openProduct}
         notifications={notifications}
         markAllRead={markAllRead}
+        clearNotifications={clearNotifications}
       >
         <Suspense fallback={<PremiumPageLoader />}>
           {renderPage()}

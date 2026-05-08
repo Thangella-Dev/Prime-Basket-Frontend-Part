@@ -19,7 +19,8 @@ export default function Header({
   theme = "light",
   onThemeToggle,
   notifications = [],
-  markAllRead
+  markAllRead,
+  clearNotifications,
 }) {
   const t = useT(language);
   const isDark = theme === "dark";
@@ -577,9 +578,14 @@ export default function Header({
                       <p>{unreadCount > 0 ? `${unreadCount} unread updates` : "Everything is up to date"}</p>
                     </div>
                     {notifications.length > 0 && (
-                      <button type="button" className="notes-mark-read" onClick={markAllRead}>
-                        Mark all read
-                      </button>
+                      <div className="notes-actions">
+                        <button type="button" className="notes-mark-read" onClick={markAllRead}>
+                          Mark all read
+                        </button>
+                        <button type="button" className="notes-mark-read notes-clear" onClick={clearNotifications}>
+                          Clear notifications
+                        </button>
+                      </div>
                     )}
                   </div>
 
@@ -736,9 +742,14 @@ export default function Header({
                     <p>{unreadCount > 0 ? `${unreadCount} unread updates` : "Everything is up to date"}</p>
                   </div>
                   {notifications.length > 0 && (
-                    <button type="button" className="notes-mark-read" onClick={markAllRead}>
-                      Mark all read
-                    </button>
+                    <div className="notes-actions">
+                      <button type="button" className="notes-mark-read" onClick={markAllRead}>
+                        Mark all read
+                      </button>
+                      <button type="button" className="notes-mark-read notes-clear" onClick={clearNotifications}>
+                        Clear notifications
+                      </button>
+                    </div>
                   )}
                 </div>
 

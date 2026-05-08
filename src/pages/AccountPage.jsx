@@ -158,7 +158,7 @@ function ConfirmDialog({
   );
 }
 
-function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSectionChange, orders: propOrders = [], language = "en", region = "in", onOrderSummary, onRateOrder, onOrderAgain, onDeleteOrder }) {
+function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSectionChange, orders: propOrders = [], notifications = [], onClearNotifications, language = "en", region = "in", onOrderSummary, onRateOrder, onOrderAgain, onDeleteOrder }) {
   const t = useT(language);
   const { logout, user, updateUser } = useAuth();
   const currSym = region === "ke" ? "KES " : "\u20b9";
@@ -231,7 +231,13 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
       {viewMode === "menu" ? (
         <div className="account-menu-stage">
           <div className="account-menu-hero">
-            <div className="account-menu-eyebrow">{t.account.title}</div>
+            <div className="account-title-row">
+              <div className="account-menu-eyebrow">{t.account.title}</div>
+              <button type="button" className="account-back-btn account-home-btn" onClick={onGoHome}>
+                <i className="fas fa-house"></i>
+                <span>{t.cart?.breadcrumbHome || "Home"}</span>
+              </button>
+            </div>
             <h2>{user?.name ? `${user.name.split(" ")[0]}, choose what you want to manage` : "Choose what you want to manage"}</h2>
             <p>Open one section at a time for a cleaner, full-screen account experience.</p>
           </div>
@@ -259,11 +265,20 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
       ) : (
         <div className="account-detail-stage">
           <div className="account-detail-bar">
-            <button type="button" className="account-back-btn" onClick={backToMenu}>
-              <i className="fas fa-arrow-left"></i>
-              <span>Back</span>
-            </button>
+            <div className="account-detail-actions">
+              <button type="button" className="account-back-btn" onClick={backToMenu}>
+                <i className="fas fa-arrow-left"></i>
+                <span>Back</span>
+              </button>
+            </div>
             <div className="account-detail-copy">
+              <div className="account-title-row">
+                <div className="account-menu-eyebrow">{t.account.title}</div>
+                <button type="button" className="account-back-btn account-home-btn" onClick={onGoHome}>
+                  <i className="fas fa-house"></i>
+                  <span>{t.cart?.breadcrumbHome || "Home"}</span>
+                </button>
+              </div>
               <h2>{sectionMeta[section]?.title || t.account.title}</h2>
               <p>{sectionMeta[section]?.subtitle || "Manage your account section details."}</p>
             </div>
@@ -275,7 +290,7 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
             {section === "addresses" && <AddressSection t={t} language={language} region={region} />}
             {section === "refunds" && <RefundsDemoSection t={t} currSym={currSym} region={region} language={language} />}
             {section === "giftcards" && <GiftCardsSection t={t} currSym={currSym} language={language} />}
-            {section === "notifications" && <NotificationsSection t={t} language={language} />}
+            {section === "notifications" && <NotificationsSection t={t} language={language} notifications={notifications} onClearNotifications={onClearNotifications} />}
             {section === "payments" && <PaymentsSection t={t} region={region} language={language} />}
             {section === "help" && <HelpSection t={t} language={language} />}
           </div>
@@ -1672,59 +1687,81 @@ function GiftCardsSection({ t, currSym }) {
 
 /* ─── Notifications Component ────────────────────────────────────── */
 
-function NotificationsSection({ t, language }) {
-  const notifications = [
-    { 
-      title: language === "ke" ? "Agizo Limewasilishwa" : "Order Delivered", 
-      desc: language === "ke" ? "Agizo lako #PB1023 limewasilishwa kwa mafanikio." : "Your order #PB1023 has been delivered successfully.", 
-      time: language === "ke" ? "saa 2 zilizopita" : "2 hours ago", 
-      icon: "fa-check-circle", color: "#16a34a" 
-    },
-    { 
-      title: language === "ke" ? "Iko Njiani" : "Out for Delivery", 
-      desc: language === "ke" ? "Agizo lako #PB1025 liko njiani na mshirika wetu." : "Your order #PB1025 is out for delivery with our partner.", 
-      time: language === "ke" ? "saa 5 zilizopita" : "5 hours ago", 
-      icon: "fa-truck", color: "#1d5ba0" 
-    },
-    { 
-      title: language === "ke" ? "Ofa Maalum" : "Special Offer", 
-      desc: language === "ke" ? "Pata punguzo la 20% kwenye agizo lako lijalo kwa kutumia kodi PB20." : "Get 20% off on your next grocery order with code PB20.", 
-      time: language === "ke" ? "siku 1 iliyopita" : "1 day ago", 
-      icon: "fa-tag", color: "#f59e0b" 
-    },
-    { 
-      title: language === "ke" ? "Sasisho la Akaunti" : "Account Update", 
-      desc: language === "ke" ? "Maelezo ya profaili yako yamesasishwa kwa mafanikio." : "Your profile details have been updated successfully.", 
-      time: language === "ke" ? "siku 2 zilizopita" : "2 days ago", 
-      icon: "fa-user-cog", color: "#64748b" 
-    },
-  ];
+function NotificationsSection({ t, notifications = [], onClearNotifications }) {
+  const accountNotifications = notifications.length > 0
+    ? notifications.map((note) => {
+        const typeConfig = {
+          success: { icon: "fa-check-circle", color: "#16a34a" },
+          warning: { icon: "fa-triangle-exclamation", color: "#f59e0b" },
+          error: { icon: "fa-circle-exclamation", color: "#ef4444" },
+          info: { icon: "fa-bell", color: "#1d5ba0" },
+        };
+        const config = typeConfig[note.type] || typeConfig.info;
+        return {
+          title: note.title,
+          desc: note.message,
+          time: note.time,
+          icon: config.icon,
+          color: config.color,
+        };
+      })
+    : [];
 
   return (
     <div className="notifications-card">
-      <h2 style={{ marginBottom: "25px" }}>{t.header.notifications}</h2>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "25px", flexWrap: "wrap" }}>
+        <h2 style={{ marginBottom: 0 }}>{t.header.notifications}</h2>
+        {notifications.length > 0 && (
+          <button
+            type="button"
+            onClick={onClearNotifications}
+            style={{
+              border: "1px solid rgba(239,68,68,0.18)",
+              background: "#fff5f5",
+              color: "#dc2626",
+              borderRadius: "999px",
+              padding: "10px 14px",
+              fontSize: "12px",
+              fontWeight: 800,
+              fontFamily: "inherit",
+              cursor: "pointer",
+            }}
+          >
+            <i className="fas fa-trash-can" style={{ marginRight: 8 }}></i>
+            Clear Notifications
+          </button>
+        )}
+      </div>
       <div className="notifications-list">
-        {notifications.map((note, i) => (
-          <div key={i} className="notification-item" style={{
-            display: "flex", gap: "16px", padding: "16px", border: "1px solid #ececec",
-            borderRadius: "12px", marginBottom: "12px", background: "#fff",
-            transition: "0.2s"
-          }} onMouseEnter={e => e.currentTarget.style.borderColor = "#1d5ba0"} onMouseLeave={e => e.currentTarget.style.borderColor = "#ececec"}>
-            <div style={{
-              width: "42px", height: "42px", borderRadius: "50%", background: note.color + "15",
-              color: note.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
-            }}>
-              <i className={`fas ${note.icon}`}></i>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <strong style={{ color: "#253d4e", fontSize: "14px" }}>{note.title}</strong>
-                <span style={{ fontSize: "11px", color: "#94a3b8" }}>{note.time}</span>
+        {accountNotifications.length === 0 ? (
+          <EmptySectionState
+            icon="fa-bell-slash"
+            title="No notifications yet"
+            description="Order updates, offers, and account alerts will show up here once you receive them."
+          />
+        ) : (
+          accountNotifications.map((note, i) => (
+            <div key={i} className="notification-item" style={{
+              display: "flex", gap: "16px", padding: "16px", border: "1px solid #ececec",
+              borderRadius: "12px", marginBottom: "12px", background: "#fff",
+              transition: "0.2s"
+            }} onMouseEnter={e => e.currentTarget.style.borderColor = "#1d5ba0"} onMouseLeave={e => e.currentTarget.style.borderColor = "#ececec"}>
+              <div style={{
+                width: "42px", height: "42px", borderRadius: "50%", background: note.color + "15",
+                color: note.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
+              }}>
+                <i className={`fas ${note.icon}`}></i>
               </div>
-              <p style={{ fontSize: "13px", color: "#64748b", margin: "4px 0 0" }}>{note.desc}</p>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <strong style={{ color: "#253d4e", fontSize: "14px" }}>{note.title}</strong>
+                  <span style={{ fontSize: "11px", color: "#94a3b8" }}>{note.time}</span>
+                </div>
+                <p style={{ fontSize: "13px", color: "#64748b", margin: "4px 0 0" }}>{note.desc}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

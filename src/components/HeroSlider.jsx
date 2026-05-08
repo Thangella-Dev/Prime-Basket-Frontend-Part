@@ -88,6 +88,14 @@ export default function HeroSlider({ language = "en" }) {
     setCurrent(index);
   };
 
+  const goToPrevious = () => {
+    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  const goToNext = () => {
+    setCurrent((prev) => (prev + 1) % slides.length);
+  };
+
   return (
     <div
       className="slider"
@@ -99,7 +107,11 @@ export default function HeroSlider({ language = "en" }) {
         className="slider-track"
       >
         {slides.map((slide, i) => (
-          <div key={i} className={`slide${i === current ? " active" : ""}`}>
+          <div
+            key={i}
+            className={`slide${i === current ? " active" : ""}`}
+            style={{ "--hero-art": `url(${slide.img})` }}
+          >
             <div className="content">
               <div className="hero-top-row">
                 <div className="hero-eyebrow">
@@ -141,24 +153,40 @@ export default function HeroSlider({ language = "en" }) {
                   </div>
                 </div>
                 <div className="image-container">
-                  <div className="hero-media-card">
-                    <div className="hero-floating-chip">
-                      <i className="fas fa-crown"></i>
-                      {heroUi.floating}
-                    </div>
-                    <img
-                      src={slide.img}
-                      alt={slide.alt}
-                      decoding="async"
-                      loading={i === 0 ? "eager" : "lazy"}
-                      fetchPriority={i === 0 ? "high" : "auto"}
-                    />
+                  <div className="hero-floating-chip">
+                    <i className="fas fa-crown"></i>
+                    {heroUi.floating}
                   </div>
-                </div>
+                  <img
+                    src={slide.img}
+                    alt={slide.alt}
+                    decoding="async"
+                    loading={i === 0 ? "eager" : "lazy"}
+                    fetchPriority={i === 0 ? "high" : "auto"}
+                  />
+                  </div>
               </div>
             </div>
           </div>
         ))}
+      </div>
+      <div className="slider-nav" aria-label="Slide navigation">
+        <button
+          type="button"
+          className="slider-nav-btn"
+          onClick={goToPrevious}
+          aria-label="Previous slide"
+        >
+          <i className="fas fa-chevron-left"></i>
+        </button>
+        <button
+          type="button"
+          className="slider-nav-btn"
+          onClick={goToNext}
+          aria-label="Next slide"
+        >
+          <i className="fas fa-chevron-right"></i>
+        </button>
       </div>
       <div className="dots">
         {slides.map((_, i) => (
