@@ -185,7 +185,7 @@ export default function App() {
   const [underDevLabel, setUnderDevLabel] = useState("");
 
   // Scroll to top on every page change
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [page, selectedProduct]);
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [page, selectedCategory, selectedProduct]);
 
   // Sync orders from localStorage if updated elsewhere
   useEffect(() => {
@@ -298,7 +298,12 @@ export default function App() {
     setSelectedProduct(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const goCategory = (cat) => { setSelectedCategory(cat); setSelectedProduct(null); setPage("category"); };
+  const goCategory = (cat) => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+    setSelectedCategory(cat);
+    setSelectedProduct(null);
+    setPage("category");
+  };
   const openProduct = (product) => { setSelectedProduct(product); setPage("product"); };
   const goCart = () => setPage("cart");
   const goWishlist = () => setPage("wishlist");
@@ -863,7 +868,7 @@ export default function App() {
         onRegionChange={handleRegionChange}
         theme={theme}
         onThemeToggle={() => setTheme((prev) => (prev === "dark" ? "light" : "dark"))}
-        showFooter={!["category", "account", "payment", "cart", "product", "order-success", "order-tracking", "order-detail", "rate-order", "under-dev"].includes(page)}
+        showFooter={page === "home"}
 
         // Chatbot props
         cart={cart}

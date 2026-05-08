@@ -1,10 +1,11 @@
 // src/pages/CategoryPage.jsx
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { database, hasFirebaseConfig } from "../firebase";
 import { ref, get } from "firebase/database";
 import { useT } from "../i18n/translations";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
 import { mergeCategoryProducts } from "../data/catalogFallback";
+import { formatCurrencyDisplay } from "../utils/currency";
 
 const CATEGORIES_DATA = [
   { value: "rice", icon: "fa-seedling", key: "rice" },
@@ -64,6 +65,15 @@ const clampRange = (range, min, max) => {
   return start <= end ? [start, end] : [end, start];
 };
 
+const prepareCategoryProduct = (product, region) => ({
+  ...product,
+  price: formatCurrencyDisplay(product.price, region),
+  oldPrice: product.oldPrice ? formatCurrencyDisplay(product.oldPrice, region) : product.oldPrice,
+  _price: parsePrice(product.price),
+  _oldPrice: parsePrice(product.oldPrice),
+  _discount: calcDiscount(product.price, product.oldPrice),
+});
+
 export default function CategoryPage({
   category, onCategoryChange, onBack,
   onAddCart, onDecreaseCart, onOpenProduct,
@@ -75,6 +85,8 @@ export default function CategoryPage({
   const isKenya = region === "ke";
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const categoryTopRef = useRef(null);
+  const productsScrollRef = useRef(null);
   const [theme, setTheme] = useState(() => (typeof document !== "undefined" ? document.body.dataset.theme || "light" : "light"));
   const isDark = theme === "dark";
   const palette = isDark
@@ -137,7 +149,41 @@ export default function CategoryPage({
         brand: "Brand",
       };
 
+  const resetCategoryScrollPosition = (behavior = "auto") => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior });
+    }
+
+    if (typeof document !== "undefined") {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+
+    if (productsScrollRef.current) {
+      productsScrollRef.current.scrollTo({ top: 0, behavior });
+      productsScrollRef.current.scrollTop = 0;
+    }
+
+    categoryTopRef.current?.scrollIntoView({ block: "start", behavior });
+  };
+
   // ── Load products from Firebase ───────────────────────────────────────────
+  useLayoutEffect(() => {
+    resetCategoryScrollPosition("auto");
+  }, [category]);
+
+  useEffect(() => {
+    if (!loading) {
+      const frame = window.requestAnimationFrame(() => {
+        resetCategoryScrollPosition("auto");
+      });
+
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    return undefined;
+  }, [category, loading]);
+
   useEffect(() => {
     if (!category) return;
     setLoading(true);
@@ -158,23 +204,15 @@ export default function CategoryPage({
         return pcat === targetCat;
       });
 
-      setProducts(localData.map((p, i) => ({
-        ...p,
-        _price: parsePrice(p.price),
-        _oldPrice: parsePrice(p.oldPrice),
-        _discount: calcDiscount(p.price, p.oldPrice),
-      })));
+      setProducts(localData.map((p) => prepareCategoryProduct(p, region)));
       setLoading(false);
       return;
     }
 
     if (!hasFirebaseConfig || !database) {
-      const fallbackProducts = mergeCategoryProducts(category).map((product) => ({
-        ...product,
-        _price: parsePrice(product.price),
-        _oldPrice: parsePrice(product.oldPrice),
-        _discount: calcDiscount(product.price, product.oldPrice),
-      }));
+      const fallbackProducts = mergeCategoryProducts(category).map((product) =>
+        prepareCategoryProduct(product, region)
+      );
       setProducts(fallbackProducts);
       setLoading(false);
       return;
@@ -193,28 +231,20 @@ export default function CategoryPage({
               _uid: `${category}_${i}`,
             }))
           : []
-        ).map((product) => ({
-          ...product,
-          _price: parsePrice(product.price),
-          _oldPrice: parsePrice(product.oldPrice),
-          _discount: calcDiscount(product.price, product.oldPrice),
-        }));
+        ).map((product) => prepareCategoryProduct(product, region));
 
         setProducts(mergedProducts);
         setLoading(false);
       })
       .catch((error) => {
         console.error("Category fetch failed, using fallback catalog:", error);
-        const fallbackProducts = mergeCategoryProducts(category).map((product) => ({
-          ...product,
-          _price: parsePrice(product.price),
-          _oldPrice: parsePrice(product.oldPrice),
-          _discount: calcDiscount(product.price, product.oldPrice),
-        }));
+        const fallbackProducts = mergeCategoryProducts(category).map((product) =>
+          prepareCategoryProduct(product, region)
+        );
         setProducts(fallbackProducts);
         setLoading(false);
       });
-  }, [category, language]);
+  }, [category, language, region]);
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
@@ -1128,7 +1158,7 @@ export default function CategoryPage({
       `}</style>
 
       {/* Breadcrumb */}
-      <div className="cat-breadcrumb" style={{ background: palette.sectionBg, borderBottom: `1px solid ${palette.borderSoft}`, padding: "12px 0" }}>
+      <div ref={categoryTopRef} className="cat-breadcrumb" style={{ background: palette.sectionBg, borderBottom: `1px solid ${palette.borderSoft}`, padding: "12px 0" }}>
         <div className="container" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: palette.muted }}>
           <span onClick={onBack} style={{ color: palette.accent, fontWeight: 600, cursor: "pointer" }}>{t.cart.breadcrumbHome}</span>
           <i className="fas fa-chevron-right" style={{ fontSize: 10 }}></i>
@@ -1209,7 +1239,7 @@ export default function CategoryPage({
           </div>
 
           {/* ── MIDDLE: Products ── */}
-          <main className="cat-mobile-products">
+          <main ref={productsScrollRef} className="cat-mobile-products">
 
             {!loading && filteredProducts.length > 0 ? (
               <div className="cat-mobile-banner" onClick={() => onOpenProduct?.(filteredProducts[0])}>
