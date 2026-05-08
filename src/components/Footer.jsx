@@ -43,12 +43,11 @@ export default function Footer({ language = "en", region = "in" }) {
       <div className="footer-top">
         <div className="footer-col footer-brand">
           <a href="#" className="brand-logo" onClick={(event) => event.preventDefault()}>
-            <div className="logo-icon">
-              <img src="assets/logo watermark 3.png" alt="Prime Basket logo" />
-            </div>
-            <div className="logo-text">
-              <strong>PRIME-BASKET</strong>
-            </div>
+            <img
+              src="assets/prime-basket-brand.png"
+              alt="Prime Basket"
+              className="brand-logo-image brand-logo-image-footer"
+            />
           </a>
 
           <p className="brand-desc">

@@ -754,6 +754,16 @@ body.prime-drawer-open .hamburger * {
   box-shadow: 0 18px 28px rgba(15,23,42,0.08);
   transform: scale(0.985);
 }
+.brand-logo-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.brand-logo-image-header {
+  width: clamp(190px, 22vw, 330px);
+  max-width: 44vw;
+}
 .logo-icon { width: 60px; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
 .logo-text { font-family: 'Outfit', 'Quicksand', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--navy); letter-spacing: 0.06em; text-transform: uppercase; line-height: 1; }
 .nav-search-row {
@@ -1368,8 +1378,7 @@ body.prime-drawer-open .hamburger * {
   .hamburger { display: flex; }
   .nav-inner { gap: 8px; height: 60px; padding: 0 10px; overflow: visible; }
   .nav-left { min-width: 0; width: 100%; }
-  .logo-icon { width: 40px; height: 40px; }
-  .logo-text { display: block; font-size: 0.8rem; letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .brand-logo-image-header { width: clamp(156px, 42vw, 220px); max-width: 54vw; }
   .brand-link { padding: 4px 4px 4px 2px; margin-left: 0; gap: 8px; min-width: 0; max-width: 100%; }
   .hamburger {
     width: 38px;
@@ -1386,7 +1395,7 @@ body.prime-drawer-open .hamburger * {
 }
 @media (max-width: 400px) {
   .nav-inner { padding: 0 8px; gap: 6px; }
-  .logo-text { display: block; font-size: 0.74rem; letter-spacing: 0.02em; }
+  .brand-logo-image-header { width: clamp(142px, 46vw, 192px); max-width: 56vw; }
   .mobile-header-actions { gap: 4px; }
   .mobile-header-icon-btn,
   .hamburger { width: 36px; height: 36px; }
@@ -1896,6 +1905,15 @@ body.prime-drawer-open .hamburger * {
   margin: 0;
 }
 .deals-title::after { content: none; }
+.category-intro-title::after {
+  content: "";
+  width: 66px;
+  height: 4px;
+  border-radius: 999px;
+  margin-left: 14px;
+  background: linear-gradient(90deg, #1d5ba0 0%, rgba(29,91,160,0.22) 100%);
+  align-self: center;
+}
 .deals-subtitle {
   margin-top: 12px !important;
   margin-bottom: 0 !important;
@@ -1929,6 +1947,9 @@ body.prime-drawer-open .hamburger * {
   background: rgba(23,79,145,0.08);
   flex-shrink: 0;
 }
+.category-intro-subtitle {
+  max-width: 52ch;
+}
 .deals-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .prod-card { background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(249,252,255,0.98) 100%); border-radius: 24px; box-shadow: 0 18px 42px rgba(15,23,42,.08); overflow: hidden; display: flex; flex-direction: column; position: relative; transition: transform .25s ease, box-shadow .25s ease; cursor: pointer; border: 1px solid rgba(148,163,184,0.16); }
 .prod-card:hover { transform: translateY(-6px); box-shadow: 0 28px 52px rgba(15,23,42,.12); }
@@ -1951,6 +1972,7 @@ body.prime-drawer-open .hamburger * {
   .deals-header { flex-direction: column; align-items: flex-start; gap: 14px; padding: 18px 18px 16px; }
   .deals-subtitle { max-width: none; font-size: 0.94rem; line-height: 1.6; }
   .deals-all-link { width: 100%; justify-content: space-between; }
+  .category-intro-title::after { width: 50px; margin-left: 10px; }
 }
 
 /* ── BANNER TRIO ── */
@@ -2329,6 +2351,9 @@ body.prime-drawer-open .hamburger * {
 .footer-col ul li a:hover { color: #fff; }
 
 .brand-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; text-decoration: none; }
+.brand-logo-image-footer {
+  width: min(100%, 280px);
+}
 .brand-logo .logo-icon { width: 60px; height: 60px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .brand-logo .logo-text strong { display: block; font-size: 1.15rem; font-weight: 800; color: #fff; letter-spacing: 0.05em; font-family: 'Outfit', 'Quicksand', sans-serif; }
 .brand-desc { font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.65; margin-bottom: 20px; }
@@ -2387,6 +2412,7 @@ body.prime-drawer-open .hamburger * {
   .footer-col { text-align: left; }
   .footer-col ul { align-items: flex-start; }
   .brand-logo { justify-content: flex-start; }
+  .brand-logo-image-footer { width: min(100%, 220px); }
   .contact-list li { justify-content: flex-start; }
   .app-buttons { justify-content: flex-start; }
   .payment-icons { justify-content: flex-start; }
@@ -2589,6 +2615,10 @@ body[data-theme="dark"] .deals-all-link {
 
 body[data-theme="dark"] .deals-all-link-icon {
   background: rgba(156,200,255,0.12);
+}
+
+body[data-theme="dark"] .category-intro-title::after {
+  background: linear-gradient(90deg, #8fc2ff 0%, rgba(143,194,255,0.18) 100%);
 }
 
 body[data-theme="dark"] .logo-text,

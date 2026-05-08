@@ -500,10 +500,11 @@ export default function Header({
         <div className="nav-inner">
         <div className="nav-left" style={{ display: "flex", alignItems: "center", gap: "15px" }}>
           <a href="#" className={`logo brand-link${brandTap ? " brand-link-active" : ""}`} onClick={handleBrandClick}>
-            <div className="logo-icon">
-              <img src="assets/logo watermark 3.png" alt="Prime Basket logo" />
-            </div>
-            <span className="logo-text">PRIME-BASKET</span>
+            <img
+              src="assets/prime-basket-brand.png"
+              alt="Prime Basket"
+              className="brand-logo-image brand-logo-image-header"
+            />
           </a>
         </div>
 

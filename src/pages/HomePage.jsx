@@ -791,16 +791,19 @@ export default function HomePage({
 
       <section className="cat-section">
         <div className="container">
-          <div className="sec-header">
-            <div> 
-              <div className="sec-title">
+          <div className="deals-header category-intro-card">
+            <div className="deals-copy category-intro-copy">
+              <h2 className="deals-title category-intro-title">
                 <span className="section-title-icon"><Compass size={18} /></span>
                 <span className="section-title-text">{t.home.shopByCategory}</span>
-              </div>
-              <p className="section-subtitle compact">{homeUi.categoriesDescription}</p>
+              </h2>
+              <p className="section-subtitle compact deals-subtitle category-intro-subtitle">{homeUi.categoriesDescription}</p>
             </div>
-            <a href="#" className="view-all" onClick={(e) => { e.preventDefault(); onCategorySelect && onCategorySelect("all"); }}>
-              {t.home.allCategories} <ChevronRight size={14} style={{ verticalAlign: "middle" }} /> 
+            <a href="#" className="deals-all-link category-intro-link" onClick={(e) => { e.preventDefault(); onCategorySelect && onCategorySelect("all"); }}>
+              <span className="deals-all-link-text">{t.home.allCategories}</span>
+              <span className="deals-all-link-icon">
+                <ChevronRight size={14} />
+              </span>
             </a>
           </div>
           <div className="cat-grid">
