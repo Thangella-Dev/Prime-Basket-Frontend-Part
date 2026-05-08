@@ -4,12 +4,36 @@ function normalizeCategory(category) {
   return String(category || "").trim().toLowerCase();
 }
 
+// Generate stable UID based on product properties, not array index
+function generateStableUid(product, category) {
+  const cat = normalizeCategory(category || product._cat);
+  const name = (product.name || "").toLowerCase().trim().replace(/\s+/g, '-');
+  const brand = (product.brand || "").toLowerCase().trim().replace(/\s+/g, '-');
+
+  const legacyIndexUid = typeof product._uid === 'string' && /^.+_\d+$/.test(product._uid);
+  if (product._uid && !legacyIndexUid) {
+    return product._uid;
+  }
+
+  if (name && brand) {
+    return `${cat}_${brand}_${name}`;
+  }
+  if (name) {
+    return `${cat}_${name}`;
+  }
+
+  const index = product._index ?? 0;
+  return `${cat}_${index}`;
+}
+
 function withCatalogMeta(product, category, index) {
+  const stableUid = generateStableUid(product, category);
+  
   return {
     ...product,
     _cat: product._cat || category,
     _index: product._index ?? index,
-    _uid: product._uid || `${product._cat || category}_${product._index ?? index}`,
+    _uid: stableUid,
     stock: product.stock ?? 18,
     inStock: product.inStock !== false,
     delivery: product.delivery || (product.badge?.toLowerCase() === "sale" ? "10 min" : "Today 6PM"),

@@ -465,9 +465,9 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
   const [orderFilter, setOrderFilter] = useState("Delivered"); // Default filter
   const [orderToDelete, setOrderToDelete] = useState(null);
 
-  // Update 'now' every 10 seconds to refresh the 2-minute timer
+  // Refreshes the UI state for time-dependent logic
   useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), 10000);
+    const interval = setInterval(() => setNow(Date.now()), 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -2160,7 +2160,7 @@ function HelpSection({ t, language }) {
         return (
           <div key={category} className="faq-accordion-category">
             <div
-              className={`faq-cat-header${isOpen ? " active" : ""}`}
+              className={`faq-cat-header ${isOpen ? "active" : ""}`}
               onClick={() => toggleCategory(category)}
             >
               <div className="faq-cat-left">
@@ -2178,7 +2178,7 @@ function HelpSection({ t, language }) {
                   const faqKey = `${catIdx}_${qIdx}`;
                   const isQOpen = openFaq === faqKey;
                   return (
-                    <div key={qIdx} className="faq-accordion-item">
+                      <div key={faqKey} className="faq-accordion-item">
                       <div
                         className={`faq-q-header${isQOpen ? " active" : ""}`}
                         onClick={() => toggleFaq(faqKey)}

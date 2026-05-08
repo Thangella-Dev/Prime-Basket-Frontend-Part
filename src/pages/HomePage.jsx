@@ -7,6 +7,7 @@ import { getFallbackCategoryProducts, mergeCategoryProducts } from "../data/cata
 import { formatCurrencyDisplay } from "../utils/currency";
 import { safeSessionGet, safeSessionRemove, safeSessionSet } from "../utils/safeStorage";
 import HeroSlider from "../components/HeroSlider";
+import { Flame, Bolt, Compass, Crown, ChevronRight, ChevronLeft, ShoppingCart, Heart, ArrowRight } from "lucide-react";
 
 const ALL_CATS = [
   "rice", "oil", "wheat-flour", "salt", "sugar", "chilli-powder",
@@ -28,6 +29,7 @@ const MULTICOL_CATS = {
 const BADGE_CLASSES = ["bs", "bh", "bo", "bn"];
 const RAIL_GAP_DESKTOP = 16;
 const RAIL_GAP_MOBILE = 12;
+const RAIL_INTERACTIVE_SELECTOR = 'button, a, input, select, textarea, [data-rail-ignore-drag="true"]';
 
 const getRailVisibleCount = (width) => {
   if (width <= 480) return 1;
@@ -53,11 +55,15 @@ const getRailMetricsForWidth = (width, itemCount) => {
   };
 };
 
+const isRailInteractiveTarget = (target) =>
+  target instanceof Element && Boolean(target.closest(RAIL_INTERACTIVE_SELECTOR));
+
 const fetchCategory = (cat) =>
   get(ref(database, `categories/${cat}`)).then((snap) => {
     const val = snap.val();
+    // Don't assign _uid here - let mergeCategoryProducts handle stable UID generation
     const liveProducts = val
-      ? Object.values(val).map((p, i) => ({ ...p, _cat: cat, _index: i, _uid: `${cat}_${i}` }))
+      ? Object.values(val).map((p, i) => ({ ...p, _cat: cat, _index: i }))
       : [];
     return mergeCategoryProducts(cat, liveProducts);
   });
@@ -67,7 +73,8 @@ const fetchWithCache = async (cat) => {
   const cached = safeSessionGet(cacheKey);
   if (cached) {
     try {
-      return JSON.parse(cached);
+      const saved = JSON.parse(cached);
+      return mergeCategoryProducts(cat, saved);
     } catch {
       safeSessionRemove(cacheKey);
     }
@@ -547,7 +554,7 @@ export default function HomePage({
             toggleWishlist && toggleWishlist(p);
           }}
         >
-          <i className={isWished ? "fas fa-heart" : "far fa-heart"}></i>
+          <Heart size={18} fill={isWished ? "#fff" : "none"} style={{ color: isWished ? "#fff" : "currentColor" }} />
         </button>
         <div className="pimg">
           <img src={p.imageUrl} alt={translatedName} loading="lazy" decoding="async" />
@@ -587,7 +594,7 @@ export default function HomePage({
               onClick={() => onAddCart && onAddCart(p)}
               style={{ marginTop: "8px" }}
             >
-              <i className="fas fa-basket-shopping"></i> {t.home.add}
+              <ShoppingCart size={14} style={{ marginRight: 8 }} /> {t.home.add}
             </button>
           )}
         </div>
@@ -601,7 +608,7 @@ export default function HomePage({
         <div className="container">
           <div className="home-showcase-grid">
             <div className="home-showcase-hero">
-              <HeroSlider language={language} />
+              <HeroSlider language={language} /> 
             </div>
             <div className="home-intro-copy">
               <span className="section-kicker">{homeUi.kicker}</span>
@@ -611,7 +618,7 @@ export default function HomePage({
             <div className="home-intro-highlights">
               {homeUi.highlights.map((item) => (
                 <div key={item.label} className="home-highlight-card">
-                  <div className="home-highlight-icon">
+                  <div className="home-highlight-icon"> 
                     <i className={`fas ${item.icon}`}></i>
                   </div>
                   <strong>{item.value}</strong>
@@ -627,8 +634,8 @@ export default function HomePage({
         <div className="container">
           <div className="sec-header">
             <div>
-              <div className="sec-title">
-                <span className="section-title-icon"><i className="fas fa-fire-flame-curved"></i></span>
+              <div className="sec-title"> 
+                <span className="section-title-icon"><Flame size={18} /></span>
                 <span className="section-title-text">{t.home.popular}</span>
               </div>
               <p className="section-subtitle compact">{homeUi.sectionDescription}</p>
@@ -649,25 +656,25 @@ export default function HomePage({
             <div className="sidebar">
               <div className="cat-box">
                 <h3>{t.home.category}</h3>
-                {[
-                  { key: "fruits", icon: "fa-apple-alt", label: t.categories.freshFruits },
-                  { key: "vegetables", icon: "fa-carrot", label: t.categories.vegetables },
-                  { key: "dairyProducts", icon: "fa-cheese", label: t.categories.dairyProducts },
-                  { key: "chipsAndNamkeens", icon: "fa-cookie-bite", label: t.categories.chipsNamkeens },
-                  { key: "coolDrinks", icon: "fa-glass-cheers", label: t.categories.coolDrinks },
-                  { key: "instantFood", icon: "fa-bolt", label: t.categories.instantFood },
-                  { key: "babyCare", icon: "fa-baby", label: t.categories.babyCare },
-                  { key: "bodyCare", icon: "fa-spa", label: t.categories.bodyCare },
-                  { key: "feminineHygiene", icon: "fa-female", label: t.categories.feminineHygiene },
+                {[ 
+                  { key: "fruits", icon: "fa-solid fa-apple-whole", label: t.categories.freshFruits },
+                  { key: "vegetables", icon: "fa-solid fa-carrot", label: t.categories.vegetables },
+                  { key: "dairyProducts", icon: "fa-solid fa-cheese", label: t.categories.dairyProducts },
+                  { key: "chipsAndNamkeens", icon: "fa-solid fa-cookie-bite", label: t.categories.chipsNamkeens },
+                  { key: "coolDrinks", icon: "fa-solid fa-glass-water", label: t.categories.coolDrinks },
+                  { key: "instantFood", icon: "fa-solid fa-bolt", label: t.categories.instantFood },
+                  { key: "babyCare", icon: "fa-solid fa-baby", label: t.categories.babyCare },
+                  { key: "bodyCare", icon: "fa-solid fa-spa", label: t.categories.bodyCare },
+                  { key: "feminineHygiene", icon: "fa-solid fa-person-dress", label: t.categories.feminineHygiene },
                 ].map((c) => (
                   <div key={c.key} className="cat-item" style={{ cursor: "pointer" }} onClick={() => onCategorySelect && onCategorySelect(c.key)}>
                     <div className="cat-item-l">
                       <div className="cicon"><i className={`fas ${c.icon}`}></i></div>
                       {c.label}
                     </div>
-                    <i className="fas fa-chevron-right" style={{ fontSize: "10px", color: "#bbb" }}></i>
+                    <ChevronRight size={14} style={{ color: "#bbb" }} />
                   </div>
-                ))}
+                ))} 
               </div>
               <div className="tags-box">
                 <h3>{t.home.productTags}</h3>
@@ -683,15 +690,15 @@ export default function HomePage({
       <section className="deals-section">
         <div className="deals-header">
           <div>
-            <h2 className="deals-title">
-              <span className="section-title-icon"><i className="fas fa-bolt"></i></span>
+            <h2 className="deals-title"> 
+              <span className="section-title-icon"><Bolt size={18} /></span>
               <span className="section-title-text">{t.home.deals}</span>
             </h2>
             <p className="section-subtitle compact">{homeUi.dealsDescription}</p>
           </div>
           <a href="#" className="deals-all-link" onClick={(e) => { e.preventDefault(); onCategorySelect && onCategorySelect("all"); }}>
-            {t.home.allDeals} <i className="fa-solid fa-chevron-right" style={{ fontSize: "10px" }}></i>
-          </a>
+            {t.home.allDeals} <ChevronRight size={14} style={{ verticalAlign: "middle" }} />
+          </a> 
         </div>
           <div className="deals-grid">
           {loading
@@ -713,7 +720,7 @@ export default function HomePage({
                           toggleWishlist && toggleWishlist(d);
                         }}
                       >
-                        <i className={isWished ? "fas fa-heart" : "far fa-heart"}></i>
+                        <Heart size={16} fill={isWished ? "#fff" : "none"} style={{ color: isWished ? "#fff" : "currentColor" }} />
                       </button>
                       <img src={d.imageUrl} alt={translatedName} loading="lazy" decoding="async" />
                     </div>
@@ -743,7 +750,8 @@ export default function HomePage({
                           </div>
                         ) : (
                           <button className="padd" onClick={() => onAddCart && onAddCart(d)} style={{ marginTop: "8px" }}>
-                            <i className="fas fa-basket-shopping"></i> {t.home.add}
+                            <ShoppingCart size={14} style={{ marginRight: 8 }} />
+                            {t.home.add}
                           </button>
                         )}
                       </div>
@@ -764,12 +772,12 @@ export default function HomePage({
                 <a
                   href="#"
                   className="bbtn"
-                  onClick={(e) => {
+                  onClick={(e) => { 
                     e.preventDefault();
                     onCategorySelect && onCategorySelect(banner.target);
                   }}
                 >
-                  {t.home.shopNow} <i className="fa-solid fa-arrow-right" style={{ fontSize: "8px" }}></i>
+                  {t.home.shopNow} <ArrowRight size={12} style={{ verticalAlign: "middle" }} />
                 </a>
               </div>
               <div className="bimg"><img src={banner.image} alt="" loading="lazy" decoding="async" /></div>
@@ -781,15 +789,15 @@ export default function HomePage({
       <section className="cat-section">
         <div className="container">
           <div className="sec-header">
-            <div>
+            <div> 
               <div className="sec-title">
-                <span className="section-title-icon"><i className="fas fa-compass"></i></span>
+                <span className="section-title-icon"><Compass size={18} /></span>
                 <span className="section-title-text">{t.home.shopByCategory}</span>
               </div>
               <p className="section-subtitle compact">{homeUi.categoriesDescription}</p>
             </div>
             <a href="#" className="view-all" onClick={(e) => { e.preventDefault(); onCategorySelect && onCategorySelect("all"); }}>
-              {t.home.allCategories} <i className="fa-solid fa-chevron-right" style={{ fontSize: "10px" }}></i>
+              {t.home.allCategories} <ChevronRight size={14} style={{ verticalAlign: "middle" }} /> 
             </a>
           </div>
           <div className="cat-grid">
@@ -807,9 +815,9 @@ export default function HomePage({
       <section className="curated-section">
         <div className="container">
           <div className="sec-header">
-            <div>
+            <div> 
               <div className="sec-title">
-                <span className="section-title-icon"><i className="fas fa-crown"></i></span>
+                <span className="section-title-icon"><Crown size={18} /></span>
                 <span className="section-title-text">{t.home.topSelling}</span>
               </div>
               <p className="section-subtitle compact">{homeUi.curatedDescription}</p>
@@ -833,8 +841,8 @@ export default function HomePage({
                       onClick={() => scrollRail(col.key, -1)}
                       disabled={currentIndex <= 0}
                       aria-label={`Scroll ${col.title} left`}
-                    >
-                      <i className="fas fa-chevron-left"></i>
+                    > 
+                      <ChevronLeft size={16} />
                     </button>
                     <button
                       type="button"
@@ -842,8 +850,8 @@ export default function HomePage({
                       onClick={() => scrollRail(col.key, 1)}
                       disabled={currentIndex >= metrics.maxIndex}
                       aria-label={`Scroll ${col.title} right`}
-                    >
-                      <i className="fas fa-chevron-right"></i>
+                    > 
+                      <ChevronRight size={16} />
                     </button>
                   </div>
                 </div>
@@ -853,6 +861,7 @@ export default function HomePage({
                   style={{ "--rail-visible-count": metrics.visibleCount }}
                   onPointerDown={(event) => {
                     if (event.pointerType === "mouse" && event.button !== 0) return;
+                    if (isRailInteractiveTarget(event.target)) return;
                     if (metrics.maxIndex <= 0) return;
                     startRailGesture(col.key, event.clientX, event.clientY);
                     event.currentTarget.setPointerCapture?.(event.pointerId);
@@ -890,60 +899,66 @@ export default function HomePage({
                             <h6>{translatedName}</h6>
                             <div className="pstars">★ {item.stars || "4.0"} <span>({item.reviews || 0})</span></div>
                             <div className="mbrand">{item.brand}</div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                            <div className="mcurated-price-row">
                               <span className="mprice">{displayPrice(item.price)}</span>
                               {item.oldPrice && (
                                 <span className="mpold">{displayPrice(item.oldPrice)}</span>
                               )}
                             </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }} onClick={(e) => e.stopPropagation()}>
+                            <div
+                              className="mcurated-actions"
+                              data-rail-ignore-drag="true"
+                              onClick={(e) => e.stopPropagation()}
+                              onPointerDown={(e) => e.stopPropagation()}
+                            >
                               {qty > 0 ? (
                                 <div
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                    background: "var(--green)",
-                                    borderRadius: "8px",
-                                    padding: "2px 6px",
-                                    height: "30px",
-                                    color: "white",
-                                    fontWeight: 700,
-                                    flex: 1
-                                  }}
+                                  className="mcurated-qty"
+                                  data-rail-ignore-drag="true"
                                 >
                                   <button
+                                    type="button"
+                                    className="mcurated-qty-btn"
+                                    data-rail-ignore-drag="true"
+                                    onPointerDown={(e) => e.stopPropagation()}
                                     onClick={() => onDecreaseCart && onDecreaseCart(item._uid)}
-                                    style={{ background: "transparent", border: "none", color: "white", fontSize: "16px", cursor: "pointer", width: "24px", lineHeight: 1 }}
                                   >
                                     -
                                   </button>
-                                  <span style={{ fontSize: "13px" }}>{qty}</span>
+                                  <span className="mcurated-qty-value">{qty}</span>
                                   <button
+                                    type="button"
+                                    className="mcurated-qty-btn"
+                                    data-rail-ignore-drag="true"
+                                    onPointerDown={(e) => e.stopPropagation()}
                                     onClick={() => onAddCart && onAddCart(item)}
-                                    style={{ background: "transparent", border: "none", color: "white", fontSize: "16px", cursor: "pointer", width: "24px", lineHeight: 1 }}
                                   >
                                     +
                                   </button>
                                 </div>
                               ) : (
                                 <button
+                                  type="button"
                                   className="padd"
+                                  data-rail-ignore-drag="true"
+                                  onPointerDown={(e) => e.stopPropagation()}
                                   style={{ fontSize: 11, padding: "4px 10px", flex: 1 }}
                                   onClick={() => onAddCart && onAddCart(item)}
                                 >
-                                  <i className="fas fa-basket-shopping"></i> {t.home.add}
+                                  <ShoppingCart size={14} style={{ marginRight: 6 }} /> {t.home.add}
                                 </button>
                               )}
                               <button
-                                className="pwish"
-                                style={{ position: "static", opacity: 1, width: 28, height: 28, fontSize: 12, flexShrink: 0, ...(isWished ? { background: "#ff3b81", color: "#fff" } : {}) }}
+                                type="button"
+                                className={`pwish mcurated-wish-btn${isWished ? " active" : ""}`}
+                                data-rail-ignore-drag="true"
+                                onPointerDown={(e) => e.stopPropagation()}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   toggleWishlist && toggleWishlist(item);
                                 }}
                               >
-                                <i className={isWished ? "fas fa-heart" : "far fa-heart"}></i>
+                                <Heart size={16} fill={isWished ? "#fff" : "none"} style={{ color: isWished ? "#fff" : "currentColor" }} />
                               </button>
                             </div>
                           </div>

@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { createPortal } from "react-dom";
 import "./ProductCard.css";
 import { enhanceProduct, getProductPrices, formatCurrency } from "../utils/productUtils";
+import { Heart, ShoppingBasket, ChevronDown, Check, X } from 'lucide-react';
 
 export default function ProductCard({ 
   p: rawProduct, 
@@ -85,7 +86,7 @@ export default function ProductCard({
         className={`pwish-v2 ${isWished ? "active" : ""}`}
         onClick={(e) => { e.stopPropagation(); toggleWishlist && toggleWishlist(p); }}
       >
-        <i className={isWished ? "fas fa-heart" : "far fa-heart"}></i>
+        <Heart size={18} fill={isWished ? "currentColor" : "none"} stroke={isWished ? "#ff3b81" : "currentColor"} color={isWished ? "#ff3b81" : "currentColor"} />
       </button>
 
       {/* Product Image */}
@@ -98,16 +99,18 @@ export default function ProductCard({
       <div className="pname-v2">{getTranslatedName(p.name)}</div>
       {(p.stars != null || p.reviews != null) && (
         <div className="prating-v2">
-          <i className="fas fa-star"></i>
-          <span>{p.stars || "4.0"}</span>
-          {p.reviews != null ? <small>({p.reviews})</small> : null}
+          <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "14px" }}>
+            <span style={{ color: "#ffc107" }}>★</span>
+            <span>{p.stars || "4.0"}</span>
+            {p.reviews != null ? <small>({p.reviews})</small> : null}
+          </span>
         </div>
       )}
 
       {/* Unit Selector */}
       <div className="unit-selector-btn" onClick={openUnitModal}>
         <span>{selectedUnit}</span>
-        <i className="fas fa-chevron-down" style={{ fontSize: 10 }}></i>
+        <ChevronDown size={10} strokeWidth={2} />
       </div>
 
       {/* Prices */}
@@ -128,6 +131,7 @@ export default function ProductCard({
           </div>
         ) : (
           <button className="padd-v2" onClick={handleAdd}>
+            <ShoppingBasket size={16} strokeWidth={2} style={{ marginRight: 8 }} />
             {t.home.add || "ADD"}
           </button>
         )}
@@ -146,7 +150,7 @@ export default function ProductCard({
                 </div>
               </div>
               <button className="unit-modal-close" onClick={() => setShowModal(false)}>
-                <i className="fas fa-times"></i>
+                <X size={18} strokeWidth={2} />
               </button>
             </div>
 
@@ -175,7 +179,7 @@ export default function ProductCard({
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       {isBestValue && <span className="best-value-badge">{t.product.bestValue || "Best Value"}</span>}
                       <div className={`unit-checkbox ${isSelected ? "checked" : ""}`}>
-                        {isSelected && <i className="fas fa-check"></i>}
+                        {isSelected && <Check size={14} strokeWidth={3} />}
                       </div>
                     </div>
                   </div>

@@ -465,9 +465,11 @@ export default function App() {
     const unit = typeof product === "object" ? resolveCartUnit(product) : null;
     
     setCart((prev) => {
-      const existing = prev.find((item) => item._uid === uid && (!unit || resolveCartUnit(item) === unit));
-      if (existing && existing.quantity > 1) {
-        return prev.map((item) => (item._uid === uid && (!unit || resolveCartUnit(item) === unit)) ? { ...item, quantity: item.quantity - 1 } : item);
+      const index = prev.findIndex((item) => item._uid === uid && (!unit || resolveCartUnit(item) === unit));
+      if (index !== -1 && prev[index].quantity > 1) {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], quantity: updated[index].quantity - 1 };
+        return updated;
       }
       return prev.filter((item) => !(item._uid === uid && (!unit || resolveCartUnit(item) === unit)));
     });
@@ -993,5 +995,3 @@ export default function App() {
     </>
   );
 }
-
-

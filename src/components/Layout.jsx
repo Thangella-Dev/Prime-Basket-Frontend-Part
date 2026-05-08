@@ -55,7 +55,7 @@ export default function Layout({
         markAllRead={markAllRead}
       />
       <main className="page-shell">{children}</main>
-      {showFooter && <Footer onNavigate={onFooterNavigate} language={language} region={region} />}
+      {showFooter && <Footer onNavigate={onFooterNavigate} language={language} region={region} wishlistCount={wishlistCount} onWishlistClick={onWishlistClick} />}
 
       <Suspense fallback={null}>
         <ChatbotWidget
