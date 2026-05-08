@@ -2381,26 +2381,28 @@ body.prime-drawer-open .hamburger * {
 }
 
 @media (max-width: 480px) {
-  .footer-top { grid-template-columns: 1fr; }
-  .footer-col { text-align: center; }
-  .footer-col ul { align-items: center; }
-  .brand-logo { justify-content: center; }
-  .contact-list li { justify-content: center; }
-  .app-buttons { justify-content: center; }
-  .payment-icons { justify-content: center; }
+  .footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
+  .footer-brand,
+  .app-col { grid-column: 1 / -1; }
+  .footer-col { text-align: left; }
+  .footer-col ul { align-items: flex-start; }
+  .brand-logo { justify-content: flex-start; }
+  .contact-list li { justify-content: flex-start; }
+  .app-buttons { justify-content: flex-start; }
+  .payment-icons { justify-content: flex-start; }
   .phone-item {
     width: 100%;
-    justify-content: center;
+    justify-content: flex-start;
   }
   .copyright,
   .phone-group {
     width: 100%;
-    text-align: center;
-    justify-content: center;
+    text-align: left;
+    justify-content: flex-start;
   }
-  .social-group { align-items: center; width: 100%; }
-  .social-discount { text-align: center; width: 100%; }
-  .social-row { justify-content: center; width: 100%; }
+  .social-group { align-items: flex-start; width: 100%; }
+  .social-discount { text-align: left; width: 100%; }
+  .social-row { justify-content: flex-start; width: 100%; }
 }
 
 /* ── TOAST ── */

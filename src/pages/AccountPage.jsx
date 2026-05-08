@@ -106,6 +106,22 @@ function InlineNotice({ notice, onClose }) {
   );
 }
 
+function EmptySectionState({
+  icon = "fa-folder-open",
+  title = "Nothing here yet",
+  description = "This section will show your saved information once it becomes available.",
+}) {
+  return (
+    <div className="account-empty-state" role="status" aria-live="polite">
+      <div className="account-empty-state-icon">
+        <i className={`fas ${icon}`}></i>
+      </div>
+      <strong>{title}</strong>
+      <p>{description}</p>
+    </div>
+  );
+}
+
 function ConfirmDialog({
   open,
   title,
@@ -889,6 +905,17 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
         }}
       />
 
+      {allOrders.length === 0 ? (
+        <EmptySectionState
+          icon={orderFilter === "Delivered" ? "fa-box-open" : "fa-bag-shopping"}
+          title={orderFilter === "Delivered" ? "No delivered orders yet" : "No orders yet"}
+          description={
+            orderFilter === "Delivered"
+              ? "Delivered orders will appear here once your purchases are completed successfully."
+              : "Your full order history will appear here after you place your first order."
+          }
+        />
+      ) : (
       <div style={{ display: "flex", flexDirection: "column" }}>
         {allOrders.map((order, i) => {
           const sc = statusConfig[order.status] || statusConfig.Processing;
@@ -1029,6 +1056,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
           );
         })}
       </div>
+      )}
     </div>
   );
 }
@@ -1126,7 +1154,11 @@ export function AddressSection({ t, language = "en", region = "in" }) {
       />
 
       {addresses.length === 0 && (
-        <p style={{ color: "#7e7e7e", fontSize: 14, padding: "12px 0" }}>{t.cart.noAddresses}</p>
+        <EmptySectionState
+          icon="fa-location-dot"
+          title="No saved addresses yet"
+          description="Your delivery addresses will appear here so you can choose them faster during checkout."
+        />
       )}
 
       {addresses.map((addr, i) => {
@@ -1454,7 +1486,11 @@ function RefundsDemoSection({ t, currSym, region }) {
 
       <div className="refunds-list" style={{ marginTop: "20px" }}>
         {refunds.length === 0 ? (
-          <p style={{ color: "#7e7e7e" }}>{t.accountExtras.noRefunds}</p>
+          <EmptySectionState
+            icon="fa-rotate-left"
+            title="No refund requests yet"
+            description="Any refund or return request you raise for your orders will be tracked here with status updates."
+          />
         ) : (
           refunds.map((rfd) => {
             const steps = statusSteps(rfd.type);
@@ -1759,10 +1795,11 @@ function PaymentsSection({ t, region }) {
       </h2>
 
       {cards.length === 0 ? (
-        <div className="payments-empty-state">
-          <i className="fas fa-credit-card payments-empty-icon"></i>
-          <p className="payments-empty-text">No saved cards found.</p>
-        </div>
+        <EmptySectionState
+          icon="fa-credit-card"
+          title="No saved payment methods yet"
+          description="Cards and saved payment methods will appear here after you use them during checkout."
+        />
       ) : (
         <div className="payments-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px" }}>
           {cards.map((card, i) => (

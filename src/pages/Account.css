@@ -766,6 +766,44 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
+.account-empty-state {
+  text-align: center;
+  padding: 40px 24px;
+  border-radius: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98), rgba(240, 246, 255, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.account-empty-state-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 15px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(29, 91, 160, 0.12), rgba(68, 196, 212, 0.12));
+  color: #7aa3d2;
+  font-size: 22px;
+  box-shadow: 0 12px 24px rgba(29, 91, 160, 0.08);
+}
+
+.account-empty-state strong {
+  display: block;
+  color: #253d4e;
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.account-empty-state p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
 .payments-empty-icon {
   font-size: 40px;
   color: #bfd0e8;
@@ -1428,6 +1466,7 @@ body[data-theme="dark"] .faq-item {
 }
 
 body[data-theme="dark"] .payments-empty-state,
+body[data-theme="dark"] .account-empty-state,
 body[data-theme="dark"] .help-modal,
 body[data-theme="dark"] .faq-accordion-category,
 body[data-theme="dark"] .faq-a-text,
@@ -1442,6 +1481,7 @@ body[data-theme="dark"] .payments-empty-icon {
 }
 
 body[data-theme="dark"] .payments-empty-text,
+body[data-theme="dark"] .account-empty-state p,
 body[data-theme="dark"] .payments-wallet-meta,
 body[data-theme="dark"] .faq-a-text,
 body[data-theme="dark"] .support-option p,
@@ -1449,6 +1489,15 @@ body[data-theme="dark"] .help-modal-header button,
 body[data-theme="dark"] .faq-q-chevron,
 body[data-theme="dark"] .faq-count-badge {
   color: #cbd5e1 !important;
+}
+
+body[data-theme="dark"] .account-empty-state-icon {
+  background: linear-gradient(135deg, rgba(29, 91, 160, 0.2), rgba(56, 189, 248, 0.14));
+  color: #8bb5e8;
+}
+
+body[data-theme="dark"] .account-empty-state strong {
+  color: #f8fbff;
 }
 
 body[data-theme="dark"] .payments-wallets-title,
