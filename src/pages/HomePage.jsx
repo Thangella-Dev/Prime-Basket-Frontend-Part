@@ -689,15 +689,18 @@ export default function HomePage({
 
       <section className="deals-section">
         <div className="deals-header">
-          <div>
+          <div className="deals-copy">
             <h2 className="deals-title"> 
               <span className="section-title-icon"><Bolt size={18} /></span>
               <span className="section-title-text">{t.home.deals}</span>
             </h2>
-            <p className="section-subtitle compact">{homeUi.dealsDescription}</p>
+            <p className="section-subtitle compact deals-subtitle">{homeUi.dealsDescription}</p>
           </div>
           <a href="#" className="deals-all-link" onClick={(e) => { e.preventDefault(); onCategorySelect && onCategorySelect("all"); }}>
-            {t.home.allDeals} <ChevronRight size={14} style={{ verticalAlign: "middle" }} />
+            <span className="deals-all-link-text">{t.home.allDeals}</span>
+            <span className="deals-all-link-icon">
+              <ChevronRight size={14} />
+            </span>
           </a> 
         </div>
           <div className="deals-grid">

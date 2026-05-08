@@ -1869,10 +1869,66 @@ body.prime-drawer-open .hamburger * {
 
 /* ── DEALS ── */
 .deals-section { background: transparent; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-.deals-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 2px solid var(--border); }
-.deals-title { font-family: 'Quicksand', sans-serif; font-size: clamp(18px, 3vw, 24px); font-weight: 800; color: var(--navy); position: relative; padding-bottom: 6px; }
-.deals-title::after { content: ''; position: absolute; left: 0; bottom: -14px; width: 100%; height: 2px; background: #1d5ba0; }
-.deals-all-link { font-size: 13.5px; font-weight: 700; color: #1d5ba0; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.deals-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding: 22px 24px;
+  border: 1px solid rgba(148,163,184,0.16);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(255,204,115,0.18), transparent 28%),
+    linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(244,248,255,0.98) 52%, rgba(238,245,255,0.98) 100%);
+  box-shadow: 0 20px 40px rgba(15,23,42,0.06);
+}
+.deals-copy {
+  min-width: 0;
+  max-width: 720px;
+}
+.deals-title {
+  font-family: 'Quicksand', sans-serif;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 800;
+  color: var(--navy);
+  position: relative;
+  margin: 0;
+}
+.deals-title::after { content: none; }
+.deals-subtitle {
+  margin-top: 12px !important;
+  margin-bottom: 0 !important;
+  max-width: 56ch;
+  font-size: clamp(0.95rem, 1.5vw, 1.04rem);
+  line-height: 1.7;
+  color: #5f6f86;
+}
+.deals-all-link {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #174f91;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  padding: 12px 16px 12px 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(239,246,255,0.96));
+}
+.deals-all-link-text {
+  letter-spacing: -0.01em;
+}
+.deals-all-link-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(23,79,145,0.08);
+  flex-shrink: 0;
+}
 .deals-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .prod-card { background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(249,252,255,0.98) 100%); border-radius: 24px; box-shadow: 0 18px 42px rgba(15,23,42,.08); overflow: hidden; display: flex; flex-direction: column; position: relative; transition: transform .25s ease, box-shadow .25s ease; cursor: pointer; border: 1px solid rgba(148,163,184,0.16); }
 .prod-card:hover { transform: translateY(-6px); box-shadow: 0 28px 52px rgba(15,23,42,.12); }
@@ -1892,7 +1948,9 @@ body.prime-drawer-open .hamburger * {
 @media (max-width: 440px) { .deals-grid { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto; } }
 @media (max-width: 480px) {
   .deals-section { padding: 0 15px; }
-  .deals-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .deals-header { flex-direction: column; align-items: flex-start; gap: 14px; padding: 18px 18px 16px; }
+  .deals-subtitle { max-width: none; font-size: 0.94rem; line-height: 1.6; }
+  .deals-all-link { width: 100%; justify-content: space-between; }
 }
 
 /* ── BANNER TRIO ── */
@@ -2488,6 +2546,7 @@ body[data-theme="dark"] .slider::before {
 
 body[data-theme="dark"] .nav-search-note,
 body[data-theme="dark"] .section-subtitle,
+body[data-theme="dark"] .deals-subtitle,
 body[data-theme="dark"] .mobile-section-head small,
 body[data-theme="dark"] .mobile-theme-copy span,
 body[data-theme="dark"] .note-message,
@@ -2510,6 +2569,24 @@ body[data-theme="dark"] .banner-content p,
 body[data-theme="dark"] .home-highlight-card span,
 body[data-theme="dark"] .content p {
   color: var(--body);
+}
+
+body[data-theme="dark"] .deals-header {
+  border-color: rgba(74,95,130,0.34);
+  background:
+    radial-gradient(circle at top right, rgba(255,204,115,0.12), transparent 26%),
+    linear-gradient(135deg, rgba(11,21,37,0.96) 0%, rgba(14,27,46,0.96) 52%, rgba(18,35,58,0.96) 100%);
+  box-shadow: 0 20px 40px rgba(2,8,23,0.24);
+}
+
+body[data-theme="dark"] .deals-all-link {
+  color: #9cc8ff;
+  border-color: rgba(74,95,130,0.34);
+  background: linear-gradient(135deg, rgba(9,17,31,0.92), rgba(14,28,47,0.92));
+}
+
+body[data-theme="dark"] .deals-all-link-icon {
+  background: rgba(156,200,255,0.12);
 }
 
 body[data-theme="dark"] .logo-text,
