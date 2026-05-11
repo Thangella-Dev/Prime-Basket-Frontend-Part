@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { database } from "../firebase";
 import { ref, get } from "firebase/database";
 import { useT } from "../i18n/translations";
+import ProductCard from "./ProductCard";
 
 const CATEGORY_LABELS = {
   rice: "Rice",
@@ -28,14 +29,8 @@ const CATEGORY_LABELS = {
   bodyCare: "Body Care",
 };
 
-function Products({ category, onAddCart, language = "en", region = "in" }) {
+function Products({ category, onAddCart, onDecreaseCart, cart = [], wishlist = [], toggleWishlist, language = "en", region = "in" }) {
   const t = useT(language);
-  const currPrefix = region === "ke" ? "KES " : "₹";
-  const formatPrice = (p) => {
-    if (!p) return "";
-    const numeric = String(p).replace(/₹/g, "").replace(/KES/gi, "").trim();
-    return `${currPrefix}${numeric}`;
-  };
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -97,49 +92,19 @@ function Products({ category, onAddCart, language = "en", region = "in" }) {
           ) : products.length === 0 ? (
             <p style={{ padding: "2rem", color: "#888" }}>No products found.</p>
           ) : (
-            products.map((item, index) => {
-              const translatedName = getTranslatedName(item.name);
-              return (
-                <div key={index} className="pcard">
-                  {item.badge && (
-                    <span className="pbadge bo">
-                      {t.badges?.[item.badge.toLowerCase()] || item.badge}
-                    </span>
-                  )}
-                  <button className="pwish">
-                    <i className="far fa-heart"></i>
-                  </button>
-                  <div className="pimg">
-                    <img
-                      src={item.imageUrl}
-                      alt={translatedName}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                  <div className="pbrand">{item.brand}</div>
-                  <div className="pname">{translatedName}</div>
-                  {item.stars != null && (
-                    <div className="pstars">
-                      ⭐ {item.stars}{" "}
-                      {item.reviews && <span>({item.reviews})</span>}
-                    </div>
-                  )}
-                  <div className="pprice">
-                    <span className="pnew">{formatPrice(item.price)}</span>
-                    {item.oldPrice && (
-                      <span className="pold">{formatPrice(item.oldPrice)}</span>
-                    )}
-                  </div>
-                  <button
-                    className="padd"
-                    onClick={() => onAddCart && onAddCart(item)}
-                  >
-                    <i className="fas fa-shopping-cart"></i> {t.home.add || "Add"}
-                  </button>
-                </div>
-              );
-            })
+            products.map((item) => (
+              <ProductCard
+                key={item._uid || item.name || item.imageUrl}
+                p={item}
+                onAddCart={onAddCart}
+                onDecreaseCart={onDecreaseCart}
+                cart={cart}
+                wishlist={wishlist}
+                toggleWishlist={toggleWishlist}
+                t={t}
+                region={region}
+              />
+            ))
           )}
         </div>
       </div>

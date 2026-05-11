@@ -27,7 +27,6 @@ const MULTICOL_CATS = {
   topRated: "pulses",
 };
 
-const BADGE_CLASSES = ["bs", "bh", "bo", "bn"];
 const RAIL_GAP_DESKTOP = 16;
 const RAIL_GAP_MOBILE = 12;
 const RAIL_INTERACTIVE_SELECTOR = 'button, a, input, select, textarea, [data-rail-ignore-drag="true"]';
@@ -645,62 +644,20 @@ export default function HomePage({
           <div className="deals-grid">
           {loading
             ? Array.from({ length: 4 }).map((_, i) => <DealSkeletonCard key={i} />)
-            : deals.map((d) => {
-                const inCart = cart.find((c) => c._uid === d._uid);
-                const qty = inCart ? inCart.quantity : 0;
-                const isWished = wishlist.some((w) => w._uid === d._uid);
-                const translatedName = getTranslatedName(d.name);
-                return (
-                  <div key={d._uid} className="prod-card" style={{ cursor: "pointer", position: "relative" }} onClick={() => onOpenProduct && onOpenProduct(d)}>
-                    <div className="card-img-zone">
-                      <span className="disc-badge">{t.badges?.[d.badge?.toLowerCase()] || d.badge || t.badges?.sale || "Sale"}</span>
-                      <button
-                        className="deal-wish-btn"
-                        style={isWished ? { background: "#ff3b81", color: "#fff", borderColor: "#ff3b81" } : {}}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleWishlist && toggleWishlist(d);
-                        }}
-                      >
-                        <Heart size={16} fill={isWished ? "#fff" : "none"} style={{ color: isWished ? "#fff" : "currentColor" }} />
-                      </button>
-                      <img src={d.imageUrl} alt={translatedName} loading="lazy" decoding="async" />
-                    </div>
-                    <div className="card-info">
-                      <div className="card-title">{translatedName}</div>
-                      <div className="card-seller">{d.brand}</div>
-                      <div className="card-price-row">
-                        <span className="price-new">{displayPrice(d.price)}</span>
-                        <span className="price-old">{displayPrice(d.oldPrice)}</span>
-                      </div>
-                      <div className="p-action-row" onClick={(e) => e.stopPropagation()}>
-                        {qty > 0 ? (
-                          <div className="qty-control catalog-qty-control">
-                            <button
-                              className="qty-control-btn"
-                              onClick={() => onDecreaseCart && onDecreaseCart(d._uid)}
-                            >
-                              -
-                            </button>
-                            <span className="qty-control-value">{qty}</span>
-                            <button
-                              className="qty-control-btn"
-                              onClick={() => onAddCart && onAddCart(d)}
-                            >
-                              +
-                            </button>
-                          </div>
-                        ) : (
-                          <button className="padd" onClick={() => onAddCart && onAddCart(d)} style={{ marginTop: "8px" }}>
-                            <ShoppingCart size={14} style={{ marginRight: 8 }} />
-                            {t.home.add}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            : deals.map((d) => (
+                <ProductCard
+                  key={d._uid}
+                  p={d}
+                  onAddCart={onAddCart}
+                  onDecreaseCart={onDecreaseCart}
+                  cart={cart}
+                  wishlist={wishlist}
+                  toggleWishlist={toggleWishlist}
+                  t={t}
+                  region={region}
+                  onOpenProduct={onOpenProduct}
+                />
+              ))}
         </div>
       </section>
 
