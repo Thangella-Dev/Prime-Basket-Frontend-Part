@@ -2418,6 +2418,32 @@ body.prime-drawer-open .hamburger * {
 .footer-bottom { max-width: 1300px; margin: 0 auto; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
 .copyright { font-size: 0.78rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
 .copyright strong { color: #fff; }
+.footer-signature {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 14px 28px rgba(4,10,22,0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.footer-signature-label {
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.58);
+}
+.footer-signature strong {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #f8fbff;
+  letter-spacing: 0.02em;
+}
 .phone-group { display: flex; align-items: center; gap: 32px; flex-shrink: 0; }
 .phone-item { display: flex; align-items: center; gap: 10px; }
 .phone-num { font-size: 17px; font-weight: 800; color: #1d5ba0; display: block; line-height: 1.2; }
@@ -3908,11 +3934,9 @@ body[data-theme="dark"] .footer-divider {
 
 .home-showcase-grid {
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
-  grid-template-areas:
-    "hero hero"
-    "copy highlights";
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "hero";
+  gap: 0;
   align-items: stretch;
 }
 

@@ -165,6 +165,10 @@ export default function Footer({ language = "en", region = "in" }) {
         <div className="copyright">
           <div>&copy; 2026 - <strong>Prime Basket</strong></div>
           <div>{t.footer?.allRights || "All rights reserved"}</div>
+          <div className="footer-signature">
+            <span className="footer-signature-label">A Product By</span>
+            <strong>Charani Infotech Pvt Ltd</strong>
+          </div>
         </div>
 
         <div className="phone-group">

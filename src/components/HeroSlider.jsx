@@ -15,8 +15,8 @@ const AUTO_SLIDE_MS = 2000;
 export default function HeroSlider({ language = "en" }) {
   const t = useT(language);
 
-  const BLUE_PRIMARY = "#155EEF";
-  const BLUE_SECONDARY = "#0F4CD9";
+  const BLUE_PRIMARY = "#1d5ba0";
+  const BLUE_SECONDARY = "#1d5ba0";
 
   const heroUi = useMemo(
     () =>
@@ -315,7 +315,7 @@ export default function HeroSlider({ language = "en" }) {
 
         backdrop-filter:blur(10px);
 
-        border:1px solid rgba(21,94,239,.14);
+        border:1px solid rgba(106, 148, 234, 0.14);
 
         color:${BLUE_PRIMARY};
 
@@ -399,7 +399,7 @@ export default function HeroSlider({ language = "en" }) {
         font-weight:700;
 
         box-shadow:
-          0 14px 34px rgba(21,94,239,.22);
+          0 14px 34px rgba(110, 153, 238, 0.22);
 
         transition:.3s ease;
       }

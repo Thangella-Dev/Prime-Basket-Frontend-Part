@@ -535,22 +535,6 @@ export default function HomePage({
             <div className="home-showcase-hero">
               <HeroSlider language={language} /> 
             </div>
-            <div className="home-intro-copy">
-              <span className="section-kicker">{homeUi.kicker}</span>
-              <h2 className="home-intro-title">{homeUi.title}</h2>
-              <p className="section-subtitle">{homeUi.subtitle}</p>
-            </div>
-            <div className="home-intro-highlights">
-              {homeUi.highlights.map((item) => (
-                <div key={item.label} className="home-highlight-card">
-                  <div className="home-highlight-icon"> 
-                    <i className={`fas ${item.icon}`}></i>
-                  </div>
-                  <strong>{item.value}</strong>
-                  <span>{item.label}</span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
@@ -613,12 +597,6 @@ export default function HomePage({
                     <ChevronRight size={14} style={{ color: "#bbb" }} />
                   </div>
                 ))} 
-              </div>
-              <div className="tags-box">
-                <h3>{t.home.productTags}</h3>
-                {["Organic", "Fresh", "Dairy", "Snacks", "Beverages", "Fruits", "Vegetables", "Spices"].map((tag) => (
-                  <span key={tag} className="tag-pill">{t.categories?.[tag.toLowerCase()] || tag}</span>
-                ))}
               </div>
             </div>
           </div>
