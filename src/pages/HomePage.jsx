@@ -7,6 +7,7 @@ import { getFallbackCategoryProducts, mergeCategoryProducts } from "../data/cata
 import { formatCurrencyDisplay } from "../utils/currency";
 import { safeSessionGet, safeSessionRemove, safeSessionSet } from "../utils/safeStorage";
 import HeroSlider from "../components/HeroSlider";
+import ProductCard from "../components/ProductCard";
 import { Flame, Bolt, Compass, Crown, ChevronRight, ChevronLeft, ShoppingCart, Heart, ArrowRight } from "lucide-react";
 
 const ALL_CATS = [
@@ -527,81 +528,6 @@ export default function HomePage({
     });
   }, [railMetrics, multiCols.topSelling, multiCols.trending, multiCols.recentlyAdded, multiCols.topRated]);
 
-  const ProductCard = ({ p, idx }) => {
-    const inCart = cart.find((c) => c._uid === p._uid);
-    const qty = inCart ? inCart.quantity : 0;
-    const isWished = wishlist.some((w) => w._uid === p._uid);
-    const translatedName = getTranslatedName(p.name);
-    const deliveryText = p.delivery || (p.oldPrice ? "10 min" : "Today 6PM");
-    const unitLabel = p.standard || p.unit || p.quantity || "1 unit";
-    const stockInfo = p.inStock === false
-      ? { text: t.product.outOfStock, klass: "outofstock", disabled: true }
-      : p.stock != null && p.stock <= 3
-        ? { text: `Only ${p.stock} left`, klass: "warning", disabled: false }
-        : { text: t.product.inStock || "In Stock", klass: "instock", disabled: false };
-
-    return (
-      <div className="pcard" data-cat={p._cat} style={{ cursor: "pointer" }} onClick={() => onOpenProduct && onOpenProduct(p)}>
-        <span className={`pbadge ${BADGE_CLASSES[idx % BADGE_CLASSES.length]}`}>
-          {t.badges?.[p.badge?.toLowerCase()] || p.badge || (p.oldPrice ? t.badges?.sale : t.badges?.new) || "Sale"}
-        </span>
-        <span className="delivery-badge">{deliveryText}</span>
-        <button
-          className="pwish"
-          style={isWished ? { opacity: 1, background: "#ff3b81", color: "#fff" } : {}}
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleWishlist && toggleWishlist(p);
-          }}
-        >
-          <Heart size={18} fill={isWished ? "#fff" : "none"} style={{ color: isWished ? "#fff" : "currentColor" }} />
-        </button>
-        <div className="pimg">
-          <img src={p.imageUrl} alt={translatedName} loading="lazy" decoding="async" />
-        </div>
-        <div className="pbrand">{p.brand}</div>
-        <div className="pname">{translatedName}</div>
-        <div className="pweight">{unitLabel}</div>
-        {p.stars != null && (
-          <div className="pstars">★ {p.stars} {p.reviews && <span>({p.reviews})</span>}</div>
-        )}
-        <div className="pprice">
-          <span className="pnew">{displayPrice(p.price)}</span>
-          {p.oldPrice && <span className="pold">{displayPrice(p.oldPrice)}</span>}
-        </div>
-        <div className={`pstock ${stockInfo.klass}`}>{stockInfo.text}</div>
-        <div className="p-action-row" onClick={(e) => e.stopPropagation()}>
-          {qty > 0 ? (
-            <div className="qty-control catalog-qty-control">
-              <button
-                className="qty-control-btn"
-                onClick={() => onDecreaseCart && onDecreaseCart(p._uid)}
-              >
-                -
-              </button>
-              <span className="qty-control-value">{qty}</span>
-              <button
-                className="qty-control-btn"
-                onClick={() => onAddCart && onAddCart(p)}
-              >
-                +
-              </button>
-            </div>
-          ) : (
-            <button
-              className="padd"
-              disabled={stockInfo.disabled}
-              onClick={() => onAddCart && onAddCart(p)}
-              style={{ marginTop: "8px" }}
-            >
-              <ShoppingCart size={14} style={{ marginRight: 8 }} /> {t.home.add}
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
       <section className="home-showcase">
@@ -649,7 +575,20 @@ export default function HomePage({
                   ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
                   : popular15.length === 0
                     ? <p style={{ color: "#7e7e7e", padding: "20px 0" }}>{t.home.noProducts}</p>
-                    : popular15.map((p, i) => <ProductCard key={p._uid} p={p} idx={i} />)}
+                    : popular15.map((p) => (
+                      <ProductCard
+                        key={p._uid}
+                        p={p}
+                        onAddCart={onAddCart}
+                        onDecreaseCart={onDecreaseCart}
+                        cart={cart}
+                        wishlist={wishlist}
+                        toggleWishlist={toggleWishlist}
+                        t={t}
+                        region={region}
+                        onOpenProduct={onOpenProduct}
+                      />
+                    ))}
               </div>
             </div>
 

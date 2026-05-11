@@ -13,7 +13,8 @@ export default function ProductCard({
   wishlist = [], 
   toggleWishlist, 
   t, 
-  region = "in" 
+  region = "in",
+  onOpenProduct,
 }) {
   // Enhance product with dynamic units
   const p = useMemo(() => enhanceProduct(rawProduct, region), [rawProduct, region]);
@@ -66,7 +67,16 @@ export default function ProductCard({
   };
 
   return (
-    <div className="pcard-v2" onClick={() => window.dispatchEvent(new CustomEvent("open-product", { detail: p }))}>
+    <div
+      className="pcard-v2"
+      onClick={() => {
+        if (onOpenProduct) {
+          onOpenProduct(p);
+        } else {
+          window.dispatchEvent(new CustomEvent("open-product", { detail: p }));
+        }
+      }}
+    >
       {/* Badges */}
       <div style={{ position: "absolute", top: 10, left: 0, display: "flex", flexDirection: "column", gap: 5, zIndex: 2, alignItems: "flex-start" }}>
         {p.badge && (
