@@ -132,7 +132,8 @@ export default function CategoryPage({
   const [filterOpen, setFilterOpen] = useState(false); // mobile
 
   const activeKey = CATEGORIES_DATA.find(c => c.value === category)?.key;
-  const activeLabel = t.categories?.[activeKey] || category;
+  const isAllProductsView = category === "all";
+  const activeLabel = isAllProductsView ? (t.home.allCategories || "All Categories") : (t.categories?.[activeKey] || category);
   const mobileUi = isKenya
     ? {
         deliveringTo: "Inawasilishwa kwa eneo lako",
@@ -209,6 +210,67 @@ export default function CategoryPage({
     setPriceRange([0, 5000]);
     setDiscountRange([0, 50]);
     setSortBy("default");
+
+    if (category === "all") {
+      if (isKenya) {
+        setProducts(KENYA_ALL_PRODUCTS.map((product) => prepareCategoryProduct(product, region)));
+        setLoading(false);
+        return;
+      }
+
+      if (!hasFirebaseConfig || !database) {
+        const allFallbackProducts = CATEGORIES_DATA.flatMap((cat) =>
+          mergeCategoryProducts(cat.value).map((product, index) => ({
+            ...product,
+            _cat: cat.value,
+            _index: index,
+            _uid: product._uid || `${cat.value}_${index}`,
+          }))
+        ).map((product) => prepareCategoryProduct(product, region));
+        setProducts(allFallbackProducts);
+        setLoading(false);
+        return;
+      }
+
+      get(ref(database, "categories"))
+        .then((snap) => {
+          const data = snap.val() || {};
+          const allProducts = Object.entries(data).flatMap(([catKey, catProducts]) =>
+            Object.values(catProducts || {}).map((product, index) => ({
+              ...product,
+              _cat: catKey,
+              _index: index,
+              _uid: product?._uid || `${catKey}_${index}`,
+            }))
+          );
+          const merged = allProducts.length
+            ? allProducts
+            : CATEGORIES_DATA.flatMap((cat) =>
+                mergeCategoryProducts(cat.value).map((product, index) => ({
+                  ...product,
+                  _cat: cat.value,
+                  _index: index,
+                  _uid: product._uid || `${cat.value}_${index}`,
+                }))
+              );
+          setProducts(merged.map((product) => prepareCategoryProduct(product, region)));
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("All categories fetch failed, using fallback catalog:", error);
+          const allFallbackProducts = CATEGORIES_DATA.flatMap((cat) =>
+            mergeCategoryProducts(cat.value).map((product, index) => ({
+              ...product,
+              _cat: cat.value,
+              _index: index,
+              _uid: product._uid || `${cat.value}_${index}`,
+            }))
+          ).map((product) => prepareCategoryProduct(product, region));
+          setProducts(allFallbackProducts);
+          setLoading(false);
+        });
+      return;
+    }
 
     if (isKenya) {
       // Case-insensitive match for category
@@ -654,6 +716,159 @@ export default function CategoryPage({
     </div>
   );
 
+  const renderDesktopFilterBar = () => (
+    <div
+      className="cat-desktop-filterbar"
+      style={{
+        background: palette.sectionBg,
+        borderRadius: 16,
+        padding: "14px 16px",
+        marginBottom: 16,
+        border: `1px solid ${palette.borderSoft}`,
+        boxShadow: isDark ? "0 22px 36px rgba(0,0,0,.2)" : "0 18px 34px rgba(15,23,42,.06)",
+        display: "grid",
+        gap: 12,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 800, fontSize: 15, color: palette.text }}>
+            <i className="fas fa-sliders-h" style={{ color: palette.accent }}></i>
+            {mobileUi.filterTitle}
+          </div>
+          <p style={{ margin: "6px 0 0", fontSize: 12, lineHeight: 1.5, color: palette.muted }}>
+            {mobileUi.showing} <strong style={{ color: palette.accent }}>{filteredProducts.length}</strong> / {products.length} {mobileUi.results}
+          </p>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          {activeFilterCount > 0 ? (
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 34, height: 34, padding: "0 10px", borderRadius: 999, background: palette.accentBg, color: palette.accent, fontSize: 13, fontWeight: 800, border: `1px solid ${palette.border}` }}>
+              {activeFilterCount}
+            </span>
+          ) : null}
+          {renderSortDropdown()}
+          {activeFilterCount > 0 ? (
+            <button
+              type="button"
+              onClick={clearAllFilters}
+              style={{
+                minHeight: 38,
+                padding: "0 14px",
+                borderRadius: 12,
+                border: `1px solid ${palette.border}`,
+                background: isDark ? "rgba(15,26,44,0.88)" : "#fff",
+                color: "#e63946",
+                fontSize: 12.5,
+                fontWeight: 800,
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              {t.filters.clearAll}
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      <div
+        className="cat-desktop-filterbar-row"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(200px, 1.12fr) minmax(220px, 1fr) minmax(180px, .76fr) minmax(180px, .76fr)",
+          gap: 12,
+          alignItems: "start",
+        }}
+      >
+        <div style={{ padding: 12, borderRadius: 14, border: `1px solid ${palette.borderSoft}`, background: palette.sectionMutedBg }}>
+          <div style={{ fontSize: 11.5, fontWeight: 800, color: palette.text, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 8 }}>
+            {mobileUi.searchProducts}
+          </div>
+          <div style={{ position: "relative" }}>
+            <i className="fas fa-search" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: palette.mutedSoft, fontSize: 12 }}></i>
+            <input
+              type="text"
+              placeholder={mobileUi.searchProducts}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: "100%", padding: "10px 14px 10px 34px", border: `1.5px solid ${palette.border}`, borderRadius: 12, fontSize: 12.5, outline: "none", fontFamily: "inherit", boxSizing: "border-box", background: isDark ? "#0f1a2c" : "#fff", color: palette.text }}
+            />
+          </div>
+        </div>
+
+        <div style={{ padding: 12, borderRadius: 14, border: `1px solid ${palette.borderSoft}`, background: palette.sectionMutedBg }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+            <div style={{ fontSize: 11.5, fontWeight: 800, color: palette.text, textTransform: "uppercase", letterSpacing: ".6px" }}>{t.filters.brand}</div>
+            <span style={{ fontSize: 11, color: palette.mutedSoft, fontWeight: 700 }}>{selectedBrands.length || brandList.length}</span>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+            {highlightedBrands.map(({ name }) => {
+              const active = selectedBrands.includes(name);
+              return (
+                <button
+                  key={name}
+                  type="button"
+                  onClick={() => toggleBrand(name)}
+                  style={{
+                    border: `1px solid ${active ? palette.accent : palette.border}`,
+                    background: active ? palette.accentBg : (isDark ? "rgba(15,26,44,0.88)" : "#fff"),
+                    color: active ? palette.accent : palette.textStrong,
+                    borderRadius: 999,
+                    padding: "7px 11px",
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {name}
+                </button>
+              );
+            })}
+          </div>
+          <div style={{ position: "relative" }}>
+            <i className="fas fa-search" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: palette.mutedSoft, fontSize: 11 }}></i>
+            <input
+              type="text"
+              placeholder={t.filters.searchBrand}
+              value={brandSearch}
+              onChange={(e) => setBrandSearch(e.target.value)}
+              style={{ width: "100%", padding: "8px 10px 8px 30px", border: `1.5px solid ${palette.border}`, borderRadius: 10, fontSize: 12, outline: "none", fontFamily: "inherit", boxSizing: "border-box", background: isDark ? "#0f1a2c" : "#fff", color: palette.text }}
+            />
+          </div>
+        </div>
+
+        <div style={{ padding: 12, borderRadius: 14, border: `1px solid ${palette.borderSoft}`, background: palette.sectionMutedBg }}>
+          <div style={{ fontSize: 11.5, fontWeight: 800, color: palette.text, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 6 }}>{t.filters.priceRange}</div>
+          <RangeSlider
+            min={priceBounds[0]}
+            max={priceBounds[1]}
+            value={effectivePriceRange}
+            onChange={setPriceRange}
+            prefix={isKenya ? "KES " : "₹"}
+          />
+        </div>
+
+        <div style={{ padding: 12, borderRadius: 14, border: `1px solid ${palette.borderSoft}`, background: palette.sectionMutedBg }}>
+          <div style={{ fontSize: 11.5, fontWeight: 800, color: palette.text, textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 6 }}>{t.filters.discountRange}</div>
+          <RangeSlider
+            min={discountBounds[0]}
+            max={discountBounds[1]}
+            value={effectiveDiscountRange}
+            onChange={setDiscountRange}
+            suffix="%"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const handleAllDealsView = () => {
+    setDiscountRange([Math.max(discountBounds[0], Math.min(5, discountBounds[1])), discountBounds[1]]);
+    setSortBy("best_discount");
+    setSearchQuery("");
+  };
+
   return (
     <div className="cat-page-root" style={{ background: palette.pageBg, minHeight: "100vh", paddingBottom: 40 }} onClick={() => sortOpen && setSortOpen(false)}>
       <style>{`
@@ -699,8 +914,86 @@ export default function CategoryPage({
           max-height:none;
           overflow:visible;
         }
-        @media(max-width:1200px){ .cat-page-wrap{ grid-template-columns:168px 1fr 188px !important; } }
-        @media(max-width:960px) { .cat-page-wrap{ grid-template-columns:150px 1fr !important; } .cat-right-col{ display:none !important; } .mobile-filter-btn{ display:flex !important; } }
+        .cat-mobile-banner{
+          display:none;
+        }
+        .cat-mobile-products .products-grid{
+          grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+          gap:12px !important;
+        }
+        .cat-mobile-products .pcard{
+          min-height:236px !important;
+          padding:9px !important;
+          border-radius:18px !important;
+          box-shadow:${isDark ? "0 18px 36px rgba(0,0,0,0.22)" : "0 16px 30px rgba(15,23,42,0.06)"} !important;
+        }
+        .cat-mobile-products .pimg{
+          aspect-ratio:1 / 1 !important;
+          margin-bottom:8px !important;
+          padding:8px !important;
+          border-radius:14px !important;
+        }
+        .cat-mobile-products .pimg img{
+          max-height:96px !important;
+        }
+        .cat-mobile-products .pbrand{
+          font-size:9px !important;
+          margin-bottom:4px !important;
+          letter-spacing:.1em !important;
+        }
+        .cat-mobile-products .pname{
+          font-size:12px !important;
+          line-height:1.28 !important;
+          min-height:2.45em !important;
+          margin-bottom:6px !important;
+          -webkit-line-clamp:2 !important;
+        }
+        .cat-mobile-products .pweight,
+        .cat-mobile-products .pstars{
+          display:none !important;
+        }
+        .cat-mobile-products .pprice{
+          gap:6px !important;
+        }
+        .cat-mobile-products .pnew{
+          font-size:13px !important;
+        }
+        .cat-mobile-products .pold{
+          font-size:10px !important;
+        }
+        .cat-mobile-products .pstock{
+          margin-top:6px !important;
+          font-size:10.5px !important;
+        }
+        .cat-mobile-products .p-action-row{
+          margin-top:auto !important;
+        }
+        .cat-mobile-products .padd{
+          min-height:32px !important;
+          margin-top:6px !important;
+          border-radius:12px !important;
+          padding:7px 8px !important;
+          font-size:10.5px !important;
+          gap:6px !important;
+        }
+        .cat-mobile-products .qty-control.catalog-qty-control{
+          min-height:34px !important;
+          margin-top:6px !important;
+          border-radius:12px !important;
+          padding:3px !important;
+        }
+        .cat-mobile-products .qty-control-btn{
+          width:28px !important;
+          height:28px !important;
+          border-radius:9px !important;
+          font-size:15px !important;
+        }
+        .cat-mobile-products .qty-control-value{
+          font-size:12px !important;
+        }
+        @media(max-width:1320px){ .cat-desktop-filterbar-row{ grid-template-columns:repeat(2, minmax(240px, 1fr)) !important; } .cat-mobile-products .products-grid{ grid-template-columns:repeat(4,minmax(0,1fr)) !important; } }
+        @media(max-width:1200px){ .cat-page-wrap{ grid-template-columns:168px 1fr !important; } }
+        @media(max-width:960px) { .cat-page-wrap{ grid-template-columns:150px 1fr !important; } .cat-right-col, .cat-desktop-filterbar{ display:none !important; } .mobile-filter-btn{ display:flex !important; } }
         @media(max-width:700px) { .cat-page-wrap{ grid-template-columns:1fr !important; } .cat-left-col{ display:none !important; } }
         @media(max-width:768px) { .products-grid{ grid-template-columns:repeat(2,1fr) !important; } }
         @media(max-width:960px){
@@ -712,6 +1005,9 @@ export default function CategoryPage({
             display:grid;
             gap:10px;
             margin-bottom:12px;
+          }
+          .cat-mobile-banner{
+            display:grid !important;
           }
           .cat-page-wrap{
             gap:10px !important;
@@ -1321,7 +1617,7 @@ export default function CategoryPage({
           ) : null}
         </div>
 
-        <div className="cat-page-wrap" style={{ display: "grid", gridTemplateColumns: "190px 1fr 220px", gap: 20, alignItems: "start" }}>
+        <div className="cat-page-wrap" style={{ display: "grid", gridTemplateColumns: "190px 1fr", gap: 20, alignItems: "start" }}>
 
           {/* ── LEFT COLUMN: All Categories only ── */}
           <div className="cat-left-col">
@@ -1380,8 +1676,21 @@ export default function CategoryPage({
                   </p>
                 )}
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                {/* Mobile filter button */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  onClick={() => onCategoryChange("all")}
+                  style={{ minHeight: 38, padding: "0 14px", borderRadius: 12, border: `1px solid ${palette.border}`, background: isAllProductsView ? palette.accentBg : (isDark ? "rgba(15,26,44,0.88)" : "#fff"), color: isAllProductsView ? palette.accent : palette.textStrong, fontSize: 12.5, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}
+                >
+                  {t.home.allCategories}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAllDealsView}
+                  style={{ minHeight: 38, padding: "0 14px", borderRadius: 12, border: `1px solid ${palette.border}`, background: isDark ? "rgba(15,26,44,0.88)" : "#fff", color: palette.textStrong, fontSize: 12.5, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}
+                >
+                  {t.home.allDeals}
+                </button>
                 <button
                   className="mobile-filter-btn"
                   onClick={(e) => { e.stopPropagation(); setFilterOpen(true); }}
@@ -1392,11 +1701,10 @@ export default function CategoryPage({
                     <span style={{ background: isDark ? "#08111f" : "#fff", color: palette.accent, borderRadius: 20, padding: "1px 7px", fontSize: 11, fontWeight: 800 }}>{activeFilterCount}</span>
                   )}
                 </button>
-                <div onClick={(e) => e.stopPropagation()}>
-                  {renderSortDropdown()}
-                </div>
               </div>
             </div>
+
+            {!loading && renderDesktopFilterBar()}
 
             {/* Active filter tags */}
             {activeTags.length > 0 && (
@@ -1418,7 +1726,7 @@ export default function CategoryPage({
 
             {/* Product Grid */}
             {loading ? (
-              <div className="products-grid" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>
+              <div className="products-grid" style={{ gridTemplateColumns: "repeat(5,1fr)" }}>
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div key={i} className="premium-product-skeleton premium-skeleton-surface" aria-hidden="true">
                     <div className="premium-skeleton-media"></div>
@@ -1446,7 +1754,7 @@ export default function CategoryPage({
                 </button>
               </div>
             ) : (
-              <div className="products-grid" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>
+              <div className="products-grid" style={{ gridTemplateColumns: "repeat(5,1fr)" }}>
                 {filteredProducts.map((item) => {
                   const inCart = cart.find((c) => c._uid === item._uid);
                   const qty = inCart ? inCart.quantity : 0;
@@ -1549,10 +1857,6 @@ export default function CategoryPage({
           </main>
 
           {/* ── RIGHT COLUMN: Filters ── */}
-          <div className="cat-right-col" style={{ position: "sticky", top: 88 }}>
-            {!loading && renderFilterPanel()}
-          </div>
-
         </div>
       </div>
 

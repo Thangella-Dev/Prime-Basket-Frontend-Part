@@ -49,8 +49,10 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 
 - `src/pages/HomePage.jsx`
 - `src/pages/CategoryPage.jsx`
+  Handles category browsing, all-products mode, compact desktop filter controls, and category-specific product-grid presentation.
 - `src/pages/ProductDetailPage.jsx`
 - `src/pages/CartPage.jsx`
+  Handles cart, mobile checkout presentation, promo flow, address selection, and recommended/special-deal product surfaces.
 - `src/pages/PaymentPage.jsx`
 - `src/pages/AccountPage.jsx`
 - `src/pages/WishlistPage.jsx`

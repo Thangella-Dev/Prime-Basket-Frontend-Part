@@ -14,6 +14,7 @@ The following improvements were implemented during the recent Prime Basket front
 - Improved desktop dark-mode header readability and reduced heavy glass/shimmer artifacts
 - Improved dark-mode dropdown visibility for desktop header interactions
 - Updated the lower header-bar arrangement so location, browse, and search follow the requested layout
+- Improved light-mode visibility for header utility icons such as notifications, wishlist, and basket
 
 ### Hero and Home
 
@@ -49,6 +50,7 @@ The following improvements were implemented during the recent Prime Basket front
 - Improved cart density and premium visual treatment
 - Reduced bulkiness of cart product cards
 - Improved cart product information hierarchy
+- Improved narrow-screen cart item alignment so quantity controls and pricing remain better grouped
 - Improved payment page styling
 - Reworked the payment step with a more premium method-selection and order-summary layout
 - Fixed the M-Pesa payment field state issue
@@ -69,6 +71,15 @@ The following improvements were implemented during the recent Prime Basket front
 - Added page-level lazy loading for major secondary pages
 - Reduced initial bundle weight compared to the earlier eager-load version
 - Kept production build stable
+
+### Category Browsing and Catalog Density
+
+- Reworked desktop category browsing to use a horizontal filter bar instead of a separate right sidebar
+- Added a real all-products mode for category browsing through `All Categories`
+- Added a quick `All Deals` filter entry point inside category browsing
+- Removed oversized featured-product treatment from desktop category pages where it crowded the catalog
+- Reduced category card size and tightened product information so browse grids behave more like compact storefront shelves
+- Reduced shared product badge/text collisions and improved title clamping on smaller product cards
 
 ## How Far the App Is Good Right Now
 

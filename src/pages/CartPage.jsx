@@ -1180,9 +1180,10 @@ export default function CartPage({
             height: 62px;
           }
           .cart-item-row {
-            grid-template-columns: 76px minmax(0,1fr);
+            grid-template-columns: 76px minmax(0,1fr) auto;
             gap: 12px;
             padding: 14px 16px;
+            align-items: center;
           }
           .cart-item-thumb {
             width: 76px;
@@ -1217,19 +1218,21 @@ export default function CartPage({
             margin-top: 8px;
           }
           .cart-item-side {
-            grid-column: 2;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            min-width: 0;
+            grid-column: 3;
+            grid-row: 1;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            width: auto;
+            min-width: 116px;
+            gap: 8px;
           }
           .cart-qty-pill {
-            min-width: 118px;
-            height: 42px;
+            min-width: 108px;
+            height: 40px;
             border-radius: 12px;
             gap: 6px;
-            padding: 0 8px;
+            padding: 0 7px;
           }
           .cart-qty-pill button {
             width: 24px;
@@ -1244,7 +1247,7 @@ export default function CartPage({
           }
           .cart-price-block small,
           .cart-price-block span {
-            font-size: 0.74rem;
+            font-size: 0.72rem;
           }
           .cart-address-body {
             padding: 0 16px 16px;
@@ -1265,14 +1268,33 @@ export default function CartPage({
           .cart-rec-grid {
             grid-template-columns: 1fr;
           }
+          .cart-item-row {
+            grid-template-columns: 72px minmax(0,1fr) auto;
+            gap: 10px;
+            padding: 12px 14px;
+          }
+          .cart-item-thumb {
+            width: 72px;
+            height: 72px;
+          }
           .cart-item-side {
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
+            min-width: 104px;
+            gap: 7px;
           }
           .cart-price-block {
-            text-align: left;
+            text-align: right;
+          }
+          .cart-qty-pill {
+            min-width: 102px;
+            height: 38px;
+          }
+          .cart-qty-pill button {
+            width: 22px;
+            height: 22px;
+            font-size: 1.2rem;
+          }
+          .cart-qty-pill span {
+            font-size: 0.88rem;
           }
         }
       `}</style>

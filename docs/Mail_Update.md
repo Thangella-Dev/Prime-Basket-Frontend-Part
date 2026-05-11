@@ -4,47 +4,48 @@ This folder contains the main handoff, architecture, backend, and improvement re
 
 ## Manager Update Mail
 
-**Subject:** Prime Basket Frontend Update - May 7, 2026
+**Subject:** Prime Basket Frontend Update - May 11, 2026
 
 Hi [Manager Name],
 
-Please find today's Prime Basket frontend update below.
+Please find today’s Prime Basket frontend update below.
 
 Project links:
 
 - GitHub: https://github.com/Thangella-Dev/Prime-Basket-Frontend-Part.git
 - Vercel: https://prime-basket-prb.vercel.app/
 
-Today's Prime Basket frontend work focused on deployment safety, mobile polish, product-unit clarity, SEO readiness, documentation readiness, and final UX cleanup.
+Today’s work focused on catalog-page cleanup, compact product presentation, mobile cart usability, header polish, slideshow refinement, favicon/browser branding, and documentation refresh.
 
 Completed today:
 
-1. Fixed the deployed product detail crash by adding a safe fallback when Firebase environment variables are missing, so product pages no longer blank on Vercel deployments without live catalog config.
-2. Improved the mobile header brand fitting so `PRIME-BASKET` displays more cleanly on smaller screens.
-3. Refined the floating footer behavior so the chatbot launcher hides near the footer and the up-arrow appears only when the footer area is reached.
-4. Upgraded the shared product-unit generation logic so weight, volume, packs, pieces, dairy, beverage, and care-item units are more realistic and less confusing across the app.
-5. Reduced the add-to-cart preview notification size so it feels lighter and fits better on mobile and compact screens.
-6. Added a more production-ready SEO setup in `index.html`, including stronger title/description metadata, Open Graph/Twitter tags, canonical URL, and JSON-LD structured data.
-7. Added crawler and AI discovery files including `robots.txt`, `sitemap.xml`, `llms.txt`, `llm.txt`, `geo.txt`, and `browserconfig.xml`.
-8. Standardized favicon, Apple touch icon, Android web-app icon, and browser tile icon references for more reliable production branding.
-9. Updated documentation so the root README and manager mail reflect the latest deployment, SEO, UI, and reliability work.
-10. Replaced the previous Vercel deployment URL references with the latest live deployment URL across production metadata and crawler files.
-11. Verified the application still builds successfully after these updates.
+1. Reworked the homepage hero/slideshow visual treatment, removed the ghosted background-image effect, reduced unwanted square surfaces, improved premium motion, and slightly increased hero height.
+2. Split branding assets properly by using the icon logo for favicons/app icons and the full brand wordmark for larger web/share metadata.
+3. Improved the category-page mobile browse dropdown so it opens directly under its trigger instead of drifting sideways.
+4. Replaced the old desktop category filter sidebar with a horizontal filter bar, giving more room to product listings.
+5. Strengthened light-mode header visibility for notification, wishlist, and basket actions so they no longer look faded.
+6. Removed oversized featured-product treatment from desktop category pages where it was crowding the catalog.
+7. Added a real `All Categories` all-products browsing mode and a category-page `All Deals` quick filter entry.
+8. Reduced category and shared product-card size, tightened copy layout, and improved badge/title handling so home, category, and other product shelves feel more compact and premium.
+9. Removed duplicate desktop sorting controls in category browsing and tightened the `Refine results` surface.
+10. Improved narrow-screen cart item layout so quantity controls and price stay grouped in the side column instead of dropping below the product details.
+11. Updated the root README plus docs overview/architecture/improvements files so they reflect the current frontend state and latest work.
+12. Verified the application still builds successfully after the above changes.
 
 Current status:
 
-- Deployment behavior is more stable even when live Firebase config is not present.
-- Mobile navigation and floating utility controls feel cleaner.
-- Product quantities and units are more trustworthy from a shopping UX perspective.
-- SEO, crawler, and browser identity setup is much closer to production-ready.
-- Documentation and manager handoff links now point to the current repository and deployment.
+- Category browsing is cleaner, denser, and closer to a premium storefront layout.
+- Product cards now show only the most useful information in a more compact format.
+- Mobile cart and checkout presentation use space better.
+- Header and brand presentation are clearer across light mode, mobile, and browser/platform icons.
+- Documentation is aligned with the current app state.
 - Build verification is passing.
 
 Recommended next steps:
 
-- Run a final live QA pass on deployed mobile and desktop builds, especially product detail, cart, and search flows.
-- Replace the current reused master-logo icon copies with fully optimized favicon/app-icon exports to reduce asset weight further.
-- Complete backend, payment, and auth hardening before production use.
+- Run another device-by-device visual QA pass on category browsing, cart, payment, and product detail pages.
+- Continue reducing large page-local inline style blocks into reusable shared styles/components.
+- Complete backend, payment, auth, and notification hardening before production use.
 
 Regards,  
 [Your Name]

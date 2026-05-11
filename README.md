@@ -97,6 +97,14 @@ What still needs work:
 
 ## Improvements Completed In This Implementation Cycle
 
+- Reworked category browsing with a compact desktop filter bar, denser square product cards, and a real `All Categories` all-products mode
+- Added category-page quick actions for `All Categories` and `All Deals`
+- Fixed mobile browse dropdown anchoring so it opens directly under its trigger
+- Strengthened light-mode header icon contrast for notifications, wishlist, and basket actions
+- Removed oversized desktop category featured-product blocks that were crowding the catalog
+- Tightened category/product card density across shared grids to reduce text collisions and improve scanability
+- Improved mobile cart item layout so quantity controls and price stay aligned in the side column instead of dropping awkwardly below the product details
+- Reduced badge/text collisions in shared product cards and tightened deal-card title handling
 - Upgraded the header and navigation shell
 - Improved region/language/currency behavior
 - Reworked hero and home presentation
@@ -150,6 +158,7 @@ See the `docs` folder for detailed project documentation:
 ## Current Validation
 
 - `npm run build` passes
+- Category browsing, cart-item layout, shared product-card density, and all-products mode were updated and revalidated in the latest pass
 - A focused code audit pass was completed on checkout, modal behavior, cart merging, chatbot currency handling, related-product/detail flows, and deployment-safe product-page behavior
 - The app is suitable as a strong frontend demo/prototype
 - Final visual QA and backend completion are still recommended before production use

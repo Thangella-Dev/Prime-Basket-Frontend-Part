@@ -71,6 +71,8 @@ Other important state is currently stored in the browser through `localStorage`,
 - Region-aware shopping foundation
 - Good amount of user flow coverage
 - Documentation and structure now clearer than before
+- Category browsing is now denser and more catalog-focused, with compact cards and an all-products browsing mode
+- Mobile cart and checkout presentation are more space-efficient than earlier revisions
 
 ## Current Limitations
 
