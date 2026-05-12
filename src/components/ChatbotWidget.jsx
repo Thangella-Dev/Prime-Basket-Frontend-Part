@@ -224,6 +224,11 @@ export default function ChatbotWidget({
           opacity: 0;
           pointer-events: none;
         }
+        body.prime-quantity-open .prime-float-stack,
+        body.prime-quantity-open .prime-chat-panel {
+          opacity: 0;
+          pointer-events: none;
+        }
         .prime-chat-trigger {
           position: relative;
           width: 58px;

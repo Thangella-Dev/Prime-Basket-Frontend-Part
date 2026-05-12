@@ -82,6 +82,7 @@ function RangeSlider({ min, max, value, onChange, prefix = "", suffix = "", acce
   const safeSpan = Math.max(max - min, 1);
   const pct = (v) => Math.min(100, Math.max(0, ((v - min) / safeSpan) * 100));
   const step = suffix === "%" ? 1 : safeSpan <= 250 ? 1 : safeSpan <= 1000 ? 5 : safeSpan <= 5000 ? 10 : 25;
+  const trackRef = useRef(null);
 
   const handleMin = useCallback((e) => {
     const v = Number(e.target.value);
@@ -95,13 +96,42 @@ function RangeSlider({ min, max, value, onChange, prefix = "", suffix = "", acce
 
   const safeVal = clampRange(value, min, max);
 
+  const jumpToPoint = useCallback((clientX) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const bounds = track.getBoundingClientRect();
+    if (!bounds.width) return;
+
+    const ratio = Math.min(1, Math.max(0, (clientX - bounds.left) / bounds.width));
+    const rawValue = min + ratio * safeSpan;
+    const snappedValue = Math.round(rawValue / step) * step;
+    const nextValue = Math.min(max, Math.max(min, snappedValue));
+    const [currentMin, currentMax] = safeVal;
+    const distanceToMin = Math.abs(nextValue - currentMin);
+    const distanceToMax = Math.abs(nextValue - currentMax);
+
+    if (distanceToMin <= distanceToMax) {
+      onChange([Math.min(nextValue, currentMax), currentMax]);
+      return;
+    }
+
+    onChange([currentMin, Math.max(nextValue, currentMin)]);
+  }, [max, min, onChange, safeSpan, safeVal, step]);
+
   return (
     <div style={{ padding: "4px 0 8px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700, color: accent, marginBottom: 10 }}>
         <span style={{ background: `${accent}18`, padding: "2px 8px", borderRadius: 6 }}>{prefix}{safeVal[0]}{suffix}</span>
         <span style={{ background: `${accent}18`, padding: "2px 8px", borderRadius: 6 }}>{prefix}{safeVal[1]}{suffix}</span>
       </div>
-      <div style={{ position: "relative", height: 32 }}>
+      <div
+        ref={trackRef}
+        style={{ position: "relative", height: 32 }}
+        onPointerDown={(event) => {
+          if (event.target instanceof HTMLInputElement) return;
+          jumpToPoint(event.clientX);
+        }}
+      >
         <div style={{ position: "absolute", top: 14, left: 0, right: 0, height: 4, background: "#e2e8f0", borderRadius: 999 }} />
         <div style={{
           position: "absolute", top: 14, height: 4,
@@ -112,6 +142,7 @@ function RangeSlider({ min, max, value, onChange, prefix = "", suffix = "", acce
         <input
           type="range" min={min} max={max} step={step} value={safeVal[0]}
           onInput={handleMin}
+          onChange={handleMin}
           style={{
             position: "absolute", top: 0, left: 0, width: "100%", height: 32,
             WebkitAppearance: "none", appearance: "none", background: "transparent",
@@ -123,6 +154,7 @@ function RangeSlider({ min, max, value, onChange, prefix = "", suffix = "", acce
         <input
           type="range" min={min} max={max} step={step} value={safeVal[1]}
           onInput={handleMax}
+          onChange={handleMax}
           style={{
             position: "absolute", top: 0, left: 0, width: "100%", height: 32,
             WebkitAppearance: "none", appearance: "none", background: "transparent",
@@ -173,6 +205,7 @@ export default function CategoryPage({
   const [filterOpen, setFilterOpen] = useState(false);   // mobile bottom sheet
   const [sortOpen, setSortOpen] = useState(false);        // desktop dropdown
   const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(false);
+  const [desktopCategoryRailExpanded, setDesktopCategoryRailExpanded] = useState(false);
   const [mobileSortOpen, setMobileSortOpen] = useState(false); // mobile sort sheet
   const [filterTab, setFilterTab] = useState("brand");    // mobile filter tab: brand | price | discount
   const [searchHintIndex, setSearchHintIndex] = useState(0);
@@ -885,7 +918,7 @@ export default function CategoryPage({
       {/* ── Styles ── */}
       <style>{`
         /* ── Range input reset ── */
-        .cp-range { -webkit-appearance:none; appearance:none; background:transparent; outline:none; touch-action:pan-y; }
+        .cp-range { -webkit-appearance:none; appearance:none; background:transparent; outline:none; touch-action:none; }
         .cp-range::-webkit-slider-runnable-track { background:transparent; }
         .cp-range::-webkit-slider-thumb { -webkit-appearance:none; width:0; height:0; }
         .cp-range::-moz-range-track { background:transparent; border:none; }
@@ -901,9 +934,16 @@ export default function CategoryPage({
           margin: 0 auto;
           padding: 20px 16px 40px;
           align-items: start;
+          transition: grid-template-columns .24s ease;
+        }
+        .cp-layout.cat-rail-expanded {
+          grid-template-columns: 248px minmax(0,1fr);
         }
         .cp-layout.filters-open {
           grid-template-columns: 92px minmax(0,1fr) 360px;
+        }
+        .cp-layout.filters-open.cat-rail-expanded {
+          grid-template-columns: 248px minmax(0,1fr) 360px;
         }
 
         /* ── Sidebar ── */
@@ -929,13 +969,11 @@ export default function CategoryPage({
         }
 
         /* ── Category nav ── */
-        .cp-sidebar { overflow: visible; z-index: 60; }
-        .cp-cat-nav { width: 92px; background: linear-gradient(180deg, ${p.card}, ${p.cardAlt}); border-radius: 20px; border: 1px solid ${p.border}; overflow: hidden; box-shadow: ${p.shadowSm}; transition: width .24s ease, box-shadow .24s ease, border-color .24s ease; }
-        .cp-sidebar:hover .cp-cat-nav,
-        .cp-sidebar:focus-within .cp-cat-nav { width: 248px; border-color: ${p.accent}33; box-shadow: 0 22px 42px rgba(15,30,60,0.14); }
+        .cp-sidebar { overflow: visible; z-index: 120; }
+        .cp-cat-nav { width: 100%; background: linear-gradient(180deg, ${p.card}, ${p.cardAlt}); border-radius: 20px; border: 1px solid ${p.border}; overflow: hidden; box-shadow: ${p.shadowSm}; transition: box-shadow .24s ease, border-color .24s ease; }
+        .cp-layout.cat-rail-expanded .cp-cat-nav { border-color: ${p.accent}33; box-shadow: 0 22px 42px rgba(15,30,60,0.14); }
         .cp-cat-nav-title { padding: 0 16px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: ${p.textFaint}; border-bottom: 1px solid transparent; opacity: 0; max-height: 0; overflow: hidden; transition: opacity .18s ease, max-height .18s ease, padding .18s ease, border-color .18s ease; }
-        .cp-sidebar:hover .cp-cat-nav-title,
-        .cp-sidebar:focus-within .cp-cat-nav-title { padding: 14px 16px 10px; opacity: 1; max-height: 48px; border-bottom-color: ${p.border}; }
+        .cp-layout.cat-rail-expanded .cp-cat-nav-title { padding: 14px 16px 10px; opacity: 1; max-height: 48px; border-bottom-color: ${p.border}; }
         .cp-cat-nav-list { max-height: 72vh; overflow-y: auto; padding: 8px 0; scrollbar-width: thin; scrollbar-color: ${p.accent}44 transparent; }
         .cp-cat-nav-list::-webkit-scrollbar { width: 3px; }
         .cp-cat-nav-list::-webkit-scrollbar-thumb { background: ${p.accent}44; border-radius: 3px; }
@@ -945,15 +983,14 @@ export default function CategoryPage({
         .cp-cat-item .cp-cat-icon { width: 34px; height: 34px; border-radius: 12px; background: ${p.cardAlt}; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
         .cp-cat-item.active .cp-cat-icon { background: ${p.accentBg}; color: ${p.accent}; }
         .cp-cat-label { white-space: nowrap; opacity: 0; transform: translateX(-8px); width: 0; overflow: hidden; transition: opacity .18s ease, transform .18s ease, width .18s ease; }
-        .cp-sidebar:hover .cp-cat-label,
-        .cp-sidebar:focus-within .cp-cat-label { opacity: 1; transform: translateX(0); width: 160px; }
+        .cp-layout.cat-rail-expanded .cp-cat-label { opacity: 1; transform: translateX(0); width: 160px; }
 
         /* ── Main content ── */
         .cp-main { min-width: 0; }
         .cp-toolbar-shell {
           position: sticky;
           top: 82px;
-          z-index: 92;
+          z-index: 90;
           margin-bottom: 14px;
         }
 
@@ -1302,10 +1339,20 @@ export default function CategoryPage({
       {/* ══════════════════════════════════════════════
           DESKTOP + TABLET layout
       ══════════════════════════════════════════════ */}
-      <div className={`cp-layout${desktopFiltersOpen ? " filters-open" : ""}`}>
+      <div className={`cp-layout${desktopFiltersOpen ? " filters-open" : ""}${desktopCategoryRailExpanded ? " cat-rail-expanded" : ""}`}>
 
         {/* ── Sidebar ── */}
-        <aside className="cp-sidebar">
+        <aside
+          className="cp-sidebar"
+          onMouseEnter={() => setDesktopCategoryRailExpanded(true)}
+          onMouseLeave={() => setDesktopCategoryRailExpanded(false)}
+          onFocusCapture={() => setDesktopCategoryRailExpanded(true)}
+          onBlurCapture={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              setDesktopCategoryRailExpanded(false);
+            }
+          }}
+        >
           {/* Category nav */}
           <div className="cp-cat-nav">
             <div className="cp-cat-nav-title">Categories</div>

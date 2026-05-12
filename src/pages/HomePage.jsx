@@ -741,6 +741,20 @@ export default function HomePage({
                     startRailGesture(col.key, event.clientX, event.clientY);
                     event.currentTarget.setPointerCapture?.(event.pointerId);
                   }}
+                  onTouchStart={(event) => {
+                    if (isRailInteractiveTarget(event.target)) return;
+                    if (metrics.maxIndex <= 0) return;
+                    const touch = event.touches?.[0];
+                    if (!touch) return;
+                    startRailGesture(col.key, touch.clientX, touch.clientY);
+                  }}
+                  onTouchMove={(event) => {
+                    const touch = event.touches?.[0];
+                    if (!touch) return;
+                    moveRailGesture(col.key, touch.clientX, touch.clientY, event);
+                  }}
+                  onTouchEnd={() => endRailGesture(col.key)}
+                  onTouchCancel={() => endRailGesture(col.key)}
                   onPointerMove={(event) => moveRailGesture(col.key, event.clientX, event.clientY, event)}
                   onPointerUp={(event) => {
                     endRailGesture(col.key);

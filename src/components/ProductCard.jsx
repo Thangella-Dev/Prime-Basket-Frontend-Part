@@ -100,6 +100,15 @@ export default function ProductCard({
     return () => document.removeEventListener("mousedown", handleClickAway);
   }, [showModal, isDesktopPopover]);
 
+  useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    const shouldHideChatbot = showModal && !isDesktopPopover;
+    document.body.classList.toggle("prime-quantity-open", shouldHideChatbot);
+    return () => {
+      document.body.classList.remove("prime-quantity-open");
+    };
+  }, [showModal, isDesktopPopover]);
+
   const quantityPicker = (
     <>
       <div className="unit-modal-header">

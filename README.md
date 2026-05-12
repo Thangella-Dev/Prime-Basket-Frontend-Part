@@ -17,6 +17,8 @@ Primary production domain: `https://prime-basket.in`
 - Ongoing desktop and mobile dark-mode refinement across header, account, and promotional surfaces
 - Route-safe public asset loading for direct and nested entries
 - Safer homepage fallback loading when live catalog fetches are slow
+- Mobile curated-rail swipe support with right-aligned shelf controls
+- Improved category-page desktop layering and tappable range-slider filter behavior
 
 ## Tech Stack
 

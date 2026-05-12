@@ -2304,7 +2304,7 @@ body[data-theme="dark"] .browse-btn .chevron {
   }
   .rail-controls {
     width: 100%;
-    justify-content: flex-start;
+    justify-content: flex-end;
   }
   .rail-control-btn {
     width: 32px;
@@ -5900,9 +5900,8 @@ body[data-theme="dark"] .slider-nav-btn:hover {
 }
 
 @media (max-width: 768px) {
-  .products-grid,
   .deals-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 8px !important;
   }
 }
