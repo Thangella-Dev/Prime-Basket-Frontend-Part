@@ -48,6 +48,9 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 - `src/components/Footer.jsx`
   Shared footer.
 
+- `src/utils/translationUtils.js`
+  Shared product-name localization normalization and search-hint helpers.
+
 ### State and Context
 
 - `src/context/AuthContext.jsx`
@@ -105,6 +108,7 @@ This works, but a future production refactor could move more navigation to a cle
 
 - Firebase Realtime Database for live catalog paths
 - local data fallback for some region-specific flows
+- timeout-backed fallback protection on key homepage catalog surfaces to avoid prolonged skeleton-only states when live fetches stall
 
 ### User and commerce state
 

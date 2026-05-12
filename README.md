@@ -15,6 +15,8 @@ Primary production domain: `https://prime-basket.in`
 - Chatbot panel and shopping assistant UI
 - Premium mobile-first UI improvements across core screens
 - Ongoing desktop and mobile dark-mode refinement across header, account, and promotional surfaces
+- Route-safe public asset loading for direct and nested entries
+- Safer homepage fallback loading when live catalog fetches are slow
 
 ## Tech Stack
 
@@ -99,6 +101,16 @@ What still needs work:
 
 ## Improvements Completed In This Implementation Cycle
 
+- Audited and stabilized desktop category browsing so the left rail, sticky toolbar, and right filter panel work as one coherent layout
+- Added hover-reveal desktop categories with icon-first collapsed state and label expansion on interaction
+- Moved desktop quantity selection into an on-card dropdown/popover instead of a detached fullscreen-style desktop modal
+- Added animated premium search hints for product/category search surfaces
+- Refined search-hint layout so desktop search recommendations render as a clean trailing chip instead of overlapping the input text
+- Replaced fuzzy product-name translation matching with safer exact-normalized matching to prevent incorrect English/Swahili product labels
+- Upgraded theme-toggle presentation with cleaner premium light/dark icons
+- Reworked the mobile `Browse All Categories` trigger into a cleaner frosted glass treatment
+- Fixed route-relative public asset references so direct entries and nested URLs no longer break brand, hero, or footer imagery
+- Added a timeout-backed homepage fallback so popular, deals, and curated sections recover faster when live catalog fetches stall
 - Reworked category browsing with a compact desktop filter bar, denser square product cards, and a real `All Categories` all-products mode
 - Added category-page quick actions for `All Categories` and `All Deals`
 - Fixed mobile browse dropdown anchoring so it opens directly under its trigger

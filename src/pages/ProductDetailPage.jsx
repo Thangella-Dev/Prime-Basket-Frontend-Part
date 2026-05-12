@@ -6,6 +6,7 @@ import { useT } from "../i18n/translations";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
 import { enhanceProduct, formatCurrency, parsePrice } from "../utils/productUtils";
 import ProductCard from "../components/ProductCard";
+import { getLocalizedProductName } from "../utils/translationUtils";
 
 const allCoupons_en = [
   { code: "ONECARD",  text: "Get 5% off with OneCard"                  },
@@ -81,15 +82,7 @@ export default function ProductDetailPage({
   const isWished = wishlist.some((w) => w._uid === product._uid);
   const displayedCoupons = showAllCoupons ? allCoupons : allCoupons.slice(0, 3);
 
-  const getTranslatedName = (name) => {
-    if (!name) return "";
-    if (t.products?.[name]) return t.products[name];
-    const entries = Object.entries(t.products || {}).sort((a, b) => b[0].length - a[0].length);
-    for (const [key, val] of entries) {
-      if (name.toLowerCase().includes(key.toLowerCase())) return val;
-    }
-    return name;
-  };
+  const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
   const translatedName = getTranslatedName(product.name);
 

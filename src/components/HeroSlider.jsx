@@ -37,7 +37,7 @@ export default function HeroSlider({ language = "en" }) {
       {
         title: t.hero[0].title,
         desc: t.hero[0].desc,
-        img: "assets/fruits.png",
+        img: "/assets/fruits.png",
         alt: "Fresh fruits",
         badge: "🍊 Fresh Picks",
         tag: "Fruits & More",
@@ -45,7 +45,7 @@ export default function HeroSlider({ language = "en" }) {
       {
         title: t.hero[1].title,
         desc: t.hero[1].desc,
-        img: "assets/fresh&clean.png",
+        img: "/assets/fresh&clean.png",
         alt: "Organic vegetables",
         badge: "🥦 Organic",
         tag: "Farm Fresh",
@@ -53,7 +53,7 @@ export default function HeroSlider({ language = "en" }) {
       {
         title: t.hero[2].title,
         desc: t.hero[2].desc,
-        img: "assets/tropical-fruits.png",
+        img: "/assets/tropical-fruits.png",
         alt: "Tropical fruits",
         badge: "🥭 Tropical",
         tag: "Exotic Range",
@@ -61,7 +61,7 @@ export default function HeroSlider({ language = "en" }) {
       {
         title: t.hero[3].title,
         desc: t.hero[3].desc,
-        img: "assets/dairy-needs.png",
+        img: "/assets/dairy-needs.png",
         alt: "Dairy products",
         badge: "🥛 Daily Fresh",
         tag: "Dairy & Eggs",

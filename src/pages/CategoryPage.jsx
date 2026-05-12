@@ -6,6 +6,7 @@ import { useT } from "../i18n/translations";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
 import { mergeCategoryProducts } from "../data/catalogFallback";
 import { formatCurrencyDisplay } from "../utils/currency";
+import { getLocalizedProductName, getSearchHintSuggestions } from "../utils/translationUtils";
 import ProductCard from "../components/ProductCard";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -174,9 +175,11 @@ export default function CategoryPage({
   const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(false);
   const [mobileSortOpen, setMobileSortOpen] = useState(false); // mobile sort sheet
   const [filterTab, setFilterTab] = useState("brand");    // mobile filter tab: brand | price | discount
+  const [searchHintIndex, setSearchHintIndex] = useState(0);
 
   const pageTopRef = useRef(null);
   const productsRef = useRef(null);
+  const searchSuggestions = useMemo(() => getSearchHintSuggestions(language), [language]);
 
   // ── Theme (palette) ────────────────────────────────────────────────────────
   const p = isDark
@@ -246,6 +249,14 @@ export default function CategoryPage({
     obs.observe(document.body, { attributes: true, attributeFilter: ["data-theme"] });
     return () => obs.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (searchSuggestions.length <= 1) return undefined;
+    const timer = window.setInterval(() => {
+      setSearchHintIndex((prev) => (prev + 1) % searchSuggestions.length);
+    }, 2200);
+    return () => window.clearInterval(timer);
+  }, [searchSuggestions]);
 
   // ── Load products ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -443,6 +454,7 @@ export default function CategoryPage({
       list = list.filter(
         (prod) =>
           normalizeText(prod.name).includes(q) ||
+          normalizeText(getTranslatedName(prod.name)).includes(q) ||
           normalizeText(prod.brand).includes(q) ||
           normalizeText(prod.quantity).includes(q)
       );
@@ -521,15 +533,7 @@ export default function CategoryPage({
   }, [discountBounds]);
 
   // ── Product helpers ────────────────────────────────────────────────────────
-  const getTranslatedName = useCallback((name) => {
-    if (!name) return "";
-    if (t.products?.[name]) return t.products[name];
-    const entries = Object.entries(t.products || {}).sort((a, b) => b[0].length - a[0].length);
-    for (const [key, val] of entries) {
-      if (name.toLowerCase().includes(key.toLowerCase())) return val;
-    }
-    return name;
-  }, [t]);
+  const getTranslatedName = useCallback((name) => getLocalizedProductName(name, t), [t]);
 
   const getStockInfo = useCallback((item) => {
     if (item.inStock === false) return { text: t.product?.outOfStock || "Out of stock", cls: "outofstock", disabled: true };
@@ -648,11 +652,8 @@ export default function CategoryPage({
 
   // Full desktop sidebar filter panel
   const renderDesktopFilterPanel = () => (
-    <div style={{
-      background: p.card, borderRadius: 16, border: `1px solid ${p.border}`,
-      overflow: "hidden", boxShadow: "0 20px 40px rgba(15,30,60,0.16)",
-    }}>
-      <div style={{ padding: "12px 16px", borderBottom: `1px solid ${p.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+    <div className="cp-filter-panel">
+      <div className="cp-filter-panel-head">
         <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 800, fontSize: 14, color: p.text }}>
           <i className="fas fa-sliders-h" style={{ color: p.accent }} />
           Refine results
@@ -672,8 +673,8 @@ export default function CategoryPage({
         </div>
       </div>
 
-      <div style={{ padding: 14, display: "grid", gap: 12 }}>
-        <div style={{ padding: 14, borderRadius: 14, border: `1px solid ${p.border}`, background: p.cardAlt }}>
+      <div className="cp-filter-panel-body">
+        <div className="cp-filter-panel-section">
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: p.text, textTransform: "uppercase", letterSpacing: ".06em" }}>Brand</div>
             <span style={{ fontSize: 11, color: p.textFaint, fontWeight: 800 }}>{selectedBrands.length || brandList.length}</span>
@@ -708,17 +709,17 @@ export default function CategoryPage({
           {renderBrandFilter()}
         </div>
 
-        <div style={{ padding: 14, borderRadius: 14, border: `1px solid ${p.border}`, background: p.cardAlt }}>
+        <div className="cp-filter-panel-section">
           <div style={{ fontSize: 12, fontWeight: 800, color: p.text, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>Price Range</div>
           {renderPriceFilter()}
         </div>
 
-        <div style={{ padding: 14, borderRadius: 14, border: `1px solid ${p.border}`, background: p.cardAlt }}>
+        <div className="cp-filter-panel-section">
           <div style={{ fontSize: 12, fontWeight: 800, color: p.text, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>Discount</div>
           {renderDiscountFilter()}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: activeFilterCount > 0 ? "1fr auto" : "1fr", gap: 10 }}>
+        <div className="cp-filter-panel-actions" style={{ gridTemplateColumns: activeFilterCount > 0 ? "1fr auto" : "1fr" }}>
           <button
             type="button"
             onClick={() => setDesktopFiltersOpen(false)}
@@ -894,15 +895,15 @@ export default function CategoryPage({
         .cp-root { font-family: "Outfit","Quicksand",system-ui,sans-serif; }
         .cp-layout {
           display: grid;
-          grid-template-columns: 240px minmax(0,1fr);
+          grid-template-columns: 92px minmax(0,1fr);
           gap: 20px;
-          max-width: 1440px;
+          max-width: 1480px;
           margin: 0 auto;
           padding: 20px 16px 40px;
           align-items: start;
         }
         .cp-layout.filters-open {
-          grid-template-columns: 240px minmax(0,1fr) 330px;
+          grid-template-columns: 92px minmax(0,1fr) 360px;
         }
 
         /* ── Sidebar ── */
@@ -922,24 +923,30 @@ export default function CategoryPage({
         .cp-filter-sidebar::-webkit-scrollbar { width: 4px; }
         .cp-sidebar::-webkit-scrollbar-thumb,
         .cp-filter-sidebar::-webkit-scrollbar-thumb { background: ${p.accent}44; border-radius: 4px; }
-        .cp-filter-sidebar {
-          display: none;
-        }
+        .cp-filter-sidebar { display: none; }
         .cp-layout.filters-open .cp-filter-sidebar {
           display: flex;
         }
 
         /* ── Category nav ── */
-        .cp-cat-nav { background: ${p.card}; border-radius: 16px; border: 1px solid ${p.border}; overflow: hidden; box-shadow: ${p.shadowSm}; }
-        .cp-cat-nav-title { padding: 14px 16px 10px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: ${p.textFaint}; border-bottom: 1px solid ${p.border}; }
-        .cp-cat-nav-list { max-height: 320px; overflow-y: auto; padding: 6px 0; scrollbar-width: thin; scrollbar-color: ${p.accent}44 transparent; }
+        .cp-sidebar { overflow: visible; z-index: 60; }
+        .cp-cat-nav { width: 92px; background: linear-gradient(180deg, ${p.card}, ${p.cardAlt}); border-radius: 20px; border: 1px solid ${p.border}; overflow: hidden; box-shadow: ${p.shadowSm}; transition: width .24s ease, box-shadow .24s ease, border-color .24s ease; }
+        .cp-sidebar:hover .cp-cat-nav,
+        .cp-sidebar:focus-within .cp-cat-nav { width: 248px; border-color: ${p.accent}33; box-shadow: 0 22px 42px rgba(15,30,60,0.14); }
+        .cp-cat-nav-title { padding: 0 16px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: ${p.textFaint}; border-bottom: 1px solid transparent; opacity: 0; max-height: 0; overflow: hidden; transition: opacity .18s ease, max-height .18s ease, padding .18s ease, border-color .18s ease; }
+        .cp-sidebar:hover .cp-cat-nav-title,
+        .cp-sidebar:focus-within .cp-cat-nav-title { padding: 14px 16px 10px; opacity: 1; max-height: 48px; border-bottom-color: ${p.border}; }
+        .cp-cat-nav-list { max-height: 72vh; overflow-y: auto; padding: 8px 0; scrollbar-width: thin; scrollbar-color: ${p.accent}44 transparent; }
         .cp-cat-nav-list::-webkit-scrollbar { width: 3px; }
         .cp-cat-nav-list::-webkit-scrollbar-thumb { background: ${p.accent}44; border-radius: 3px; }
-        .cp-cat-item { display: flex; align-items: center; gap: 10px; padding: 9px 14px; cursor: pointer; font-size: 13px; font-weight: 500; color: ${p.textMuted}; transition: all .12s; border-left: 3px solid transparent; }
+        .cp-cat-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; min-height: 50px; cursor: pointer; font-size: 13px; font-weight: 600; color: ${p.textMuted}; transition: all .18s; border-left: 3px solid transparent; overflow: hidden; }
         .cp-cat-item:hover { background: ${p.accentBg}; color: ${p.accent}; }
         .cp-cat-item.active { background: ${p.accentBg}; color: ${p.accent}; font-weight: 700; border-left-color: ${p.accent}; }
-        .cp-cat-item .cp-cat-icon { width: 28px; height: 28px; border-radius: 8px; background: ${p.cardAlt}; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+        .cp-cat-item .cp-cat-icon { width: 34px; height: 34px; border-radius: 12px; background: ${p.cardAlt}; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
         .cp-cat-item.active .cp-cat-icon { background: ${p.accentBg}; color: ${p.accent}; }
+        .cp-cat-label { white-space: nowrap; opacity: 0; transform: translateX(-8px); width: 0; overflow: hidden; transition: opacity .18s ease, transform .18s ease, width .18s ease; }
+        .cp-sidebar:hover .cp-cat-label,
+        .cp-sidebar:focus-within .cp-cat-label { opacity: 1; transform: translateX(0); width: 160px; }
 
         /* ── Main content ── */
         .cp-main { min-width: 0; }
@@ -964,7 +971,7 @@ export default function CategoryPage({
         }
         .cp-toolbar-meta { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; color: ${p.textMuted}; white-space: nowrap; }
         .cp-toolbar-meta strong { color: ${p.text}; font-size: 14px; font-weight: 800; }
-        .cp-search-wrap { flex: 1; min-width: 220px; max-width: 360px; position: relative; }
+        .cp-search-wrap { flex: 1; min-width: 240px; max-width: 390px; position: relative; }
         .cp-search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: ${p.textFaint}; font-size: 13px; }
         .cp-search-input {
           width: 100%; padding: 9px 12px 9px 36px; border-radius: 10px;
@@ -973,6 +980,7 @@ export default function CategoryPage({
           transition: border-color .15s;
         }
         .cp-search-input:focus { border-color: ${p.accent}; }
+        .cp-search-suggestion { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 700; color: ${p.textFaint}; pointer-events: none; white-space: nowrap; animation: cpHintSlide .38s ease; }
 
         .cp-toolbar-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; flex-wrap: wrap; margin-left: auto; }
         .cp-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; border: 1.5px solid ${p.border}; background: ${p.card}; color: ${p.text}; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; transition: all .15s; }
@@ -1134,6 +1142,13 @@ export default function CategoryPage({
         .cp-filter-sheet-footer { padding: 12px 18px; border-top: 1px solid ${p.border}; display: flex; gap: 10px; }
         .cp-filter-footer-clear { flex: 1; padding: 12px; border-radius: 12px; border: 1.5px solid ${p.border}; background: ${p.cardAlt}; color: ${p.text}; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
         .cp-filter-footer-apply { flex: 2; padding: 12px; border-radius: 12px; border: none; background: ${p.accent}; color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; font-family: inherit; }
+        .cp-filter-panel { background: ${p.card}; border-radius: 20px; border: 1px solid ${p.border}; overflow: hidden; box-shadow: 0 20px 40px rgba(15,30,60,0.16); display: flex; flex-direction: column; max-height: calc(100vh - 154px); }
+        .cp-filter-panel-head { padding: 12px 16px; border-bottom: 1px solid ${p.border}; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .cp-filter-panel-body { padding: 14px; display: grid; gap: 12px; overflow-y: auto; }
+        .cp-filter-panel-body::-webkit-scrollbar { width: 6px; }
+        .cp-filter-panel-body::-webkit-scrollbar-thumb { background: ${p.accent}44; border-radius: 999px; }
+        .cp-filter-panel-section { padding: 14px; border-radius: 16px; border: 1px solid ${p.border}; background: ${p.cardAlt}; }
+        .cp-filter-panel-actions { display: grid; gap: 10px; }
 
         /* ── Mobile sort sheet ── */
         .cp-sort-sheet { background: ${p.card}; border-radius: 24px 24px 0 0; padding: 8px 0 20px; }
@@ -1151,6 +1166,7 @@ export default function CategoryPage({
         @keyframes cpFadeDown { from { opacity:0; transform:translateY(-6px) } to { opacity:1; transform:translateY(0) } }
         @keyframes cpFadeIn { from { opacity:0 } to { opacity:1 } }
         @keyframes cpSlideUp { from { transform:translateY(100%) } to { transform:translateY(0) } }
+        @keyframes cpHintSlide { from { opacity:0; transform:translate(8px,-50%) } to { opacity:1; transform:translate(0,-50%) } }
 
         /* ── Active filter tags (mobile) ── */
         .cp-mobile-tags { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 2px; scrollbar-width: none; margin-bottom: 10px; }
@@ -1160,14 +1176,14 @@ export default function CategoryPage({
 
         /* ── Tablet (768–1024) ── */
         @media (max-width: 1100px) {
-          .cp-layout { grid-template-columns: 220px minmax(0,1fr); gap: 14px; }
-          .cp-layout.filters-open { grid-template-columns: 220px minmax(0,1fr) 300px; }
+          .cp-layout { grid-template-columns: 84px minmax(0,1fr); gap: 14px; }
+          .cp-layout.filters-open { grid-template-columns: 84px minmax(0,1fr) 320px; }
           .cp-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
         }
 
         @media (max-width: 900px) {
-          .cp-layout { grid-template-columns: 200px minmax(0,1fr); gap: 12px; }
-          .cp-layout.filters-open { grid-template-columns: 200px minmax(0,1fr) 280px; }
+          .cp-layout { grid-template-columns: 76px minmax(0,1fr); gap: 12px; }
+          .cp-layout.filters-open { grid-template-columns: 76px minmax(0,1fr) 280px; }
           .cp-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
         }
 
@@ -1237,6 +1253,11 @@ export default function CategoryPage({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+            {!searchQuery && (
+              <span className="cp-search-suggestion">
+                search {searchSuggestions[searchHintIndex]}
+              </span>
+            )}
           </div>
           <button
             className={`cp-mobile-filter-btn${activeFilterCount > 0 ? " has-filters" : ""}`}
@@ -1296,7 +1317,7 @@ export default function CategoryPage({
                 <span className="cp-cat-icon">
                   <i className="fas fa-th" />
                 </span>
-                {t.home?.allCategories || "All Categories"}
+                <span className="cp-cat-label">{t.home?.allCategories || "All Categories"}</span>
               </div>
               {CATEGORIES_DATA.map((cat) => (
                 <div
@@ -1307,7 +1328,7 @@ export default function CategoryPage({
                   <span className="cp-cat-icon">
                     <i className={`fas ${cat.icon}`} />
                   </span>
-                  {t.categories?.[cat.key] || cat.value}
+                  <span className="cp-cat-label">{t.categories?.[cat.key] || cat.value}</span>
                 </div>
               ))}
             </div>
@@ -1334,6 +1355,11 @@ export default function CategoryPage({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+              {!searchQuery && (
+                <span className="cp-search-suggestion">
+                  search {searchSuggestions[searchHintIndex]}
+                </span>
+              )}
             </div>
             <div className="cp-toolbar-actions">
               <button className="cp-btn" onClick={handleAllDeals}>

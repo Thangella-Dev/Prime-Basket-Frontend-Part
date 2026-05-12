@@ -16,6 +16,7 @@ The following improvements were implemented during the recent Prime Basket front
 - Updated the lower header-bar arrangement so location, browse, and search follow the requested layout
 - Improved light-mode visibility for header utility icons such as notifications, wishlist, and basket
 - Aligned canonical, OG, Twitter, robots, sitemap, geo, and LLM discovery metadata with the production domain `https://prime-basket.in`
+- Fixed direct and nested entry image breakage by moving shared storefront assets to route-safe root public paths
 
 ### Hero and Home
 
@@ -24,6 +25,7 @@ The following improvements were implemented during the recent Prime Basket front
 - Adjusted mobile hero image frame sizing and layout
 - Improved homepage visual density and presentation
 - Improved desktop click behavior for curated shelf cards so home rail products can open reliably
+- Added timeout-backed homepage fallback behavior so key catalog sections recover faster when live data is slow
 
 ### Account and Navigation
 
@@ -103,6 +105,7 @@ The following improvements were implemented during the recent Prime Basket front
 - Good amount of UI polish compared to the starting point
 - Stable production build
 - Region-aware foundation
+- Better resilience on direct-entry rendering because shared assets now load from root-safe public URLs
 
 ### Areas that are moderate but not finished
 

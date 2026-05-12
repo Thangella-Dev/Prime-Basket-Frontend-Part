@@ -10,7 +10,7 @@ export default function PremiumPageLoader({ fullScreen = false }) {
         <div className="premium-loader-brand">
           <div className="premium-loader-topline">
             <div className="premium-loader-mark">
-              <img src="assets/logo watermark 3.png" alt="Prime Basket" />
+              <img src="/assets/logo watermark 3.png" alt="Prime Basket" />
             </div>
             <div className="premium-loader-copy">
               <span className="premium-loader-kicker">Prime Basket</span>

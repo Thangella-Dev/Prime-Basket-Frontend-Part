@@ -9,6 +9,7 @@ import { safeSessionGet, safeSessionRemove, safeSessionSet } from "../utils/safe
 import HeroSlider from "../components/HeroSlider";
 import ProductCard from "../components/ProductCard";
 import { Flame, Bolt, Compass, Crown, ChevronRight, ChevronLeft, ShoppingCart, Heart, ArrowRight } from "lucide-react";
+import { getLocalizedProductName } from "../utils/translationUtils";
 
 const ALL_CATS = [
   "rice", "oil", "wheat-flour", "salt", "sugar", "chilli-powder",
@@ -171,40 +172,32 @@ export default function HomePage({
         };
 
   const bannerCards = [
-    { className: "b1", title: t.home.banner1, target: "vegetables", image: "assets/fresh&clean.png" },
-    { className: "b2", title: t.home.banner2, target: "dairyProducts", image: "assets/healthy-breakfast.png" },
-    { className: "b3", title: t.home.banner3, target: "fruits", image: "assets/organic-food.png" },
+    { className: "b1", title: t.home.banner1, target: "vegetables", image: "/assets/fresh&clean.png" },
+    { className: "b2", title: t.home.banner2, target: "dairyProducts", image: "/assets/healthy-breakfast.png" },
+    { className: "b3", title: t.home.banner3, target: "fruits", image: "/assets/organic-food.png" },
   ];
 
   const categoryTiles = [
-    { key: "dairyProducts", img: "assets/category-1.png", name: t.categories.dairyProducts },
-    { key: "coolDrinks", img: "assets/category-2.png", name: t.categories.coolDrinks },
-    { key: "bodyCare", img: "assets/category-3.png", name: t.categories.bodyCare },
-    { key: "babyCare", img: "assets/category-4.png", name: t.categories.babyCare },
-    { key: "instantFood", img: "assets/category-5.png", name: t.categories.instantFood },
-    { key: "biscuitsAndCookies", img: "assets/category-6.png", name: t.categories.biscuitsCookies },
-    { key: "vegetables", img: "assets/category-7.png", name: t.categories.vegetables },
-    { key: "fruits", img: "assets/category-10.png", name: t.categories.freshFruits },
-    { key: "feminineHygiene", img: "assets/category-9.png", name: t.categories.feminineHygiene },
+    { key: "dairyProducts", img: "/assets/category-1.png", name: t.categories.dairyProducts },
+    { key: "coolDrinks", img: "/assets/category-2.png", name: t.categories.coolDrinks },
+    { key: "bodyCare", img: "/assets/category-3.png", name: t.categories.bodyCare },
+    { key: "babyCare", img: "/assets/category-4.png", name: t.categories.babyCare },
+    { key: "instantFood", img: "/assets/category-5.png", name: t.categories.instantFood },
+    { key: "biscuitsAndCookies", img: "/assets/category-6.png", name: t.categories.biscuitsCookies },
+    { key: "vegetables", img: "/assets/category-7.png", name: t.categories.vegetables },
+    { key: "fruits", img: "/assets/category-10.png", name: t.categories.freshFruits },
+    { key: "feminineHygiene", img: "/assets/category-9.png", name: t.categories.feminineHygiene },
   ];
 
   const featureItems = [
-    { img: "assets/icon-1.png", title: t.features.bestPrices, sub: t.features.bestPricesSub },
-    { img: "assets/icon-2.png", title: t.features.freeDelivery, sub: t.features.freeDeliverySub },
-    { img: "assets/icon-3.png", title: t.features.greatDeal, sub: t.features.greatDealSub },
-    { img: "assets/icon-4.png", title: t.features.wideAssortment, sub: t.features.wideAssortmentSub },
-    { img: "assets/icon-5.png", title: t.features.easyReturns, sub: t.features.easyReturnsSub },
+    { img: "/assets/icon-1.png", title: t.features.bestPrices, sub: t.features.bestPricesSub },
+    { img: "/assets/icon-2.png", title: t.features.freeDelivery, sub: t.features.freeDeliverySub },
+    { img: "/assets/icon-3.png", title: t.features.greatDeal, sub: t.features.greatDealSub },
+    { img: "/assets/icon-4.png", title: t.features.wideAssortment, sub: t.features.wideAssortmentSub },
+    { img: "/assets/icon-5.png", title: t.features.easyReturns, sub: t.features.easyReturnsSub },
   ];
 
-  const getTranslatedName = (name) => {
-    if (!name) return "";
-    if (t.products?.[name]) return t.products[name];
-    const entries = Object.entries(t.products || {}).sort((a, b) => b[0].length - a[0].length);
-    for (const [key, val] of entries) {
-      if (name.toLowerCase().includes(key.toLowerCase())) return val;
-    }
-    return name;
-  };
+  const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
   useEffect(() => {
     let cancelled = false;
@@ -237,17 +230,23 @@ export default function HomePage({
     const load = async () => {
       setLoading(true);
       try {
-        const popularResults = await Promise.all(ALL_CATS.map(fetchWithCache));
+        const fallbackSections = buildFallbackHomeSections();
+        const withTimeout = (promise, ms = 4000) =>
+          Promise.race([
+            promise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
+          ]);
+
+        const popularResults = await withTimeout(Promise.all(ALL_CATS.map(fetchWithCache)));
         const allPopular = popularResults.flat();
 
-        const dealResults = await Promise.all(DEAL_CATS.map(fetchWithCache));
+        const dealResults = await withTimeout(Promise.all(DEAL_CATS.map(fetchWithCache)));
         const allDeals = dealResults.flat().filter((p) => p.oldPrice);
 
-        const mcValues = await Promise.all(Object.values(MULTICOL_CATS).map(fetchWithCache));
+        const mcValues = await withTimeout(Promise.all(Object.values(MULTICOL_CATS).map(fetchWithCache)));
         const [ts, tr, ra, tp] = mcValues;
 
         if (!cancelled) {
-          const fallbackSections = buildFallbackHomeSections();
           setPopular15(
             shuffle(allPopular.length ? allPopular : fallbackSections.popular15).slice(0, 15)
           );
@@ -871,7 +870,7 @@ export default function HomePage({
         <div className="banner-images">
           <img
             className="img-person"
-            src="assets/banner-9-min.png"
+            src="/assets/banner-9-min.png"
             alt="delivery person with groceries"
             loading="lazy"
             decoding="async"

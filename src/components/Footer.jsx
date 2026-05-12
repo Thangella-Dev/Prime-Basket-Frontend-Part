@@ -44,7 +44,7 @@ export default function Footer({ language = "en", region = "in" }) {
         <div className="footer-col footer-brand">
           <a href="#" className="brand-logo" onClick={(event) => event.preventDefault()}>
             <img
-              src="assets/prime-basket-brand.png"
+              src="/assets/prime-basket-brand.png"
               alt="Prime Basket"
               className="brand-logo-image brand-logo-image-footer"
             />
@@ -154,7 +154,7 @@ export default function Footer({ language = "en", region = "in" }) {
 
           <p className="payment-title">{t.footer?.paymentMethods || "Secured Payment Gateways"}</p>
           <div className="payment-icons">
-            <img src="assets/payment-method.png" alt="payment methods" />
+            <img src="/assets/payment-method.png" alt="payment methods" />
           </div>
         </div>
       </div>

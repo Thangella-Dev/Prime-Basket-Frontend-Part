@@ -3,6 +3,7 @@ import { database } from "../firebase";
 import { ref, get } from "firebase/database";
 import { useT } from "../i18n/translations";
 import ProductCard from "./ProductCard";
+import { getLocalizedProductName } from "../utils/translationUtils";
 
 const CATEGORY_LABELS = {
   rice: "Rice",
@@ -34,15 +35,7 @@ function Products({ category, onAddCart, onDecreaseCart, cart = [], wishlist = [
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const getTranslatedName = (name) => {
-    if (!name) return "";
-    if (t.products?.[name]) return t.products[name];
-    const entries = Object.entries(t.products || {}).sort((a, b) => b[0].length - a[0].length);
-    for (const [key, val] of entries) {
-      if (name.toLowerCase().includes(key.toLowerCase())) return val;
-    }
-    return name;
-  };
+  const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
   useEffect(() => {
     if (!category) return;

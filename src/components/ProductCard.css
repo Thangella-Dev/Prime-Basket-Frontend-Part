@@ -161,6 +161,11 @@
   transition: all 0.2s;
 }
 
+.pcard-v2 .unit-selector-wrap {
+  position: relative;
+  z-index: 30;
+}
+
 .pcard-v2 .unit-selector-btn:hover {
   background: #f1f5f9;
   border-color: #cbd5e1;
@@ -275,6 +280,83 @@
   max-height: 80vh;
   overflow-y: auto;
   animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.unit-desktop-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  z-index: 80;
+  background: #fff;
+  border: 1px solid rgba(203, 213, 225, 0.86);
+  border-radius: 16px;
+  box-shadow: 0 24px 44px rgba(15, 23, 42, 0.16);
+  padding: 10px;
+}
+
+.unit-desktop-popover .unit-modal-header {
+  margin-bottom: 10px;
+}
+
+.unit-desktop-popover .unit-modal-header img {
+  display: none;
+}
+
+.unit-desktop-popover .unit-modal-header h3 {
+  font-size: 13px !important;
+}
+
+.unit-desktop-popover .unit-modal-header p {
+  font-size: 11px !important;
+}
+
+.unit-desktop-popover .unit-list {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.unit-desktop-popover .unit-item {
+  padding: 11px 12px;
+  border-radius: 14px;
+}
+
+.unit-desktop-popover .unit-item-label {
+  font-size: 13px;
+}
+
+.unit-desktop-popover .unit-item-price {
+  font-size: 13px;
+}
+
+.unit-desktop-popover .unit-item-old-price {
+  font-size: 10px;
+}
+
+.unit-desktop-popover .best-value-badge {
+  font-size: 9px;
+  padding: 2px 7px;
+}
+
+.unit-desktop-popover .unit-modal-footer {
+  margin-top: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.unit-desktop-popover .unit-done-btn,
+.unit-desktop-popover .unit-add-btn {
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.unit-desktop-popover .unit-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.unit-desktop-popover .unit-list::-webkit-scrollbar-thumb {
+  background: rgba(29, 91, 160, 0.22);
+  border-radius: 999px;
 }
 
 @media (min-width: 768px) {
@@ -488,6 +570,12 @@ body[data-theme="dark"] .unit-modal-content {
   box-shadow: 0 28px 54px rgba(0, 0, 0, 0.4);
 }
 
+body[data-theme="dark"] .unit-desktop-popover {
+  background: linear-gradient(180deg, rgba(11, 20, 33, 0.99), rgba(15, 26, 41, 0.99));
+  border-color: rgba(87, 111, 148, 0.22);
+  box-shadow: 0 28px 54px rgba(0, 0, 0, 0.4);
+}
+
 body[data-theme="dark"] .unit-item-price {
   color: #7fc0ff;
 }
@@ -596,6 +684,10 @@ body[data-theme="dark"] .unit-item-price {
 
   .unit-modal-footer {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .unit-desktop-popover {
+    display: none;
   }
 
   .pdp-related-grid .pcard-v2 {

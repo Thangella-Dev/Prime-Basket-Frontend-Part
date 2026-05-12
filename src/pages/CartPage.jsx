@@ -6,6 +6,7 @@ import { formatPhoneForDisplay } from "../utils/phoneValidation";
 import { enhanceProduct, formatCurrency, getProductPrices, parsePrice } from "../utils/productUtils";
 import { getFallbackDeals } from "../data/catalogFallback";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
+import { getLocalizedProductName } from "../utils/translationUtils";
 
 function loadAddresses() {
   try {
@@ -64,15 +65,7 @@ export default function CartPage({
         promoApplied: "Promo applied",
       };
 
-  const getTranslatedName = (name) => {
-    if (!name) return "";
-    if (t.products?.[name]) return t.products[name];
-    const entries = Object.entries(t.products || {}).sort((a, b) => b[0].length - a[0].length);
-    for (const [key, val] of entries) {
-      if (name.toLowerCase().includes(key.toLowerCase())) return val;
-    }
-    return name;
-  };
+  const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
   const subtotal = cart.reduce((sum, item) => sum + parsePrice(item.price) * item.quantity, 0);
   const totalOldPrice = cart.reduce((sum, item) => sum + parsePrice(item.oldPrice || item.price) * item.quantity, 0);

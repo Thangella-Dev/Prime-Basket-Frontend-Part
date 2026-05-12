@@ -6,6 +6,7 @@ import { formatCurrency, parsePrice } from "../utils/productUtils";
 
 import { PAYMENT_CONFIG } from "../config/paymentConfig";
 import PaymentMethods from "../components/payment/PaymentMethods";
+import { getLocalizedProductName } from "../utils/translationUtils";
 
 export default function PaymentPage({ cart, total, delivery, vat = 0, handlingFee = 0, subtotal = 0, saving = 0, promoDiscount = 0, promoCode = "", address, onBack, onSuccess, language = "en", region = "in" }) {
   const t = useT(language);
@@ -37,15 +38,7 @@ export default function PaymentPage({ cart, total, delivery, vat = 0, handlingFe
   const selectedMethodLabel = selectedMethodMeta?.overrideLabel || t.payment.methods?.[selectedMethodMeta?.id] || selectedMethodMeta?.id || "";
   const selectedMethodDesc = selectedMethodMeta?.overrideDesc || t.payment?.[`${selectedMethodMeta?.id}Desc`] || "";
 
-  const getTranslatedName = (name) => {
-    if (!name) return "";
-    if (t.products?.[name]) return t.products[name];
-    const entries = Object.entries(t.products || {}).sort((a, b) => b[0].length - a[0].length);
-    for (const [key, val] of entries) {
-      if (name.toLowerCase().includes(key.toLowerCase())) return val;
-    }
-    return name;
-  };
+  const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
   const formatCard = (v) =>
     v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();

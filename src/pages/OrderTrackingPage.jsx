@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useT } from "../i18n/translations";
 import { useTracking } from "../context/TrackingContext";
+import { getLocalizedProductName } from "../utils/translationUtils";
 
 const getTrackingSteps = (t) => [
   { key: "Confirmed",  icon: "fa-clipboard-check", label: t.tracking.confirmed,  desc: t.tracking.confirmedDesc },
@@ -14,15 +15,7 @@ export default function OrderTrackingPage({ order, onGoHome, onGoOrders, addNoti
   const t = useT(language);
   const currSym = region === "ke" ? "KES " : "\u20b9";
 
-  const getTranslatedName = (name) => {
-    if (!name) return "";
-    if (t.products?.[name]) return t.products[name];
-    const entries = Object.entries(t.products || {}).sort((a, b) => b[0].length - a[0].length);
-    for (const [key, val] of entries) {
-      if (name.toLowerCase().includes(key.toLowerCase())) return val;
-    }
-    return name;
-  };
+  const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
   // Track current step index (0..3)
   const [currentStep, setCurrentStep] = useState(0);

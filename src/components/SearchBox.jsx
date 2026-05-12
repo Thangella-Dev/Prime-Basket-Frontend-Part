@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useSearch } from "../hooks/useSearch";
 import { useT } from "../i18n/translations";
+import { getLocalizedProductName, getSearchHintSuggestions } from "../utils/translationUtils";
 
 function dismissKeyboard(target) {
   target?.blur?.();
@@ -17,8 +18,10 @@ export default function SearchBox({ onCategorySelect, onOpenProduct, mobile = fa
   const [results, setResults]     = useState({ categories: [], products: [] });
   const [open, setOpen]           = useState(false);
   const [activeIdx, setActiveIdx] = useState(-1);
+  const [hintIndex, setHintIndex] = useState(0);
   const inputRef = useRef(null);
   const wrapRef  = useRef(null);
+  const hintSuggestions = useMemo(() => getSearchHintSuggestions(language), [language]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -37,6 +40,14 @@ export default function SearchBox({ onCategorySelect, onOpenProduct, mobile = fa
     setResults(nextResults);
     setOpen(nextResults.categories.length > 0 || nextResults.products.length > 0);
   }, [indexReady, query, search]);
+
+  useEffect(() => {
+    if (hintSuggestions.length <= 1) return undefined;
+    const timer = window.setInterval(() => {
+      setHintIndex((prev) => (prev + 1) % hintSuggestions.length);
+    }, 2200);
+    return () => window.clearInterval(timer);
+  }, [hintSuggestions]);
 
   const handleInput = (e) => {
     const val = e.target.value;
@@ -148,7 +159,7 @@ export default function SearchBox({ onCategorySelect, onOpenProduct, mobile = fa
           flex: 1;
           border: none;
           outline: none;
-          padding: 0 4px 0 16px;
+          padding: 0 116px 0 16px;
           font-family: 'Manrope', 'Nunito', sans-serif;
           font-size: 0.875rem;
           color: #1f2c44;
@@ -156,6 +167,28 @@ export default function SearchBox({ onCategorySelect, onOpenProduct, mobile = fa
           min-width: 0;
         }
         .sb-input::placeholder { color: #9aa7bb; }
+        .sb-hint {
+          position: absolute;
+          right: 52px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 0.64rem;
+          font-weight: 800;
+          color: #7f92af;
+          letter-spacing: 0.01em;
+          pointer-events: none;
+          white-space: nowrap;
+          background: linear-gradient(180deg, rgba(245,249,255,0.96), rgba(233,241,252,0.98));
+          border: 1px solid rgba(177, 196, 223, 0.36);
+          border-radius: 999px;
+          padding: 4px 9px;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.78);
+          animation: sbHintSlide 0.32s ease;
+        }
+        @keyframes sbHintSlide {
+          from { opacity: 0; transform: translate(8px, -50%); }
+          to { opacity: 1; transform: translate(0, -50%); }
+        }
 
         .sb-btn {
           width: 40px;
@@ -217,6 +250,12 @@ export default function SearchBox({ onCategorySelect, onOpenProduct, mobile = fa
           .sb-wrap:focus-within .sb-form {
             max-width: none;
           }
+          .sb-input {
+            padding-right: 16px;
+          }
+        }
+        @media (max-width: 560px) {
+          .sb-hint { display: none; }
         }
 
         /* Section label */
@@ -370,6 +409,9 @@ export default function SearchBox({ onCategorySelect, onOpenProduct, mobile = fa
           autoComplete="off"
           spellCheck="false"
         />
+        {!query && indexReady && (
+          <span className="sb-hint">search {hintSuggestions[hintIndex]}</span>
+        )}
         <button className="sb-btn" type="submit" aria-label="Search">
           <i className="fas fa-search"></i>
         </button>
@@ -410,7 +452,7 @@ export default function SearchBox({ onCategorySelect, onOpenProduct, mobile = fa
                 <div className="sb-label">{t.header.searchProducts}</div>
                 {prodResults.map((prod, i) => {
                   const fi = catResults.length + i;
-                  const translatedName = t.products?.[prod.name] || prod.name;
+                  const translatedName = getLocalizedProductName(prod.name, t);
                   const translatedCat  = t.categories?.[prod._catLabel.toLowerCase().replace(/\s/g, "")] || prod._catLabel;
                   return (
                     <div

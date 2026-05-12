@@ -4,6 +4,7 @@ import SearchBox from "./SearchBox";
 import { useT } from "../i18n/translations";
 import { detectCurrentLocation, loadSavedLocation } from "../utils/locationService";
 import { lockBodyScroll, unlockBodyScroll } from "../utils/scrollLock";
+import { MoonStar, SunMedium } from "lucide-react";
 
 export default function Header({
   onAccountClick, isLoggedIn, user,
@@ -24,6 +25,7 @@ export default function Header({
 }) {
   const t = useT(language);
   const isDark = theme === "dark";
+  const ThemeIcon = isDark ? SunMedium : MoonStar;
   const isHomePage = currentPage === "home";
   const isCategoryPage = currentPage === "category";
   const locationUi = language === "ke"
@@ -448,7 +450,7 @@ export default function Header({
                     title={themeUi.action}
                     aria-label={themeUi.action}
                     >
-                      <i className={`fas ${isDark ? "fa-sun" : "fa-moon"}`}></i>
+                      <ThemeIcon size={18} strokeWidth={2.1} />
                   </button>
                 </div>
               </div>
@@ -509,7 +511,7 @@ export default function Header({
         <div className="nav-left" style={{ display: "flex", alignItems: "center", gap: "15px" }}>
           <a href="#" className={`logo brand-link${brandTap ? " brand-link-active" : ""}`} onClick={handleBrandClick}>
             <img
-              src="assets/prime-basket-brand.png"
+              src="/assets/prime-basket-brand.png"
               alt="Prime Basket"
               className="brand-logo-image brand-logo-image-header"
             />
@@ -557,7 +559,7 @@ export default function Header({
               title={themeUi.action}
               aria-label={themeUi.action}
             >
-              <i className={`fas ${isDark ? "fa-sun" : "fa-moon"}`}></i>
+              <ThemeIcon size={18} strokeWidth={2.1} />
             </button>
           </div>
           <div className="nav-icons">
@@ -844,7 +846,7 @@ export default function Header({
                   }}
                 >
                   <span className="bar-icon"><span></span><span></span><span></span></span>
-                  {t.header.browseAll}
+                  <span className="browse-btn-label">{t.header.browseAll}</span>
                   <i className="fa fa-chevron-down chevron"></i>
                 </button>
                 <nav className={`dropdown-menu${dropdownOpen ? " open" : ""}`} role="menu">
@@ -865,7 +867,7 @@ export default function Header({
                   }}
                 >
                   <span className="bar-icon"><span></span><span></span><span></span></span>
-                  <span>{t.header.browseAll}</span>
+                  <span className="browse-btn-label">{t.header.browseAll}</span>
                   <i className="fa fa-chevron-down chevron"></i>
                 </button>
                 <nav className={`dropdown-menu mobile-browse-menu${dropdownOpen ? " open" : ""}`} role="menu">

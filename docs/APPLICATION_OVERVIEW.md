@@ -78,6 +78,8 @@ Other important state is currently stored in the browser through `localStorage`,
 - Category browsing is now denser and more catalog-focused, with compact cards and an all-products browsing mode
 - Mobile cart and checkout presentation are more space-efficient than earlier revisions
 - SEO, crawler-discovery, sitemap, geo, and structured metadata are now aligned to the production domain
+- Public asset references are now route-safe, reducing broken-image risk on direct or nested entries
+- Homepage catalog sections now fail over faster to fallback data instead of remaining in long skeleton states during slow live fetches
 
 ## Current Limitations
 

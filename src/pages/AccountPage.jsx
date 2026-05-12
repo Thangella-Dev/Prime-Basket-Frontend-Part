@@ -11,6 +11,7 @@ import {
   sanitizePhoneInput,
   validateAndNormalizePhone,
 } from "../utils/phoneValidation";
+import { getLocalizedProductName } from "../utils/translationUtils";
 
 // Shared key used by both AccountPage and CartPage
 export const ADDRESSES_KEY = "pb_saved_addresses";
@@ -752,9 +753,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
     Cancelled: { bg: "#fee2e2", color: "#dc2626", icon: "fa-times-circle", label: "Cancelled" },
   };
 
-  const getTranslatedName = (name) => {
-    return name;
-  };
+  const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
   return (
     <div className="orders-card">
