@@ -2178,27 +2178,27 @@ body.prime-drawer-open .hamburger * {
 
 .mprod {
   display: grid;
-  grid-template-columns: clamp(56px, 5vw, 64px) minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: clamp(52px, 4.4vw, 60px) minmax(0, 1fr);
+  gap: 10px;
   align-items: flex-start;
   flex: 0 0 calc((100% - (var(--rail-visible-count, 4) - 1) * var(--rail-gap)) / var(--rail-visible-count, 4));
-  padding: 15px 14px;
+  padding: 12px;
   min-width: 0;
-  min-height: 156px;
-  border-radius: 20px;
+  min-height: 144px;
+  border-radius: 18px;
   border: 1px solid rgba(148,163,184,0.12);
   background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(246,250,255,0.98) 100%);
   box-shadow: 0 16px 26px rgba(15,23,42,0.05);
   transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
 }
 .mprod:hover { transform: translateY(-3px); box-shadow: 0 22px 34px rgba(15,23,42,0.09); border-color: rgba(15,91,215,0.2); }
-.mimg { width: 100%; aspect-ratio: 1; border-radius: 12px; overflow: hidden; flex-shrink: 0; align-self: start; }
+.mimg { width: 100%; aspect-ratio: 1; border-radius: 11px; overflow: hidden; flex-shrink: 0; align-self: start; }
 .mimg img { width: 100%; height: 100%; object-fit: cover; }
 .minfo { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-.minfo h6 { font-size: 0.82rem; font-weight: 800; margin-bottom: 4px; line-height: 1.4; color: var(--navy); }
-.mbrand { font-size: 11px; color: var(--body); margin-bottom: 2px; }
-.mprice { font-size: 13px; font-weight: 800; color: #1d5ba0; }
-.mpold { font-size: 11px; color: var(--body); text-decoration: line-through; margin-left: 4px; }
+.minfo h6 { font-size: 0.78rem; font-weight: 800; margin-bottom: 3px; line-height: 1.35; color: var(--navy); }
+.mbrand { font-size: 10px; color: var(--body); margin-bottom: 2px; }
+.mprice { font-size: 12.5px; font-weight: 800; color: #1d5ba0; }
+.mpold { font-size: 10px; color: var(--body); text-decoration: line-through; margin-left: 4px; }
 .mcurated-price-row {
   display: flex;
   align-items: center;
@@ -2210,7 +2210,7 @@ body.prime-drawer-open .hamburger * {
   align-items: center;
   gap: 6px;
   margin-top: auto;
-  padding-top: 8px;
+  padding-top: 6px;
 }
 .mcurated-qty {
   display: flex;

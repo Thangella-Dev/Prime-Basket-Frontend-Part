@@ -427,7 +427,7 @@ export default function HomePage({
       return;
     }
 
-    if (Math.abs(deltaX) > 8) {
+    if (state.lockedAxis === "x" && Math.abs(deltaX) > 18) {
       railGestureState.current[key] = { blockClickUntil: Date.now() + 120 };
       return;
     }

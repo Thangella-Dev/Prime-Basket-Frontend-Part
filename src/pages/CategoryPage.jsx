@@ -547,7 +547,9 @@ export default function CategoryPage({
   }, [activeLabel]);
 
   // ── Sort label ─────────────────────────────────────────────────────────────
-  const sortLabel = getSortOptions(t).find((o) => o.value === sortBy)?.label || "";
+  const sortLabel = sortBy === "default"
+    ? "Sort By"
+    : (getSortOptions(t).find((o) => o.value === sortBy)?.label || "Sort By");
 
   // ══════════════════════════════════════════════════════════════════════════
   // RENDER: Filter sidebar content (shared between desktop sidebar + mobile drawer)
@@ -1003,7 +1005,7 @@ export default function CategoryPage({
         .cp-clear-btn { font-size: 12px; font-weight: 700; color: ${p.danger}; background: none; border: none; cursor: pointer; font-family: inherit; padding: 4px 6px; }
 
         /* ── Product grid ── */
-        .cp-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+        .cp-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; }
         .cp-grid .pcard-v2 {
           min-height: 292px;
           padding: 10px;
@@ -1160,13 +1162,13 @@ export default function CategoryPage({
         @media (max-width: 1100px) {
           .cp-layout { grid-template-columns: 220px minmax(0,1fr); gap: 14px; }
           .cp-layout.filters-open { grid-template-columns: 220px minmax(0,1fr) 300px; }
-          .cp-grid { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+          .cp-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
         }
 
         @media (max-width: 900px) {
           .cp-layout { grid-template-columns: 200px minmax(0,1fr); gap: 12px; }
           .cp-layout.filters-open { grid-template-columns: 200px minmax(0,1fr) 280px; }
-          .cp-grid { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+          .cp-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
         }
 
         /* ── Mobile (≤ 768) ── */
@@ -1330,22 +1332,6 @@ export default function CategoryPage({
               />
             </div>
             <div className="cp-toolbar-actions">
-              <div className="cp-select-wrap">
-                <i className="fas fa-layer-group cp-select-icon" />
-                <select
-                  className="cp-select"
-                  value={category}
-                  onChange={(e) => onCategoryChange?.(e.target.value)}
-                >
-                  {categorySelectOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <i className="fas fa-chevron-down cp-select-chevron" />
-              </div>
-
               <button className="cp-btn" onClick={handleAllDeals}>
                 <i className="fas fa-tags" />
                 {t.home?.allDeals || "All Deals"}
