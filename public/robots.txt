@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://prime-basket-prb.vercel.app/sitemap.xml
-Host: https://prime-basket-prb.vercel.app
+Sitemap: https://prime-basket.in/sitemap.xml
+Host: https://prime-basket.in

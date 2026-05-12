@@ -23,6 +23,17 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 
 ## Main Frontend Architecture
 
+## Deployment and Discovery Surface
+
+- Production storefront domain: `https://prime-basket.in`
+- SEO/discovery assets currently maintained in the repo:
+  - `index.html` metadata
+  - `public/robots.txt`
+  - `public/sitemap.xml`
+  - `public/geo.txt`
+  - `public/llms.txt`
+  - `public/site.webmanifest`
+
 ### App Shell
 
 - `src/App.jsx`

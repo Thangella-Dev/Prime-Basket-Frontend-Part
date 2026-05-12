@@ -1106,7 +1106,7 @@ export default function CategoryPage({
         .cp-mobile-action-bar { display: none; }
 
         /* ── Mobile category strip ── */
-        .cp-mobile-cats { display: none; position: sticky; top: 108px; z-index: 99; background: ${p.card}; border-bottom: 1px solid ${p.border}; box-shadow: ${p.shadowSm}; padding: 0; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; white-space: nowrap; }
+        .cp-mobile-cats { display: none; position: sticky; top: 116px; z-index: 99; background: ${p.card}; border-bottom: 1px solid ${p.border}; box-shadow: ${p.shadowSm}; padding: 2px 0 0; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; white-space: nowrap; }
         .cp-mobile-cats::-webkit-scrollbar { display: none; }
         .cp-mobile-cat-chip { display: inline-flex; align-items: center; gap: 7px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: ${p.textMuted}; cursor: pointer; border-bottom: 2.5px solid transparent; white-space: nowrap; transition: all .15s; }
         .cp-mobile-cat-chip.active { color: ${p.accent}; border-bottom-color: ${p.accent}; font-weight: 800; }

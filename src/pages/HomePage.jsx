@@ -737,6 +737,7 @@ export default function HomePage({
                   onPointerDown={(event) => {
                     if (event.pointerType === "mouse" && event.button !== 0) return;
                     if (isRailInteractiveTarget(event.target)) return;
+                    if (event.pointerType === "mouse" && event.target instanceof Element && event.target.closest(".mprod")) return;
                     if (metrics.maxIndex <= 0) return;
                     startRailGesture(col.key, event.clientX, event.clientY);
                     event.currentTarget.setPointerCapture?.(event.pointerId);

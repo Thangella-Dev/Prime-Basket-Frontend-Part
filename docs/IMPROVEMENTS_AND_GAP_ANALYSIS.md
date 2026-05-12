@@ -15,6 +15,7 @@ The following improvements were implemented during the recent Prime Basket front
 - Improved dark-mode dropdown visibility for desktop header interactions
 - Updated the lower header-bar arrangement so location, browse, and search follow the requested layout
 - Improved light-mode visibility for header utility icons such as notifications, wishlist, and basket
+- Aligned canonical, OG, Twitter, robots, sitemap, geo, and LLM discovery metadata with the production domain `https://prime-basket.in`
 
 ### Hero and Home
 
@@ -22,6 +23,17 @@ The following improvements were implemented during the recent Prime Basket front
 - Improved slide text alignment and overflow handling
 - Adjusted mobile hero image frame sizing and layout
 - Improved homepage visual density and presentation
+- Improved desktop click behavior for curated shelf cards so home rail products can open reliably
+
+### Account and Navigation
+
+- Reworked desktop `My Account` into a left-navigation and right-content layout while preserving the mobile flow
+- Improved side-menu account identity presentation with a curved-square profile image treatment
+
+### Category Browsing and Modals
+
+- Improved sticky category/search behavior in the mobile category page header area
+- Fixed quantity modal outside-tap dismissal so it closes cleanly without triggering unwanted product navigation
 
 ### Product Detail
 

@@ -2,10 +2,10 @@
 
 > Prime Basket is a premium grocery storefront for fresh produce, dairy, pantry essentials, beverages, snacks, home care, and fast mobile-first shopping.
 
-Base URL: https://prime-basket-prb.vercel.app/
+Base URL: https://prime-basket.in/
 
 Primary entry points:
-- https://prime-basket-prb.vercel.app/
+- https://prime-basket.in/
 
 Site summary:
 - Consumer-facing grocery storefront.

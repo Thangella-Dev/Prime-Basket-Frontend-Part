@@ -2,6 +2,8 @@
 
 Prime Basket is a premium grocery ecommerce frontend built with React and Vite. It currently supports region-aware shopping flows, product discovery, cart and checkout, account management, order/refund demos, theme switching, and an in-app shopping assistant.
 
+Primary production domain: `https://prime-basket.in`
+
 ## What The App Includes
 
 - Home, category, product detail, cart, wishlist, payment, and account pages
@@ -130,6 +132,11 @@ What still needs work:
 - Improved mobile header brand fitting and refined smarter product-unit inference across groceries, drinks, dairy, snacks, and care items
 - Tuned footer/chatbot floating-control behavior so the up-arrow and chat launcher hand off cleanly near the footer
 - Added production-ready SEO, crawler, LLM discovery, manifest, and favicon/browser icon setup
+- Pointed canonical, Open Graph, Twitter, sitemap, robots, geo, and LLM discovery files to the production domain `https://prime-basket.in`
+- Improved desktop curated product rail click behavior so `Top Selling`, `Trending`, `Recently Added`, and `Top Rated` cards open reliably
+- Stabilized quantity modal close behavior so outside taps dismiss the modal without accidentally opening the product page
+- Refined mobile category sticky header/chip behavior and improved desktop account layout with a left navigation rail
+- Added curved-square account avatar presentation inside the mobile side menu account card
 
 ## Backend Attachment Direction
 
@@ -150,6 +157,7 @@ Detailed backend guidance is available in [docs/BACKEND_INTEGRATION_GUIDE.md](./
 See the `docs` folder for detailed project documentation:
 
 - [Manager Mail Update](./docs/Mail_Update.md)
+- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-12.md)
 - [Application Overview](./docs/APPLICATION_OVERVIEW.md)
 - [Tech Stack and Architecture](./docs/TECH_STACK_AND_ARCHITECTURE.md)
 - [Backend Integration Guide](./docs/BACKEND_INTEGRATION_GUIDE.md)
@@ -158,6 +166,7 @@ See the `docs` folder for detailed project documentation:
 ## Current Validation
 
 - `npm run build` passes
+- Production metadata now targets `https://prime-basket.in`
 - Category browsing, cart-item layout, shared product-card density, and all-products mode were updated and revalidated in the latest pass
 - A focused code audit pass was completed on checkout, modal behavior, cart merging, chatbot currency handling, related-product/detail flows, and deployment-safe product-page behavior
 - The app is suitable as a strong frontend demo/prototype

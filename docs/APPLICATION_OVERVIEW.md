@@ -15,6 +15,10 @@ Prime Basket is a mobile-first grocery ecommerce frontend built with React and V
 - Region and language switching
 - In-app chatbot support
 
+Current production domain:
+
+- `https://prime-basket.in`
+
 ## Current Product Shape
 
 The current application behaves like a premium frontend demo or near-production storefront with strong UX work already completed. It is more advanced than a basic mockup because it includes:
@@ -73,6 +77,7 @@ Other important state is currently stored in the browser through `localStorage`,
 - Documentation and structure now clearer than before
 - Category browsing is now denser and more catalog-focused, with compact cards and an all-products browsing mode
 - Mobile cart and checkout presentation are more space-efficient than earlier revisions
+- SEO, crawler-discovery, sitemap, geo, and structured metadata are now aligned to the production domain
 
 ## Current Limitations
 

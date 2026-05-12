@@ -1,9 +1,9 @@
 {
-  "id": "/",
+  "id": "https://prime-basket.in/",
   "name": "Prime Basket",
   "short_name": "PrimeBasket",
   "description": "Premium grocery storefront for fresh produce, pantry essentials, dairy, beverages, snacks, and household shopping.",
-  "start_url": "/",
+  "start_url": "https://prime-basket.in/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

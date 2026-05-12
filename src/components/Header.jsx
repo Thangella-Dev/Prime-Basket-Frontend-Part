@@ -396,7 +396,15 @@ export default function Header({
                     onAccountClick?.();
                   }}
                 >
-                  <i className={`fas ${isLoggedIn ? "fa-circle-user" : "fa-user"}`}></i>
+                  {isLoggedIn && user?.profileImage ? (
+                    <img
+                      src={user.profileImage}
+                      alt={user?.name || "Profile"}
+                      className="mobile-quick-avatar"
+                    />
+                  ) : (
+                    <i className={`fas ${isLoggedIn ? "fa-circle-user" : "fa-user"}`}></i>
+                  )}
                   <span>{isLoggedIn ? (user?.name || t.header.account) : t.header.login}</span>
                 </button>
               </div>
