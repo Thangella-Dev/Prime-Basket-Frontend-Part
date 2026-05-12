@@ -315,7 +315,7 @@ export default function HeroSlider({ language = "en" }) {
 
         backdrop-filter:blur(10px);
 
-        border:1px solid #1d5ba0;
+        border:1px solid rgba(106, 148, 234, 0.14);
 
         color:${BLUE_PRIMARY};
 
@@ -399,7 +399,7 @@ export default function HeroSlider({ language = "en" }) {
         font-weight:700;
 
         box-shadow:
-          0 14px 34px #1d5ba0;
+          0 14px 34px rgba(110, 153, 238, 0.22);
 
         transition:.3s ease;
       }
@@ -446,7 +446,7 @@ export default function HeroSlider({ language = "en" }) {
         backdrop-filter:blur(14px);
 
         box-shadow:
-          0 18px 40px #1d5ba0;
+          0 18px 40px rgba(66, 144, 232, 0.1);
 
         transition:
           transform .65s cubic-bezier(.22,1,.36,1),
