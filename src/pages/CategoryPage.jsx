@@ -1184,10 +1184,14 @@ export default function CategoryPage({
           .cp-mobile-cats { display: block; }
           .cp-mobile-action-bar { display: flex; }
 
-          .cp-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+          .cp-grid { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
         }
 
         @media (max-width: 480px) {
+          .cp-grid { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+        }
+
+        @media (max-width: 420px) {
           .cp-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
         }
       `}</style>

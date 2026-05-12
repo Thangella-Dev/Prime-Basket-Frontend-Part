@@ -427,11 +427,6 @@ export default function HomePage({
       return;
     }
 
-    if (state.lockedAxis === "x" && Math.abs(deltaX) > 18) {
-      railGestureState.current[key] = { blockClickUntil: Date.now() + 120 };
-      return;
-    }
-
     delete railGestureState.current[key];
   };
 

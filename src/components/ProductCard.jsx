@@ -40,12 +40,12 @@ export default function ProductCard({
   
   const isWished = wishlist.some(w => w._uid === p._uid);
 
-  const handleAdd = (e) => {
+  const handleAdd = (e, unitOverride = selectedUnit) => {
     e.stopPropagation();
     onAddCart && onAddCart({
       ...p,
-      selectedUnit,
-      price: prices.price
+      selectedUnit: unitOverride,
+      price: getProductPrices(p, unitOverride).price
     });
   };
 
@@ -198,8 +198,15 @@ export default function ProductCard({
             </div>
 
             <div className="unit-modal-footer">
-              <button className="unit-done-btn" onClick={() => setShowModal(false)}>{t.product.done || "Done"}</button>
-              <button className="unit-add-btn" onClick={(e) => { handleAdd(e); setShowModal(false); }}>
+              <button className="unit-done-btn" type="button" onClick={() => setShowModal(false)}>{t.product.done || "Done"}</button>
+              <button
+                className="unit-add-btn"
+                type="button"
+                onClick={(e) => {
+                  handleAdd(e, selectedUnit);
+                  setShowModal(false);
+                }}
+              >
                 {t.home.add || "ADD"} TO CART
               </button>
             </div>
