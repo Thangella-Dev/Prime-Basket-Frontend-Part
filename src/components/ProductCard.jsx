@@ -1,5 +1,5 @@
 // src/components/ProductCard.jsx
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import "./ProductCard.css";
 import { enhanceProduct, getProductPrices, formatCurrency } from "../utils/productUtils";
@@ -21,6 +21,7 @@ export default function ProductCard({
   
   const [selectedUnit, setSelectedUnit] = useState(p.baseUnit);
   const [showModal, setShowModal] = useState(false);
+  const suppressOpenUntilRef = useRef(0);
 
   const getTranslatedName = (name) => {
     if (!name) return "";
@@ -66,10 +67,19 @@ export default function ProductCard({
     setSelectedUnit(unitLabel);
   };
 
+  const closeUnitModal = (event) => {
+    if (event) {
+      event.stopPropagation();
+    }
+    suppressOpenUntilRef.current = Date.now() + 260;
+    setShowModal(false);
+  };
+
   return (
     <div
       className="pcard-v2"
       onClick={() => {
+        if (Date.now() < suppressOpenUntilRef.current) return;
         if (onOpenProduct) {
           onOpenProduct(p);
         } else {
@@ -149,7 +159,14 @@ export default function ProductCard({
 
       {/* Unit Selection Modal */}
       {showModal && createPortal(
-        <div className="unit-modal-overlay" onClick={() => setShowModal(false)}>
+        <div
+          className="unit-modal-overlay"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            if (e.target !== e.currentTarget) return;
+            closeUnitModal(e);
+          }}
+        >
           <div className="unit-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="unit-modal-header">
               <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
@@ -159,7 +176,7 @@ export default function ProductCard({
                   <p style={{ fontSize: 12, color: "#64748b", margin: 0 }}>{getTranslatedName(p.name)}</p>
                 </div>
               </div>
-              <button className="unit-modal-close" onClick={() => setShowModal(false)}>
+              <button className="unit-modal-close" onClick={closeUnitModal}>
                 <X size={18} strokeWidth={2} />
               </button>
             </div>
@@ -198,13 +215,13 @@ export default function ProductCard({
             </div>
 
             <div className="unit-modal-footer">
-              <button className="unit-done-btn" type="button" onClick={() => setShowModal(false)}>{t.product.done || "Done"}</button>
+              <button className="unit-done-btn" type="button" onClick={closeUnitModal}>{t.product.done || "Done"}</button>
               <button
                 className="unit-add-btn"
                 type="button"
                 onClick={(e) => {
                   handleAdd(e, selectedUnit);
-                  setShowModal(false);
+                  closeUnitModal(e);
                 }}
               >
                 {t.home.add || "ADD"} TO CART

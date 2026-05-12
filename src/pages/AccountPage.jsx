@@ -162,6 +162,9 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
   const t = useT(language);
   const { logout, user, updateUser } = useAuth();
   const currSym = region === "ke" ? "KES " : "\u20b9";
+  const [isDesktopLayout, setIsDesktopLayout] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth > 900 : true
+  );
   const shouldOpenInitialDetail = initialSection && initialSection !== "profile";
   const [section, setSection] = useState(shouldOpenInitialDetail ? initialSection : "profile");
   const [viewMode, setViewMode] = useState(shouldOpenInitialDetail ? "detail" : "menu");
@@ -197,6 +200,14 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
     setViewMode(nextIsDetail ? "detail" : "menu");
   }, [initialSection]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const syncLayout = () => setIsDesktopLayout(window.innerWidth > 900);
+    syncLayout();
+    window.addEventListener("resize", syncLayout);
+    return () => window.removeEventListener("resize", syncLayout);
+  }, []);
+
   const openSection = (nextSection) => {
     if (nextSection === "logout") {
       handleLogout();
@@ -225,6 +236,74 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
       onGoHome();
     }
   };
+
+  const renderSectionContent = () => (
+    <>
+      {section === "profile" && <Profile user={user} updateUser={updateUser} t={t} language={language} region={region} />}
+      {section === "orders" && <OrdersSection orders={propOrders} t={t} currSym={currSym} onOrderSummary={onOrderSummary} onRateOrder={onRateOrder} onOrderAgain={onOrderAgain} onDeleteOrder={onDeleteOrder} language={language} />}
+      {section === "addresses" && <AddressSection t={t} language={language} region={region} />}
+      {section === "refunds" && <RefundsDemoSection t={t} currSym={currSym} region={region} language={language} />}
+      {section === "giftcards" && <GiftCardsSection t={t} currSym={currSym} language={language} />}
+      {section === "notifications" && <NotificationsSection t={t} language={language} notifications={notifications} onClearNotifications={onClearNotifications} />}
+      {section === "payments" && <PaymentsSection t={t} region={region} language={language} />}
+      {section === "help" && <HelpSection t={t} language={language} />}
+    </>
+  );
+
+  if (isDesktopLayout) {
+    return (
+      <div className="account-container account-desktop-layout">
+        <aside className="account-sidebar">
+          <div className="account-sidebar-header">
+            <div className="account-title-row">
+              <h2>{t.account.title}</h2>
+              <button type="button" className="account-back-btn account-home-btn account-desktop-home" onClick={onGoHome}>
+                <i className="fas fa-house"></i>
+                <span>{t.cart?.breadcrumbHome || "Home"}</span>
+              </button>
+            </div>
+            <p className="account-sidebar-subtitle">
+              {user?.name ? `${user.name.split(" ")[0]}, manage everything from one place.` : "Manage everything from one place."}
+            </p>
+          </div>
+
+          <div className="account-menu">
+            {menuItems.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                className={`account-item${section === item.key ? " active" : ""}${item.tone === "logout" ? " logout" : ""}`}
+                onClick={() => {
+                  if (item.key === "logout") {
+                    handleLogout();
+                    return;
+                  }
+                  setSection(item.key);
+                  onSectionChange && onSectionChange(item.key);
+                }}
+              >
+                <i className={`fas ${item.icon}`}></i>
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <main className="account-content">
+          <div className="account-desktop-panel">
+            <div className="account-desktop-panel-head">
+              <div className="account-menu-eyebrow">{t.account.title}</div>
+              <h2>{sectionMeta[section]?.title || t.account.title}</h2>
+              <p>{sectionMeta[section]?.subtitle || "Manage your account section details."}</p>
+            </div>
+            <div className="account-detail-content">
+              {renderSectionContent()}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={`account-container reveal ${viewMode === "detail" ? "detail-open" : "menu-open"}`}>
@@ -285,14 +364,7 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
           </div>
 
           <div className="account-detail-content">
-            {section === "profile" && <Profile user={user} updateUser={updateUser} t={t} language={language} region={region} />}
-            {section === "orders" && <OrdersSection orders={propOrders} t={t} currSym={currSym} onOrderSummary={onOrderSummary} onRateOrder={onRateOrder} onOrderAgain={onOrderAgain} onDeleteOrder={onDeleteOrder} language={language} />}
-            {section === "addresses" && <AddressSection t={t} language={language} region={region} />}
-            {section === "refunds" && <RefundsDemoSection t={t} currSym={currSym} region={region} language={language} />}
-            {section === "giftcards" && <GiftCardsSection t={t} currSym={currSym} language={language} />}
-            {section === "notifications" && <NotificationsSection t={t} language={language} notifications={notifications} onClearNotifications={onClearNotifications} />}
-            {section === "payments" && <PaymentsSection t={t} region={region} language={language} />}
-            {section === "help" && <HelpSection t={t} language={language} />}
+            {renderSectionContent()}
           </div>
         </div>
       )}
