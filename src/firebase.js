@@ -24,7 +24,7 @@ let database = null;
 if (hasFirebaseConfig) {
   const app = initializeApp(firebaseConfig);
   database = getDatabase(app);
-} else {
+} else if (import.meta.env.DEV) {
   console.warn(
     "Firebase config is missing. Set VITE_FIREBASE_* env vars to enable live catalog data."
   );

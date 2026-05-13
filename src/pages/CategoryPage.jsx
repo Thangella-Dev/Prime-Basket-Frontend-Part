@@ -467,6 +467,8 @@ export default function CategoryPage({
     return brandList;
   }, [filteredBrands, brandList]);
 
+  const getTranslatedName = useCallback((name) => getLocalizedProductName(name, t), [t]);
+
   // Effective ranges (clamped)
   const effectivePriceRange = useMemo(
     () => clampRange(priceRange, priceBounds[0], priceBounds[1]),
@@ -566,8 +568,6 @@ export default function CategoryPage({
   }, [discountBounds]);
 
   // ── Product helpers ────────────────────────────────────────────────────────
-  const getTranslatedName = useCallback((name) => getLocalizedProductName(name, t), [t]);
-
   const getStockInfo = useCallback((item) => {
     if (item.inStock === false) return { text: t.product?.outOfStock || "Out of stock", cls: "outofstock", disabled: true };
     if (item.stock != null && item.stock <= 3) return { text: `Only ${item.stock} left`, cls: "warning", disabled: false };
@@ -685,7 +685,11 @@ export default function CategoryPage({
 
   // Full desktop sidebar filter panel
   const renderDesktopFilterPanel = () => (
-    <div className="cp-filter-panel">
+    <div
+      className="cp-filter-panel"
+      onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       <div className="cp-filter-panel-head">
         <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 800, fontSize: 14, color: p.text }}>
           <i className="fas fa-sliders-h" style={{ color: p.accent }} />
@@ -1526,7 +1530,11 @@ export default function CategoryPage({
           </div>
         </main>
 
-        <aside className="cp-filter-sidebar">
+        <aside
+          className="cp-filter-sidebar"
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
           {desktopFiltersOpen ? renderDesktopFilterPanel() : null}
         </aside>
       </div>

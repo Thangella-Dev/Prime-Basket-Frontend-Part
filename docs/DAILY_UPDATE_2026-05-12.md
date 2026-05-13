@@ -27,6 +27,11 @@ Target domain: `https://prime-basket.in`
 - Improved category filter sliders so tapping or clicking anywhere on the track moves the nearest handle cleanly.
 - Hid the floating chatbot while the mobile quantity modal is open so it no longer blocks quantity choices.
 - Tightened the mobile deals grid so cards no longer look overly thin with extra side spacing.
+- Fixed the category-page search runtime error that could blank the page when the search field was focused or typed into.
+- Kept the desktop refine-filters sidebar open while selecting options or typing in its search box.
+- Updated `site.webmanifest` to use same-origin `id` and `start_url` values for local and production compatibility.
+- Reduced noisy missing-Firebase warnings by showing them only during development fallback mode.
+- Corrected the `robots.txt` host directive format.
 - Fixed public asset loading for direct and nested entries by moving critical storefront imagery to route-safe root asset paths.
 - Added timeout-backed homepage fallback loading so popular, deals, and curated sections do not remain in skeleton state as long when live fetches are slow.
 - Reworked desktop `My Account` into a left-side navigation plus right-side content layout.

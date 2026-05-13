@@ -28,6 +28,11 @@ Today’s work focused on storefront usability fixes, desktop account layout ref
 - Improved category filter sliders so clicking or tapping the track jumps the selected range cleanly on mobile and desktop.
 - Hid the floating chatbot while the mobile quantity modal is open so it no longer overlaps quantity selection.
 - Tightened the mobile deals grid so product cards no longer appear overly thin with wasted side space.
+- Fixed the category-page search runtime error that could blank the page when the search field was focused or typed into.
+- Kept the desktop refine-filters sidebar open while selecting filter options or typing into the filter search input.
+- Updated `site.webmanifest` so `id` and `start_url` use same-origin values and no longer trigger browser manifest warnings in local/dev runs.
+- Reduced noisy fallback logging by showing the missing Firebase-config warning only during development.
+- Corrected the `robots.txt` host directive format.
 
 Validation:
 
