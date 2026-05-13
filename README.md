@@ -29,6 +29,9 @@ Primary production domain: `https://prime-basket.in`
 - Mobile category filter/sort sheets now render through a body portal so they attach to the viewport instead of the scrolling product list
 - Pull-to-refresh now refreshes in-app without a full loader flash, and its touch handling no longer triggers passive-listener console warnings
 - Shared product image rendering now sanitizes malformed remote URLs such as accidental `hhttps://...` entries
+- Desktop home-category sidebar now has an internal scroll area with a fuller category list instead of ending early with empty space
+- Home `Deals Of The Day` now supports a denser 3-column mobile layout and pads to six cards when the available deal pool is smaller
+- Cart removal/decrement actions now clear top-right cart feedback immediately when the removed item no longer exists in cart
 
 ## Tech Stack
 

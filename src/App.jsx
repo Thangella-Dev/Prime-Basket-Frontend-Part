@@ -7,7 +7,7 @@ import HomePage from "./pages/HomePage";
 import { translations } from "./i18n/translations";
 import { useTracking } from "./context/TrackingContext";
 import TrackingPopup from "./components/TrackingPopup";
-import { formatCurrency, parsePrice } from "./utils/productUtils";
+import { formatCurrency, parsePrice, sanitizeImageUrl } from "./utils/productUtils";
 
 const AccountPage = lazy(() => import("./pages/AccountPage"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
@@ -41,6 +41,29 @@ const readStoredJson = (key, fallback = null) => {
     return fallback;
   }
 };
+
+const sanitizeStoredProduct = (product) => {
+  if (!product || typeof product !== "object") return product;
+  return {
+    ...product,
+    imageUrl: sanitizeImageUrl(product.imageUrl || product.image),
+    image: sanitizeImageUrl(product.image || product.imageUrl),
+  };
+};
+
+const sanitizeStoredOrder = (order) => {
+  if (!order || typeof order !== "object") return order;
+  return {
+    ...order,
+    items: Array.isArray(order.items) ? order.items.map(sanitizeStoredProduct) : order.items,
+  };
+};
+
+const buildCartToastPayload = (product, qty, action = "added") => ({
+  product,
+  qty,
+  action,
+});
 
 export default function App() {
   const { isAuthenticated, user, login, logout } = useAuth();
@@ -176,17 +199,29 @@ export default function App() {
   const [checkoutData, setCheckoutData] = useState(() => initialNav.checkoutData || null);
   const [orderData, setOrderData] = useState(() => initialNav.orderData || null);
   const [orders, setOrders] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pb_orders") || "[]"); } catch { return []; }
+    try {
+      return JSON.parse(localStorage.getItem("pb_orders") || "[]").map(sanitizeStoredOrder);
+    } catch {
+      return [];
+    }
   });
   const [accountSection, setAccountSection] = useState(() => initialNav.accountSection || "profile");
   const [selectedOrderForDetail, setSelectedOrderForDetail] = useState(() => initialNav.selectedOrderForDetail || null);
 
   // ── Cart & Wishlist ──
   const [cart, setCart] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pb_cart") || "[]"); } catch { return []; }
+    try {
+      return JSON.parse(localStorage.getItem("pb_cart") || "[]").map(sanitizeStoredProduct);
+    } catch {
+      return [];
+    }
   });
   const [wishlist, setWishlist] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pb_wishlist") || "[]"); } catch { return []; }
+    try {
+      return JSON.parse(localStorage.getItem("pb_wishlist") || "[]").map(sanitizeStoredProduct);
+    } catch {
+      return [];
+    }
   });
 
   useEffect(() => {
@@ -198,7 +233,7 @@ export default function App() {
   }, [wishlist]);
 
   // ── Cart Toast Panel ──
-  const [cartToast, setCartToast] = useState(null); // { product, qty }
+  const [cartToast, setCartToast] = useState(null); // { product, qty, action }
   const cartToastTimer = useRef(null);
 
   // ── Modal ──
@@ -479,7 +514,7 @@ export default function App() {
   const normalizeCartProduct = useCallback((product) => {
     const selectedUnit = resolveCartUnit(product);
     return {
-      ...product,
+      ...sanitizeStoredProduct(product),
       selectedUnit,
       quantity: Number(product?.quantity) > 0 ? Number(product.quantity) : 1,
     };
@@ -528,9 +563,21 @@ export default function App() {
     if (cartToastTimer.current) clearTimeout(cartToastTimer.current);
     const normalizedProduct = normalizeCartProduct(product);
     const item = updatedCart.find((i) => i._uid === normalizedProduct._uid && resolveCartUnit(i) === normalizedProduct.selectedUnit);
-    setCartToast({ product: normalizedProduct, qty: item ? item.quantity : 1 });
+    if (!item) {
+      setCartToast(null);
+      return;
+    }
+    setCartToast(buildCartToastPayload(normalizedProduct, item.quantity, "added"));
     cartToastTimer.current = setTimeout(() => setCartToast(null), 3000);
   }, [normalizeCartProduct, resolveCartUnit]);
+
+  const showCartRemovedToast = useCallback((product) => {
+    if (!product) return;
+    if (cartToastTimer.current) clearTimeout(cartToastTimer.current);
+    const normalizedProduct = normalizeCartProduct(product);
+    setCartToast(buildCartToastPayload(normalizedProduct, 0, "removed"));
+    cartToastTimer.current = setTimeout(() => setCartToast(null), 2200);
+  }, [normalizeCartProduct]);
 
   // ── Cart helpers ──
   const addToCart = (product) => {
@@ -561,13 +608,31 @@ export default function App() {
       if (index !== -1 && prev[index].quantity > 1) {
         const updated = [...prev];
         updated[index] = { ...updated[index], quantity: updated[index].quantity - 1 };
+        if (typeof product === "object") {
+          showCartToast(product, updated);
+        }
         return updated;
       }
-      return prev.filter((item) => !(item._uid === uid && (!unit || resolveCartUnit(item) === unit)));
+      const updated = prev.filter((item) => !(item._uid === uid && (!unit || resolveCartUnit(item) === unit)));
+      if (typeof product === "object") {
+        showCartRemovedToast(product);
+      } else {
+        setCartToast(null);
+      }
+      return updated;
     });
   };
 
-  const removeFromCart = (uid, unit) => setCart((prev) => prev.filter((i) => !(i._uid === uid && (!unit || resolveCartUnit(i) === unit))));
+  const removeFromCart = (uid, unit) =>
+    setCart((prev) => {
+      const removedItem = prev.find((i) => i._uid === uid && (!unit || resolveCartUnit(i) === unit));
+      if (removedItem) {
+        showCartRemovedToast(removedItem);
+      } else {
+        setCartToast(null);
+      }
+      return prev.filter((i) => !(i._uid === uid && (!unit || resolveCartUnit(i) === unit)));
+    });
 
   const updateCartQty = (uid, unit, qty) => {
     if (qty <= 0) removeFromCart(uid, unit);
@@ -585,7 +650,7 @@ export default function App() {
         return prev.filter((item) => item._uid !== product._uid);
       }
       showToast(translations[language].toasts.addedToWishlist);
-      return [...prev, product];
+      return [...prev, sanitizeStoredProduct(product)];
     });
   };
 
@@ -1006,8 +1071,13 @@ export default function App() {
           padding: "10px 12px 8px",
           borderBottom: "1px solid #f0f0f0",
         }}>
-          <i className="fas fa-check-circle" style={{ color: "#2e7d32", fontSize: "16px" }}></i>
-          <span style={{ fontWeight: 700, fontSize: "13px", color: "#2e7d32" }}>Added to Cart</span>
+          <i
+            className={`fas ${cartToast?.action === "removed" ? "fa-trash-can" : "fa-check-circle"}`}
+            style={{ color: cartToast?.action === "removed" ? "#c62828" : "#2e7d32", fontSize: "16px" }}
+          ></i>
+          <span style={{ fontWeight: 700, fontSize: "13px", color: cartToast?.action === "removed" ? "#c62828" : "#2e7d32" }}>
+            {cartToast?.action === "removed" ? "Removed from Cart" : "Added to Cart"}
+          </span>
         </div>
 
         {/* Product Row */}
@@ -1029,7 +1099,7 @@ export default function App() {
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 {p.image || p.imageUrl ? (
-                  <img src={p.image || p.imageUrl} alt={name}
+                  <img src={sanitizeImageUrl(p.image || p.imageUrl)} alt={name}
                     style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                 ) : (
                   <i className="fas fa-box" style={{ color: "#ccc", fontSize: "22px" }}></i>
@@ -1043,7 +1113,11 @@ export default function App() {
                   display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
                   lineHeight: 1.3,
                 }}>{name}</div>
-                {unit && <div style={{ fontSize: "11px", color: "#888", marginTop: "2px" }}>{unit} ×{cartToast.qty}</div>}
+                {cartToast.action === "removed" ? (
+                  <div style={{ fontSize: "11px", color: "#888", marginTop: "2px" }}>Item removed from your basket</div>
+                ) : (
+                  unit && <div style={{ fontSize: "11px", color: "#888", marginTop: "2px" }}>{unit} ×{cartToast.qty}</div>
+                )}
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "5px" }}>
                   <span style={{
                     background: "#2e7d32", color: "#fff",

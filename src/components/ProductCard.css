@@ -285,16 +285,15 @@
 }
 
 .unit-desktop-popover {
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
-  right: 0;
-  z-index: 80;
+  position: fixed;
+  z-index: 100070;
   background: #fff;
   border: 1px solid rgba(203, 213, 225, 0.86);
   border-radius: 16px;
   box-shadow: 0 24px 44px rgba(15, 23, 42, 0.16);
   padding: 10px;
+  max-height: min(420px, calc(100vh - 24px));
+  overflow: hidden;
 }
 
 .unit-desktop-popover .unit-modal-header {

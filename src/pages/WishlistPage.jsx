@@ -1,6 +1,7 @@
 // src/pages/WishlistPage.jsx
 import { useT } from "../i18n/translations";
 import { getLocalizedProductName } from "../utils/translationUtils";
+import { sanitizeImageUrl } from "../utils/productUtils";
 
 export default function WishlistPage({
   wishlist,
@@ -271,7 +272,7 @@ export default function WishlistPage({
                       </button>
 
                       <div className="wl-card-img" onClick={() => onOpenProduct && onOpenProduct(item)}>
-                        <img src={item.imageUrl} alt={translatedName} loading="lazy" />
+                        <img src={sanitizeImageUrl(item.imageUrl)} alt={translatedName} loading="lazy" />
                       </div>
 
                       <div className="wl-card-body">

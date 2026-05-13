@@ -1864,6 +1864,18 @@ body[data-theme="dark"] .browse-btn .chevron {
   top: 128px;
   align-self: start;
 }
+.products-layout .sidebar .cat-box {
+  max-height: calc(100vh - 156px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.products-layout .sidebar .cat-box::-webkit-scrollbar {
+  width: 6px;
+}
+.products-layout .sidebar .cat-box::-webkit-scrollbar-thumb {
+  background: rgba(29, 91, 160, 0.22);
+  border-radius: 999px;
+}
 .products-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
 .pcard { display: flex; flex-direction: column; min-height: 286px; background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(244,248,255,0.98) 100%); border: 1px solid rgba(148,163,184,0.18); border-radius: 20px; padding: 10px; position: relative; transition: transform .32s ease, box-shadow .32s ease, border-color .32s ease; overflow: hidden; box-shadow: 0 16px 34px rgba(15,23,42,0.07); }
 .pcard::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at top left, rgba(15,91,215,0.08), transparent 24%), linear-gradient(180deg, rgba(255,255,255,0.45), transparent 42%); opacity: 0; transition: opacity .32s ease; pointer-events: none; }
@@ -2043,8 +2055,8 @@ body[data-theme="dark"] .browse-btn .chevron {
 .price-new { font-size: 16px; font-weight: 800; color: var(--navy); font-family: 'Outfit', 'Quicksand', sans-serif; }
 .price-old { font-size: 12px; color: #aaa; text-decoration: line-through; font-weight: 500; }
 
-@media (max-width: 768px) { .deals-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 440px) { .deals-grid { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto; } }
+@media (max-width: 768px) { .deals-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; } }
+@media (max-width: 440px) { .deals-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: none; margin: 0; gap: 8px; } }
 @media (max-width: 480px) {
   .deals-section { padding: 0 15px; }
   .deals-header { flex-direction: column; align-items: flex-start; gap: 14px; padding: 18px 18px 16px; }
@@ -6025,7 +6037,7 @@ body[data-theme="dark"] .slider-nav-btn:hover {
 
 @media (max-width: 768px) {
   .deals-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 8px !important;
   }
 }
@@ -6033,7 +6045,7 @@ body[data-theme="dark"] .slider-nav-btn:hover {
 @media (max-width: 420px) {
   .products-grid,
   .deals-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }
 }
 

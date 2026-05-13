@@ -94,6 +94,24 @@ const fetchWithCache = async (cat) => {
 
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
+const ensureMinimumItems = (items, minimum) => {
+  const source = Array.isArray(items) ? items.filter(Boolean) : [];
+  if (source.length === 0) return [];
+  if (source.length >= minimum) return source.slice(0, minimum);
+
+  const expanded = [...source];
+  let cloneIndex = 0;
+  while (expanded.length < minimum) {
+    const original = source[cloneIndex % source.length];
+    expanded.push({
+      ...original,
+      _uid: `${original._uid || original.name || "item"}__dup_${cloneIndex}`,
+    });
+    cloneIndex += 1;
+  }
+  return expanded;
+};
+
 const buildFallbackHomeSections = () => {
   const topSelling = getFallbackCategoryProducts(MULTICOL_CATS.topSelling).slice(0, 6);
   const trending = getFallbackCategoryProducts(MULTICOL_CATS.trending).slice(0, 6);
@@ -106,7 +124,7 @@ const buildFallbackHomeSections = () => {
 
   return {
     popular15: shuffle(allPopular).slice(0, 15),
-    deals: shuffle(allDeals).slice(0, 4),
+    deals: ensureMinimumItems(shuffle(allDeals), 6),
     multiCols: { topSelling, trending, recentlyAdded, topRated },
   };
 };
@@ -256,7 +274,10 @@ export default function HomePage({
             shuffle(allPopular.length ? allPopular : fallbackSections.popular15).slice(0, 15)
           );
           setDeals(
-            shuffle(allDeals.length ? allDeals : fallbackSections.deals).slice(0, 4)
+            ensureMinimumItems(
+              shuffle(allDeals.length ? allDeals : fallbackSections.deals),
+              6
+            )
           );
           setMultiCols({
             topSelling: (ts.length ? ts : fallbackSections.multiCols.topSelling).slice(0, 6),
@@ -411,7 +432,9 @@ export default function HomePage({
 
       state.dragX = dragX;
       setRailDragOffset((prev) => (prev[key] === dragX ? prev : { ...prev, [key]: dragX }));
-      event.preventDefault();
+      if (event.cancelable) {
+        event.preventDefault();
+      }
     }
   };
 
@@ -495,7 +518,9 @@ export default function HomePage({
         const dominantDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
         if (Math.abs(dominantDelta) < 12) return;
 
-        event.preventDefault();
+        if (event.cancelable) {
+          event.preventDefault();
+        }
         scrollRail(section.key, dominantDelta > 0 ? 1 : -1);
       };
 
@@ -579,7 +604,7 @@ export default function HomePage({
             <div className="sidebar">
               <div className="cat-box">
                 <h3>{t.home.category}</h3>
-                {[ 
+                {[
                   { key: "fruits", icon: "fa-solid fa-apple-whole", label: t.categories.freshFruits },
                   { key: "vegetables", icon: "fa-solid fa-carrot", label: t.categories.vegetables },
                   { key: "dairyProducts", icon: "fa-solid fa-cheese", label: t.categories.dairyProducts },
@@ -589,6 +614,10 @@ export default function HomePage({
                   { key: "babyCare", icon: "fa-solid fa-baby", label: t.categories.babyCare },
                   { key: "bodyCare", icon: "fa-solid fa-spa", label: t.categories.bodyCare },
                   { key: "feminineHygiene", icon: "fa-solid fa-person-dress", label: t.categories.feminineHygiene },
+                  { key: "homeNeeds", icon: "fa-solid fa-broom", label: t.categories.homeNeeds },
+                  { key: "oralCare", icon: "fa-solid fa-tooth", label: t.categories.oralCare },
+                  { key: "biscuitsAndCookies", icon: "fa-solid fa-cookie", label: t.categories.biscuitsCookies },
+                  { key: "milkPowders", icon: "fa-solid fa-glass-whiskey", label: t.categories.milkPowders },
                 ].map((c) => (
                   <div key={c.key} className="cat-item" style={{ cursor: "pointer" }} onClick={() => onCategorySelect && onCategorySelect(c.key)}>
                     <div className="cat-item-l">
@@ -622,7 +651,7 @@ export default function HomePage({
         </div>
           <div className="deals-grid">
           {loading
-            ? Array.from({ length: 4 }).map((_, i) => <DealSkeletonCard key={i} />)
+            ? Array.from({ length: 6 }).map((_, i) => <DealSkeletonCard key={i} />)
             : deals.map((d) => (
                 <ProductCard
                   key={d._uid}

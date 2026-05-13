@@ -77,7 +77,9 @@ export default function Layout({
     const damped = Math.min(maxPull, raw * 0.45);
     state.distance = damped;
     setPullDistance(damped);
-    event.preventDefault();
+    if (event.cancelable) {
+      event.preventDefault();
+    }
   }, [isRefreshing]);
 
   const endPull = useCallback(async () => {

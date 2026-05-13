@@ -1,5 +1,5 @@
 // src/components/ProductCard.jsx
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import "./ProductCard.css";
 import { enhanceProduct, getProductPrices, formatCurrency } from "../utils/productUtils";
@@ -24,7 +24,10 @@ export default function ProductCard({
   const [showModal, setShowModal] = useState(false);
   const suppressOpenUntilRef = useRef(0);
   const cardRef = useRef(null);
+  const unitTriggerRef = useRef(null);
+  const desktopPopoverRef = useRef(null);
   const [isDesktopPopover, setIsDesktopPopover] = useState(false);
+  const [desktopPopoverStyle, setDesktopPopoverStyle] = useState(null);
 
   const prices = useMemo(() => getProductPrices(p, selectedUnit), [p, selectedUnit]);
   const translatedName = getLocalizedProductName(p.name, t);
@@ -69,6 +72,24 @@ export default function ProductCard({
     setShowModal(false);
   };
 
+  const updateDesktopPopoverPosition = useCallback(() => {
+    const trigger = unitTriggerRef.current;
+    if (!trigger || typeof window === "undefined") return;
+    const rect = trigger.getBoundingClientRect();
+    const viewportPadding = 12;
+    const width = Math.min(Math.max(rect.width, 228), 320);
+    const maxLeft = window.innerWidth - width - viewportPadding;
+    const left = Math.max(viewportPadding, Math.min(rect.left, maxLeft));
+    const top = Math.min(rect.bottom + 10, window.innerHeight - viewportPadding);
+    setDesktopPopoverStyle({
+      position: "fixed",
+      top,
+      left,
+      width,
+      zIndex: 100070,
+    });
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
     const syncPopoverMode = () => {
@@ -91,14 +112,29 @@ export default function ProductCard({
 
   useEffect(() => {
     if (!showModal || !isDesktopPopover) return undefined;
+    updateDesktopPopoverPosition();
+
     const handleClickAway = (event) => {
-      if (!cardRef.current?.contains(event.target)) {
+      const insideCard = cardRef.current?.contains(event.target);
+      const insidePopover = desktopPopoverRef.current?.contains(event.target);
+      if (!insideCard && !insidePopover) {
         closeUnitModal();
       }
     };
+
+    const handleViewportChange = () => {
+      updateDesktopPopoverPosition();
+    };
+
     document.addEventListener("mousedown", handleClickAway);
-    return () => document.removeEventListener("mousedown", handleClickAway);
-  }, [showModal, isDesktopPopover]);
+    window.addEventListener("resize", handleViewportChange);
+    window.addEventListener("scroll", handleViewportChange, true);
+    return () => {
+      document.removeEventListener("mousedown", handleClickAway);
+      window.removeEventListener("resize", handleViewportChange);
+      window.removeEventListener("scroll", handleViewportChange, true);
+    };
+  }, [showModal, isDesktopPopover, updateDesktopPopoverPosition]);
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
@@ -228,14 +264,20 @@ export default function ProductCard({
 
       {/* Unit Selector */}
       <div className="unit-selector-wrap">
-        <div className="unit-selector-btn" onClick={openUnitModal}>
+        <div ref={unitTriggerRef} className="unit-selector-btn" onClick={openUnitModal}>
           <span>{selectedUnit}</span>
           <ChevronDown size={10} strokeWidth={2} />
         </div>
-        {showModal && isDesktopPopover ? (
-          <div className="unit-desktop-popover">
+        {showModal && isDesktopPopover && desktopPopoverStyle ? createPortal(
+          <div
+            ref={desktopPopoverRef}
+            className="unit-desktop-popover"
+            style={desktopPopoverStyle}
+            onClick={(e) => e.stopPropagation()}
+          >
             {quantityPicker}
-          </div>
+          </div>,
+          document.body
         ) : null}
       </div>
 
