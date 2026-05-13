@@ -26,6 +26,9 @@ Primary production domain: `https://prime-basket.in`
 - Premium mobile delivery-location bar under the header on home, replacing the raw detected-location text treatment
 - Category-page filter-mode separation so desktop uses the right refine sidebar and mobile uses the bottom-sheet flow
 - Mobile category-search blur handling to reduce unwanted scroll jumps after leaving the search field
+- Mobile category filter/sort sheets now render through a body portal so they attach to the viewport instead of the scrolling product list
+- Pull-to-refresh now refreshes in-app without a full loader flash, and its touch handling no longer triggers passive-listener console warnings
+- Shared product image rendering now sanitizes malformed remote URLs such as accidental `hhttps://...` entries
 
 ## Tech Stack
 
@@ -178,7 +181,7 @@ Detailed backend guidance is available in [docs/BACKEND_INTEGRATION_GUIDE.md](./
 See the `docs` folder for detailed project documentation:
 
 - [Manager Mail Update](./docs/Mail_Update.md)
-- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-12.md)
+- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-13.md)
 - [Application Overview](./docs/APPLICATION_OVERVIEW.md)
 - [Tech Stack and Architecture](./docs/TECH_STACK_AND_ARCHITECTURE.md)
 - [Backend Integration Guide](./docs/BACKEND_INTEGRATION_GUIDE.md)
@@ -190,5 +193,6 @@ See the `docs` folder for detailed project documentation:
 - Production metadata now targets `https://prime-basket.in`
 - Category browsing, cart-item layout, shared product-card density, and all-products mode were updated and revalidated in the latest pass
 - A focused code audit pass was completed on checkout, modal behavior, cart merging, chatbot currency handling, related-product/detail flows, and deployment-safe product-page behavior
+- Mobile category filter popup mounting, pull-to-refresh behavior, and malformed image URL handling were stabilized in the latest pass
 - The app is suitable as a strong frontend demo/prototype
-- Final visual QA and backend completion are still recommended before production use
+- Final device-lab/browser QA and backend completion are still recommended before production use
