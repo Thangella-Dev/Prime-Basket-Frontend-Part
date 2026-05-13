@@ -187,6 +187,14 @@ export function parsePrice(val) {
   return parseFloat(cleaned) || 0;
 }
 
+export function sanitizeImageUrl(url) {
+  const raw = String(url || "").trim();
+  if (!raw) return "";
+  if (/^hhttps:\/\//i.test(raw)) return raw.replace(/^hhttps:\/\//i, "https://");
+  if (/^hhttp:\/\//i.test(raw)) return raw.replace(/^hhttp:\/\//i, "http://");
+  return raw;
+}
+
 /**
  * Enhances a product with dynamic weight/unit options if they don't exist.
  */
@@ -196,9 +204,10 @@ export function enhanceProduct(p, region = "in", isDeal = false) {
   // If already enhanced or has units, just return
   if (p.units && p.units.length > 0) return p;
 
+  const sanitizedImageUrl = sanitizeImageUrl(p.imageUrl || p.image);
   const cat = p._cat || "";
   const nameLower = (p.name || "").toLowerCase();
-  const imgLower = (p.imageUrl || "").toLowerCase();
+  const imgLower = sanitizedImageUrl.toLowerCase();
   const templateKey = inferTemplateKey(cat, nameLower, imgLower);
 
   let units = [...(UNIT_TEMPLATES[templateKey] || UNIT_TEMPLATES["weight"])];
@@ -302,6 +311,8 @@ export function enhanceProduct(p, region = "in", isDeal = false) {
 
   return {
     ...p,
+    imageUrl: sanitizedImageUrl,
+    image: sanitizedImageUrl || p.image,
     ...specs,
     badge: finalBadge,
     basePrice: currentPrice,

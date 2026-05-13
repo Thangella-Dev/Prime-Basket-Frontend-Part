@@ -24,6 +24,8 @@ Primary production domain: `https://prime-basket.in`
 - App navigation and scroll persistence across browser refreshes
 - Mobile pull-to-refresh support for core shopping pages with a content-only refresh indicator
 - Premium mobile delivery-location bar under the header on home, replacing the raw detected-location text treatment
+- Category-page filter-mode separation so desktop uses the right refine sidebar and mobile uses the bottom-sheet flow
+- Mobile category-search blur handling to reduce unwanted scroll jumps after leaving the search field
 
 ## Tech Stack
 

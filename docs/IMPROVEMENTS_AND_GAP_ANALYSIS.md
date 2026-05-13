@@ -174,3 +174,9 @@ The following improvements were implemented during the recent Prime Basket front
 ## Overall Assessment
 
 Prime Basket is currently a strong frontend-first ecommerce experience with solid polish and a lot of practical user flow coverage. It is good enough to demonstrate product direction, UX quality, and shopping flow design. It is not yet fully production-grade commerce software until backend ownership, security, data persistence, and QA are completed.
+## 2026-05-13 Additional UI/UX Stabilization
+
+- Improved the mobile home location treatment by turning the detected-area message into a persistent premium bar under the header and separating it visually from the hero slider.
+- Fixed category-page filter-mode leakage so the mobile bottom-sheet filter is no longer mounted in desktop layouts while the desktop refine panel is active.
+- Added auto-scroll behavior when opening filters so the user lands near the active filter area instead of needing to manually scroll back to it.
+- Added mobile search blur restoration on the category page to reduce unwanted viewport jumps after focusing and leaving the search field.

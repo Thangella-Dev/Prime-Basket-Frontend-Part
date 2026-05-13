@@ -1,0 +1,50 @@
+## Prime Basket Update
+
+Date: 2026-05-12
+
+Today’s work focused on storefront usability fixes, desktop account layout refinement, and production metadata cleanup.
+
+- Fixed quantity-selection modal behavior so `Done` and `Add to Cart` stay side by side and outside taps close the modal without accidentally opening the product page.
+- Improved shared product-card density so more products fit across home, category, and related-product grids.
+- Fixed desktop behavior for curated home rails so `Top Selling`, `Trending`, `Recently Added`, and `Top Rated` cards can be opened more reliably while touch swipe behavior remains available on mobile.
+- Tightened mobile category-page sticky behavior so the search/category bar remains visible and cleaner while scrolling.
+- Reworked desktop `My Account` into a left-side navigation with right-side section content, while keeping the mobile flow intact.
+- Updated the mobile side-menu account card to show the user profile image in a curved-square style when available.
+- Switched production SEO/discovery metadata from the old preview URL to the live domain `https://prime-basket.in`.
+- Updated canonical, Open Graph, Twitter, sitemap, robots, geo, LLM discovery, structured data, and manifest references for the live domain.
+- Refreshed core documentation files so the current implementation status and production domain are documented.
+- Audited desktop `Browse All Categories` and cleaned up the left category rail, sticky toolbar, and right-side filter panel behavior.
+- Added hover-reveal desktop category labels so the rail stays compact by default and expands on interaction.
+- Changed desktop quantity selection from a large detached modal into an on-card dropdown/popover.
+- Added rotating search suggestions like `search milk`, `search bread`, and `search sugar` across key search inputs.
+- Refined desktop search suggestions so the hint sits as a clean trailing chip and no longer mixes into the input text.
+- Replaced broad fuzzy product translation matching with safer normalized exact matching to avoid incorrect Swahili/English product names.
+- Upgraded the light/dark theme-toggle icons to a more premium visual treatment.
+- Reworked the mobile `Browse All Categories` trigger styling into a more premium frosted-glass control.
+- Fixed route-relative public asset paths so direct entries and nested URLs no longer break shared storefront imagery.
+- Added timeout-backed homepage fallback loading so key catalog sections recover faster when live data is slow.
+- Restored touch swipe support for curated mobile product rails and kept the shelf arrows aligned to the right.
+- Fixed desktop category-page layering so the expanding left category rail is no longer cut by the sticky toolbar.
+- Improved category filter sliders so clicking or tapping the track jumps the selected range cleanly on mobile and desktop.
+- Hid the floating chatbot while the mobile quantity modal is open so it no longer overlaps quantity selection.
+- Tightened the mobile deals grid so product cards no longer appear overly thin with wasted side space.
+- Fixed the category-page search runtime error that could blank the page when the search field was focused or typed into.
+- Kept the desktop refine-filters sidebar open while selecting filter options or typing into the filter search input.
+- Updated `site.webmanifest` so `id` and `start_url` use same-origin values and no longer trigger browser manifest warnings in local/dev runs.
+- Reduced noisy fallback logging by showing the missing Firebase-config warning only during development.
+- Corrected the `robots.txt` host directive format.
+- Added app-level page-state persistence so refreshing returns users to the same page context instead of always going back home.
+- Added scroll-position persistence per page/view so refresh restores users closer to where they were in the shopping flow.
+- Added mobile pull-to-refresh for key shopping pages, with the refresh indicator attached to the content area rather than dragging the fixed header.
+- Removed the harsh rectangular focus outline from search inputs in the main shopping search surfaces on mobile and desktop.
+- Made the home `Popular Products` category sidebar behave more cleanly during scroll by keeping it sticky instead of feeling abandoned below the product grid.
+- Reworked the mobile detected-location treatment into a thin premium bar under the header on the home screen instead of letting the raw success text sit awkwardly over the hero area.
+- Kept the home mobile location display persistent like the desktop experience so users continue seeing the delivery area clearly after detection.
+- Added extra spacing under the mobile home location bar so it reads cleanly as a header strip instead of visually touching the hero slider.
+- Prevented the mobile category bottom-sheet filter from rendering in desktop layouts, so desktop now uses only the right-side refine filter panel.
+- Made opening filters scroll the category page back toward the filter area automatically so users do not need to scroll again to see the opened controls.
+- Added a mobile search blur restoration guard on the category page so leaving the search field no longer causes awkward jump-back scrolling.
+
+Validation:
+
+- `npm run build` passes successfully after these changes.

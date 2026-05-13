@@ -121,6 +121,7 @@ export default function HomePage({
   toggleWishlist,
   language = "en",
   region = "in",
+  refreshSignal = 0,
 }) {
   const t = useT(language);
   const isKenya = region === "ke";
@@ -135,6 +136,7 @@ export default function HomePage({
   const [railMetrics, setRailMetrics] = useState({});
   const railViewportRefs = useRef({});
   const railGestureState = useRef({});
+  const hasLoadedHomeRef = useRef(false);
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -201,6 +203,7 @@ export default function HomePage({
 
   useEffect(() => {
     let cancelled = false;
+    const keepContentVisible = hasLoadedHomeRef.current && refreshSignal > 0;
 
     if (isKenya) {
       if (!cancelled) {
@@ -208,6 +211,7 @@ export default function HomePage({
         setDeals(KENYA_DEALS);
         setMultiCols(KENYA_SECTIONS);
         setLoading(false);
+        hasLoadedHomeRef.current = true;
       }
       return () => {
         cancelled = true;
@@ -221,6 +225,7 @@ export default function HomePage({
         setDeals(fallbackSections.deals);
         setMultiCols(fallbackSections.multiCols);
         setLoading(false);
+        hasLoadedHomeRef.current = true;
       }
       return () => {
         cancelled = true;
@@ -228,7 +233,7 @@ export default function HomePage({
     }
 
     const load = async () => {
-      setLoading(true);
+      setLoading(!keepContentVisible);
       try {
         const fallbackSections = buildFallbackHomeSections();
         const withTimeout = (promise, ms = 4000) =>
@@ -260,6 +265,7 @@ export default function HomePage({
             topRated: (tp.length ? tp : fallbackSections.multiCols.topRated).slice(0, 6),
           });
           setLoading(false);
+          hasLoadedHomeRef.current = true;
         }
       } catch (err) {
         console.error("HomePage fetch error:", err);
@@ -269,6 +275,7 @@ export default function HomePage({
           setDeals(fallbackSections.deals);
           setMultiCols(fallbackSections.multiCols);
           setLoading(false);
+          hasLoadedHomeRef.current = true;
         }
       }
     };
@@ -277,7 +284,7 @@ export default function HomePage({
     return () => {
       cancelled = true;
     };
-  }, [isKenya, language]);
+  }, [isKenya, language, refreshSignal]);
 
   const SkeletonCard = () => (
     <div className="premium-product-skeleton premium-skeleton-surface" aria-hidden="true">

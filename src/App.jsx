@@ -46,6 +46,7 @@ export default function App() {
   const { isAuthenticated, user, login, logout } = useAuth();
   const { startTracking, activeOrder, completedOrder, setCompletedOrder } = useTracking();
   const [bootVisualReady, setBootVisualReady] = useState(false);
+  const [refreshSignal, setRefreshSignal] = useState(0);
   const initialNavRef = useRef(null);
   if (initialNavRef.current === null) {
     initialNavRef.current = readStoredJson(NAV_STATE_KEY, {});
@@ -662,6 +663,11 @@ export default function App() {
   const wishlistCount = wishlist.length;
   const refreshablePages = new Set(["home", "category", "product", "cart", "wishlist", "account"]);
 
+  const handlePullRefresh = useCallback(async () => {
+    setRefreshSignal((prev) => prev + 1);
+    await new Promise((resolve) => window.setTimeout(resolve, 320));
+  }, []);
+
   // ── Render current page ──
   const renderPage = () => {
 
@@ -882,6 +888,7 @@ export default function App() {
           toggleWishlist={toggleWishlist}
           language={language}
           region={region}
+          refreshSignal={refreshSignal}
         />
       );
     }
@@ -914,6 +921,7 @@ export default function App() {
           toggleWishlist={toggleWishlist}
           language={language}
           region={region}
+          refreshSignal={refreshSignal}
         />
       );
     }
@@ -930,6 +938,7 @@ export default function App() {
         toggleWishlist={toggleWishlist}
         language={language}
         region={region}
+        refreshSignal={refreshSignal}
       />
     );
   };
@@ -972,7 +981,7 @@ export default function App() {
         markAllRead={markAllRead}
         clearNotifications={clearNotifications}
         enablePullRefresh={refreshablePages.has(page)}
-        onPullRefresh={() => window.location.reload()}
+        onPullRefresh={handlePullRefresh}
       >
         <Suspense fallback={<PremiumPageLoader />}>
           {renderPage()}

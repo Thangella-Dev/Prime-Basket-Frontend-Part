@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, useCallback } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -49,16 +49,16 @@ export default function Layout({
   const maxPull = 88;
   const triggerPull = 62;
 
-  const handleTouchStart = (event) => {
+  const handleTouchStart = useCallback((event) => {
     if (!enablePullRefresh || isRefreshing) return;
     if (window.innerWidth > 768) return;
     if ((window.scrollY || 0) > 0) return;
     const touch = event.touches?.[0];
     if (!touch) return;
     pullStateRef.current = { active: true, startY: touch.clientY, distance: 0 };
-  };
+  }, [enablePullRefresh, isRefreshing]);
 
-  const handleTouchMove = (event) => {
+  const handleTouchMove = useCallback((event) => {
     const state = pullStateRef.current;
     if (!state.active || isRefreshing) return;
     const touch = event.touches?.[0];
@@ -78,9 +78,9 @@ export default function Layout({
     state.distance = damped;
     setPullDistance(damped);
     event.preventDefault();
-  };
+  }, [isRefreshing]);
 
-  const endPull = async () => {
+  const endPull = useCallback(async () => {
     const state = pullStateRef.current;
     if (!state.active) return;
     const shouldRefresh = state.distance >= triggerPull && enablePullRefresh && !isRefreshing;
@@ -99,7 +99,30 @@ export default function Layout({
       setPullDistance(0);
       setIsRefreshing(false);
     }
-  };
+  }, [enablePullRefresh, isRefreshing, onPullRefresh]);
+
+  useEffect(() => {
+    const node = shellRef.current;
+    if (!node || !enablePullRefresh) return undefined;
+
+    const start = (event) => handleTouchStart(event);
+    const move = (event) => handleTouchMove(event);
+    const end = () => {
+      void endPull();
+    };
+
+    node.addEventListener("touchstart", start, { passive: true });
+    node.addEventListener("touchmove", move, { passive: false });
+    node.addEventListener("touchend", end);
+    node.addEventListener("touchcancel", end);
+
+    return () => {
+      node.removeEventListener("touchstart", start);
+      node.removeEventListener("touchmove", move);
+      node.removeEventListener("touchend", end);
+      node.removeEventListener("touchcancel", end);
+    };
+  }, [enablePullRefresh, handleTouchMove, handleTouchStart, endPull]);
 
   return (
     <>
@@ -129,10 +152,6 @@ export default function Layout({
       <main
         ref={shellRef}
         className={`page-shell${enablePullRefresh ? " page-shell-refreshable" : ""}`}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={endPull}
-        onTouchCancel={endPull}
       >
         {enablePullRefresh && (
           <div
@@ -145,7 +164,12 @@ export default function Layout({
         )}
         <div
           className="page-shell-content"
-          style={{ transform: enablePullRefresh ? `translateY(${pullDistance}px)` : undefined }}
+          style={{
+            transform:
+              enablePullRefresh && pullDistance > 0
+                ? `translateY(${pullDistance}px)`
+                : undefined,
+          }}
         >
           {children}
         </div>

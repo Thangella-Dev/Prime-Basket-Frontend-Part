@@ -1,5 +1,6 @@
 // src/pages/CategoryPage.jsx
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { database, hasFirebaseConfig } from "../firebase";
 import { ref, get } from "firebase/database";
 import { useT } from "../i18n/translations";
@@ -7,6 +8,7 @@ import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
 import { mergeCategoryProducts } from "../data/catalogFallback";
 import { formatCurrencyDisplay } from "../utils/currency";
 import { getLocalizedProductName, getSearchHintSuggestions } from "../utils/translationUtils";
+import { sanitizeImageUrl } from "../utils/productUtils";
 import ProductCard from "../components/ProductCard";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -180,6 +182,7 @@ export default function CategoryPage({
   cart = [], wishlist = [], toggleWishlist,
   language = "en",
   region = "in",
+  refreshSignal = 0,
 }) {
   const t = useT(language);
   const isKenya = region === "ke";
@@ -209,9 +212,16 @@ export default function CategoryPage({
   const [mobileSortOpen, setMobileSortOpen] = useState(false); // mobile sort sheet
   const [filterTab, setFilterTab] = useState("brand");    // mobile filter tab: brand | price | discount
   const [searchHintIndex, setSearchHintIndex] = useState(0);
+  const [isMobileViewport, setIsMobileViewport] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth <= 768 : false
+  );
 
   const pageTopRef = useRef(null);
   const productsRef = useRef(null);
+  const mobileSearchScrollRef = useRef(0);
+  const previousCategoryRef = useRef(category);
+  const previousRegionRef = useRef(region);
+  const previousRefreshRef = useRef(refreshSignal);
   const searchSuggestions = useMemo(() => getSearchHintSuggestions(language), [language]);
 
   // ── Theme (palette) ────────────────────────────────────────────────────────
@@ -291,11 +301,47 @@ export default function CategoryPage({
     return () => window.clearInterval(timer);
   }, [searchSuggestions]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const syncViewport = () => setIsMobileViewport(window.innerWidth <= 768);
+    syncViewport();
+    window.addEventListener("resize", syncViewport);
+    return () => window.removeEventListener("resize", syncViewport);
+  }, []);
+
+  useEffect(() => {
+    if (isMobileViewport) {
+      setDesktopFiltersOpen(false);
+      return;
+    }
+    setFilterOpen(false);
+    setMobileSortOpen(false);
+  }, [isMobileViewport]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    if (!isMobileViewport || !filterOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [filterOpen, isMobileViewport]);
+
   // ── Load products ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!category) return;
-    setLoading(true);
-    setProducts([]);
+    const categoryChanged = previousCategoryRef.current !== category;
+    const regionChanged = previousRegionRef.current !== region;
+    const pullRefreshTriggered = previousRefreshRef.current !== refreshSignal;
+    const keepContentVisible = pullRefreshTriggered && !categoryChanged && !regionChanged && products.length > 0;
+
+    setLoading(!keepContentVisible);
+    if (!keepContentVisible) {
+      setProducts([]);
+    }
     setSelectedBrands([]);
     setBrandSearch("");
     setSearchQuery("");
@@ -317,11 +363,17 @@ export default function CategoryPage({
       if (isKenya) {
         const final = prep(KENYA_ALL_PRODUCTS);
         setAllProducts(final); setProducts(final); setLoading(false);
+        previousCategoryRef.current = category;
+        previousRegionRef.current = region;
+        previousRefreshRef.current = refreshSignal;
         return;
       }
       if (!hasFirebaseConfig || !database) {
         const all = fromFallbackAll();
         setAllProducts(all); setProducts(all); setLoading(false);
+        previousCategoryRef.current = category;
+        previousRegionRef.current = region;
+        previousRefreshRef.current = refreshSignal;
         return;
       }
       get(ref(database, "categories"))
@@ -335,10 +387,16 @@ export default function CategoryPage({
           );
           const merged = raw.length ? prep(raw) : fromFallbackAll();
           setAllProducts(merged); setProducts(merged); setLoading(false);
+          previousCategoryRef.current = category;
+          previousRegionRef.current = region;
+          previousRefreshRef.current = refreshSignal;
         })
         .catch(() => {
           const all = fromFallbackAll();
           setAllProducts(all); setProducts(all); setLoading(false);
+          previousCategoryRef.current = category;
+          previousRegionRef.current = region;
+          previousRefreshRef.current = refreshSignal;
         });
       return;
     }
@@ -350,12 +408,18 @@ export default function CategoryPage({
       );
       const final = prep(local);
       setAllProducts(final); setProducts(final); setLoading(false);
+      previousCategoryRef.current = category;
+      previousRegionRef.current = region;
+      previousRefreshRef.current = refreshSignal;
       return;
     }
 
     if (!hasFirebaseConfig || !database) {
       const fallback = prep(mergeCategoryProducts(category));
       setAllProducts(fallback); setProducts(fallback); setLoading(false);
+      previousCategoryRef.current = category;
+      previousRegionRef.current = region;
+      previousRefreshRef.current = refreshSignal;
       return;
     }
 
@@ -373,12 +437,18 @@ export default function CategoryPage({
           )
         );
         setProducts(merged); setLoading(false);
+        previousCategoryRef.current = category;
+        previousRegionRef.current = region;
+        previousRefreshRef.current = refreshSignal;
       })
       .catch(() => {
         const fallback = prep(mergeCategoryProducts(category));
         setProducts(fallback); setLoading(false);
+        previousCategoryRef.current = category;
+        previousRegionRef.current = region;
+        previousRefreshRef.current = refreshSignal;
       });
-  }, [category, language, region]);
+  }, [category, language, region, refreshSignal]);
 
   // ── Preload allProducts for cross-category search ──────────────────────────
   useEffect(() => {
@@ -566,6 +636,13 @@ export default function CategoryPage({
     setSortBy("best_discount");
     setSearchQuery("");
   }, [discountBounds]);
+
+  const scrollFiltersIntoView = useCallback(() => {
+    const topTarget = pageTopRef.current?.getBoundingClientRect().top != null
+      ? window.scrollY + pageTopRef.current.getBoundingClientRect().top - 12
+      : Math.max(0, window.scrollY - 120);
+    window.scrollTo({ top: Math.max(0, topTarget), behavior: "smooth" });
+  }, []);
 
   // ── Product helpers ────────────────────────────────────────────────────────
   const getStockInfo = useCallback((item) => {
@@ -837,7 +914,7 @@ export default function CategoryPage({
         </button>
 
         <div className="pimg">
-          <img src={item.imageUrl} alt={name} loading="lazy" />
+          <img src={sanitizeImageUrl(item.imageUrl)} alt={name} loading="lazy" />
         </div>
 
         <div className="pbrand">{item.brand}</div>
@@ -1120,12 +1197,14 @@ export default function CategoryPage({
         .cp-mobile-topbar {
           display: none;
           position: sticky;
-          top: 0;
-          z-index: 100;
-          background: ${p.card};
+          top: 64px;
+          z-index: 140;
+          background: linear-gradient(180deg, ${p.card} 0%, ${p.cardAlt} 100%);
           border-bottom: 1px solid ${p.border};
           box-shadow: ${p.shadowSm};
-          padding: 10px 14px;
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          padding: 10px 14px 12px;
           gap: 10px;
           flex-direction: column;
         }
@@ -1134,13 +1213,14 @@ export default function CategoryPage({
         .cp-mobile-title { flex: 1; min-width: 0; }
         .cp-mobile-title-main { font-size: 15px; font-weight: 800; color: ${p.text}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .cp-mobile-title-sub { font-size: 11px; color: ${p.textMuted}; margin-top: 1px; }
-        .cp-mobile-topbar-row2 { display: flex; gap: 8px; }
-        .cp-mobile-search-wrap { flex: 1; position: relative; }
+        .cp-mobile-topbar-row2 { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .cp-mobile-search-wrap { flex: 1; position: relative; min-width: 0; }
         .cp-mobile-search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: ${p.textFaint}; font-size: 13px; pointer-events: none; }
         .cp-mobile-search-input {
           width: 100%; padding: 10px 12px 10px 36px; border-radius: 12px;
           border: 1.5px solid ${p.border}; background: ${p.cardAlt}; color: ${p.text};
           font-size: 14px; outline: none; box-sizing: border-box; font-family: inherit;
+          min-height: 42px;
         }
         .cp-mobile-search-input:focus { border-color: ${p.accent}; }
         .cp-mobile-filter-btn {
@@ -1155,23 +1235,38 @@ export default function CategoryPage({
         .cp-mobile-action-bar { display: none; }
 
         /* ── Mobile category strip ── */
-        .cp-mobile-cats { display: none; position: sticky; top: 116px; z-index: 99; background: ${p.card}; border-bottom: 1px solid ${p.border}; box-shadow: ${p.shadowSm}; padding: 2px 0 0; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; white-space: nowrap; }
+        .cp-mobile-cats {
+          display: none;
+          position: sticky;
+          top: 172px;
+          z-index: 139;
+          background: linear-gradient(180deg, ${p.card} 0%, ${p.cardAlt} 100%);
+          border-bottom: 1px solid ${p.border};
+          box-shadow: ${p.shadowSm};
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          padding: 2px 0 0;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+          white-space: nowrap;
+        }
         .cp-mobile-cats::-webkit-scrollbar { display: none; }
         .cp-mobile-cat-chip { display: inline-flex; align-items: center; gap: 7px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: ${p.textMuted}; cursor: pointer; border-bottom: 2.5px solid transparent; white-space: nowrap; transition: all .15s; }
         .cp-mobile-cat-chip.active { color: ${p.accent}; border-bottom-color: ${p.accent}; font-weight: 800; }
         .cp-mobile-cat-chip i { font-size: 12px; }
 
         /* ── Mobile bottom sheet ── */
-        .cp-filter-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; }
+        .cp-filter-overlay { display: none; position: fixed; inset: 0; background: rgba(8,15,28,.56); z-index: 1200; }
         .cp-filter-overlay.open { display: block; animation: cpFadeIn .2s ease; }
         .cp-filter-sheet {
-          position: fixed; bottom: 0; left: 0; right: 0; z-index: 501;
+          position: fixed; bottom: 0; left: 0; right: 0; z-index: 1201;
           background: ${p.card}; border-radius: 24px 24px 0 0;
-          max-height: 90vh; display: flex; flex-direction: column;
+          max-height: min(90vh, calc(100dvh - 72px)); display: flex; flex-direction: column;
           box-shadow: 0 -8px 32px rgba(0,0,0,.2);
           transform: translateY(100%); transition: transform .3s ease;
         }
-        .cp-filter-sheet.open { transform: translateY(0); }
+        .cp-filter-sheet.open { transform: translateY(0); animation: cpSlideUp .24s ease; }
         .cp-filter-sheet-handle { width: 36px; height: 4px; background: ${p.border}; border-radius: 2px; margin: 12px auto 0; }
         .cp-filter-sheet-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid ${p.border}; }
         .cp-filter-sheet-title { font-size: 16px; font-weight: 800; color: ${p.text}; display: flex; align-items: center; gap: 8px; }
@@ -1197,7 +1292,7 @@ export default function CategoryPage({
         .cp-sort-sheet-item.active { color: ${p.accent}; font-weight: 800; }
 
         /* ── Mobile products wrapper ── */
-        .cp-mobile-products-wrap { padding: 12px 14px 80px; }
+        .cp-mobile-products-wrap { position: relative; z-index: 1; padding: 12px 14px 80px; }
         .cp-mobile-result-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .cp-mobile-result-count { font-size: 13px; color: ${p.textMuted}; font-weight: 600; }
         .cp-mobile-result-count strong { color: ${p.accent}; }
@@ -1293,6 +1388,15 @@ export default function CategoryPage({
               placeholder="Search products or brands…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => {
+                mobileSearchScrollRef.current = window.scrollY || 0;
+              }}
+              onBlur={() => {
+                const restoreY = mobileSearchScrollRef.current;
+                window.setTimeout(() => {
+                  window.scrollTo({ top: restoreY, behavior: "auto" });
+                }, 60);
+              }}
             />
             {!searchQuery && (
               <span className="cp-search-suggestion">
@@ -1302,7 +1406,13 @@ export default function CategoryPage({
           </div>
           <button
             className={`cp-mobile-filter-btn${activeFilterCount > 0 ? " has-filters" : ""}`}
-            onClick={() => setFilterOpen(true)}
+            onClick={() => {
+              setDesktopFiltersOpen(false);
+              setMobileSortOpen(false);
+              setSortOpen(false);
+              setFilterTab("brand");
+              setFilterOpen(true);
+            }}
           >
             <i className="fas fa-sliders-h" />
             Filter
@@ -1405,6 +1515,18 @@ export default function CategoryPage({
                 placeholder="Search products or brands..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => {
+                  if (isMobileViewport) {
+                    mobileSearchScrollRef.current = window.scrollY || 0;
+                  }
+                }}
+                onBlur={() => {
+                  if (!isMobileViewport) return;
+                  const restoreY = mobileSearchScrollRef.current;
+                  window.setTimeout(() => {
+                    window.scrollTo({ top: restoreY, behavior: "auto" });
+                  }, 60);
+                }}
               />
               {!searchQuery && (
                 <span className="cp-search-suggestion">
@@ -1418,7 +1540,16 @@ export default function CategoryPage({
                 {t.home?.allDeals || "All Deals"}
               </button>
 
-              <button className="cp-btn" onClick={() => setDesktopFiltersOpen((open) => !open)}>
+              <button className="cp-btn" onClick={() => {
+                setFilterOpen(false);
+                setDesktopFiltersOpen((open) => {
+                  const next = !open;
+                  if (next) {
+                    window.setTimeout(scrollFiltersIntoView, 30);
+                  }
+                  return next;
+                });
+              }}>
                 <i className="fas fa-sliders-h" />
                 Filters
                 {activeFilterCount > 0 && <span className="cp-badge">{activeFilterCount}</span>}
@@ -1542,7 +1673,7 @@ export default function CategoryPage({
       {/* ══════════════════════════════════════════════
           MOBILE: Sort bottom sheet
       ══════════════════════════════════════════════ */}
-      {mobileSortOpen && (
+      {isMobileViewport && mobileSortOpen && typeof document !== "undefined" && createPortal(
         <>
           <div
             className="cp-filter-overlay open"
@@ -1571,17 +1702,20 @@ export default function CategoryPage({
             ))}
             <div style={{ height: 20 }} />
           </div>
-        </>
+        </>,
+        document.body
       )}
 
       {/* ══════════════════════════════════════════════
           MOBILE: Filter bottom sheet
       ══════════════════════════════════════════════ */}
+      {isMobileViewport && filterOpen && typeof document !== "undefined" && createPortal(
+        <>
       <div
-        className={`cp-filter-overlay${filterOpen ? " open" : ""}`}
+        className="cp-filter-overlay open"
         onClick={() => setFilterOpen(false)}
       />
-      <div className={`cp-filter-sheet${filterOpen ? " open" : ""}`}>
+      <div className="cp-filter-sheet open">
         <div className="cp-filter-sheet-handle" />
         <div className="cp-filter-sheet-header">
           <div className="cp-filter-sheet-title">
@@ -1674,6 +1808,9 @@ export default function CategoryPage({
           </button>
         </div>
       </div>
+        </>,
+        document.body
+      )}
     </div>
   );
 }

@@ -509,7 +509,7 @@ export default function Header({
 
   return (
     <>
-      <header id="navbar" className={`${scrolled ? "scrolled" : ""}${chromeHidden ? " chrome-hidden" : ""}${drawerOpen ? " drawer-open" : ""}${isCategoryPage ? " page-category" : ""}`}>
+      <header id="navbar" className={`${scrolled ? "scrolled" : ""}${chromeHidden ? " chrome-hidden" : ""}${drawerOpen ? " drawer-open" : ""}${isCategoryPage ? " page-category" : ""}${showMobileLocationBar ? " has-mobile-location-bar" : ""}`}>
         <div className="nav-inner">
         <div className="nav-left" style={{ display: "flex", alignItems: "center", gap: "15px" }}>
           <a href="#" className={`logo brand-link${brandTap ? " brand-link-active" : ""}`} onClick={handleBrandClick}>

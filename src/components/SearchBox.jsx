@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { useSearch } from "../hooks/useSearch";
 import { useT } from "../i18n/translations";
 import { getLocalizedProductName, getSearchHintSuggestions } from "../utils/translationUtils";
+import { sanitizeImageUrl } from "../utils/productUtils";
 
 function dismissKeyboard(target) {
   target?.blur?.();
@@ -463,7 +464,7 @@ export default function SearchBox({ onCategorySelect, onOpenProduct, mobile = fa
                     >
                       <div className="sb-ico prod">
                         {prod.imageUrl
-                          ? <img src={prod.imageUrl} alt={translatedName} loading="lazy" />
+                          ? <img src={sanitizeImageUrl(prod.imageUrl)} alt={translatedName} loading="lazy" />
                           : <i className="fas fa-box" style={{ color: "#c8d4e8", fontSize: 13 }}></i>
                         }
                       </div>
