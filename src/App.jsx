@@ -27,13 +27,30 @@ const TermsPage = lazy(() => import("./pages/TermsPage"));
 const FAQPage = lazy(() => import("./pages/FAQPage"));
 const GenericStaticPage = lazy(() => import("./pages/GenericStaticPage"));
 
+const NAV_STATE_KEY = "pb_nav_state_v2";
+const NAV_SCROLL_KEY = "pb_nav_scroll_v2";
+
 const getDefaultLanguageForRegion = (regionValue = "in") =>
   regionValue === "ke" ? "ke" : "en";
+
+const readStoredJson = (key, fallback = null) => {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+};
 
 export default function App() {
   const { isAuthenticated, user, login, logout } = useAuth();
   const { startTracking, activeOrder, completedOrder, setCompletedOrder } = useTracking();
   const [bootVisualReady, setBootVisualReady] = useState(false);
+  const initialNavRef = useRef(null);
+  if (initialNavRef.current === null) {
+    initialNavRef.current = readStoredJson(NAV_STATE_KEY, {});
+  }
+  const initialNav = initialNavRef.current || {};
 
   // ── Language & Region ──
   const [language, setLanguage] = useState(() => localStorage.getItem("pb_lang") || "en");
@@ -150,18 +167,18 @@ export default function App() {
 
 
   // ── Navigation state ──
-  const [page, setPage] = useState("home");
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [page, setPage] = useState(() => initialNav.page || "home");
+  const [selectedCategory, setSelectedCategory] = useState(() => initialNav.selectedCategory || null);
+  const [selectedProduct, setSelectedProduct] = useState(() => initialNav.selectedProduct || null);
 
   // ── Payment & Order state ──
-  const [checkoutData, setCheckoutData] = useState(null);
-  const [orderData, setOrderData] = useState(null);
+  const [checkoutData, setCheckoutData] = useState(() => initialNav.checkoutData || null);
+  const [orderData, setOrderData] = useState(() => initialNav.orderData || null);
   const [orders, setOrders] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pb_orders") || "[]"); } catch { return []; }
   });
-  const [accountSection, setAccountSection] = useState("profile");
-  const [selectedOrderForDetail, setSelectedOrderForDetail] = useState(null);
+  const [accountSection, setAccountSection] = useState(() => initialNav.accountSection || "profile");
+  const [selectedOrderForDetail, setSelectedOrderForDetail] = useState(() => initialNav.selectedOrderForDetail || null);
 
   // ── Cart & Wishlist ──
   const [cart, setCart] = useState(() => {
@@ -187,10 +204,69 @@ export default function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // ── Under-development page ──
-  const [underDevLabel, setUnderDevLabel] = useState("");
+  const [underDevLabel, setUnderDevLabel] = useState(() => initialNav.underDevLabel || "");
 
-  // Scroll to top on every page change
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [page, selectedCategory, selectedProduct]);
+  const hasMountedNavigationRef = useRef(false);
+  // Scroll to top on in-app navigation, but not on initial boot/refresh restore
+  useEffect(() => {
+    if (!hasMountedNavigationRef.current) {
+      hasMountedNavigationRef.current = true;
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page, selectedCategory, selectedProduct]);
+
+  const getViewKey = useCallback(
+    () =>
+      [
+        page || "home",
+        selectedCategory || "",
+        selectedProduct?._uid || selectedProduct?.id || "",
+        page === "account" ? accountSection || "" : "",
+        selectedOrderForDetail?.orderId || selectedOrderForDetail?.id || "",
+      ].join("|"),
+    [page, selectedCategory, selectedProduct, accountSection, selectedOrderForDetail]
+  );
+
+  useEffect(() => {
+    const navState = {
+      page,
+      selectedCategory,
+      selectedProduct,
+      checkoutData,
+      orderData,
+      accountSection,
+      selectedOrderForDetail,
+      underDevLabel,
+    };
+    localStorage.setItem(NAV_STATE_KEY, JSON.stringify(navState));
+  }, [page, selectedCategory, selectedProduct, checkoutData, orderData, accountSection, selectedOrderForDetail, underDevLabel]);
+
+  useEffect(() => {
+    const viewKey = getViewKey();
+    const saveScroll = () => {
+      const existing = readStoredJson(NAV_SCROLL_KEY, {}) || {};
+      existing[viewKey] = window.scrollY || 0;
+      localStorage.setItem(NAV_SCROLL_KEY, JSON.stringify(existing));
+    };
+
+    const restoreScroll = () => {
+      const saved = readStoredJson(NAV_SCROLL_KEY, {}) || {};
+      const y = Number(saved[viewKey] || 0);
+      if (y > 0) {
+        window.scrollTo({ top: y, behavior: "auto" });
+      }
+    };
+
+    const raf = window.requestAnimationFrame(restoreScroll);
+    const timer = window.setTimeout(restoreScroll, 240);
+    window.addEventListener("scroll", saveScroll, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", saveScroll);
+    };
+  }, [getViewKey, page, selectedCategory, selectedProduct, accountSection, selectedOrderForDetail, bootVisualReady]);
 
   // Sync orders from localStorage if updated elsewhere
   useEffect(() => {
@@ -231,7 +307,12 @@ export default function App() {
     
     // Initial state push
     if (!window.history.state) {
-      window.history.replaceState({ page: "home" }, "", "");
+      window.history.replaceState({
+        page: initialNav.page || "home",
+        cat: initialNav.selectedCategory || null,
+        prod: initialNav.selectedProduct || null,
+        accSec: initialNav.accountSection || null,
+      }, "", "");
     }
 
     return () => window.removeEventListener("popstate", handlePopState);
@@ -579,6 +660,7 @@ export default function App() {
 
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const wishlistCount = wishlist.length;
+  const refreshablePages = new Set(["home", "category", "product", "cart", "wishlist", "account"]);
 
   // ── Render current page ──
   const renderPage = () => {
@@ -889,6 +971,8 @@ export default function App() {
         notifications={notifications}
         markAllRead={markAllRead}
         clearNotifications={clearNotifications}
+        enablePullRefresh={refreshablePages.has(page)}
+        onPullRefresh={() => window.location.reload()}
       >
         <Suspense fallback={<PremiumPageLoader />}>
           {renderPage()}

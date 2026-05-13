@@ -306,6 +306,9 @@ export default function Header({
     language === "ke" ? "Unanunua kwa eneo hili" : "Shopping for this area";
   const locationBannerCopy =
     locationState?.fullAddress || locationState?.label || locationUi.unavailable;
+  const mobileLocationBarTitle =
+    language === "ke" ? "Inapeleka hadi" : "Delivering to";
+  const showMobileLocationBar = isHomePage && !drawerOpen && Boolean(locationState?.fullAddress || locationState?.label);
   const languageOptions = [
     { value: "en", label: "English" },
     { value: "ke", label: "Swahili" },
@@ -914,9 +917,21 @@ export default function Header({
             </div>
           </div>
         </div>
+
+        {showMobileLocationBar && (
+          <div className="mobile-location-status-bar">
+            <div className="mobile-location-status-icon">
+              <i className={`fas ${locationLoading ? "fa-spinner fa-spin" : "fa-location-dot"}`}></i>
+            </div>
+            <div className="mobile-location-status-copy">
+              <strong>{mobileLocationBarTitle}</strong>
+              <span>{locationBannerCopy}</span>
+            </div>
+          </div>
+        )}
       </div>
 
-      {(locationError || locationNotice) && !drawerOpen && (
+      {(locationError || (locationNotice && !showMobileLocationBar)) && !drawerOpen && (
         <div className={`nav-location-hint${locationNotice ? " success" : ""}`}>
           {locationError || locationNotice}
         </div>

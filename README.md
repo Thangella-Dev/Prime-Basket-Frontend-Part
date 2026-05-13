@@ -21,6 +21,9 @@ Primary production domain: `https://prime-basket.in`
 - Improved category-page desktop layering and tappable range-slider filter behavior
 - Same-origin web manifest values for local and production compatibility
 - Category-page search/filter runtime stabilization for desktop refine-panel interactions
+- App navigation and scroll persistence across browser refreshes
+- Mobile pull-to-refresh support for core shopping pages with a content-only refresh indicator
+- Premium mobile delivery-location bar under the header on home, replacing the raw detected-location text treatment
 
 ## Tech Stack
 

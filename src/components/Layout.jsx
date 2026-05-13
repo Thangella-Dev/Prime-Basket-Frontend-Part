@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -30,7 +30,77 @@ export default function Layout({
   clearNotifications,
   currentPage = "home",
   showFooter = true,
+  enablePullRefresh = false,
+  onPullRefresh,
 }) {
+  const shellRef = useRef(null);
+  const pullStateRef = useRef({ active: false, startY: 0, distance: 0 });
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    if (!enablePullRefresh) {
+      setPullDistance(0);
+      setIsRefreshing(false);
+      pullStateRef.current = { active: false, startY: 0, distance: 0 };
+    }
+  }, [enablePullRefresh]);
+
+  const maxPull = 88;
+  const triggerPull = 62;
+
+  const handleTouchStart = (event) => {
+    if (!enablePullRefresh || isRefreshing) return;
+    if (window.innerWidth > 768) return;
+    if ((window.scrollY || 0) > 0) return;
+    const touch = event.touches?.[0];
+    if (!touch) return;
+    pullStateRef.current = { active: true, startY: touch.clientY, distance: 0 };
+  };
+
+  const handleTouchMove = (event) => {
+    const state = pullStateRef.current;
+    if (!state.active || isRefreshing) return;
+    const touch = event.touches?.[0];
+    if (!touch) return;
+    const raw = touch.clientY - state.startY;
+    if (raw <= 0) {
+      setPullDistance(0);
+      state.distance = 0;
+      return;
+    }
+    if ((window.scrollY || 0) > 0) {
+      state.active = false;
+      setPullDistance(0);
+      return;
+    }
+    const damped = Math.min(maxPull, raw * 0.45);
+    state.distance = damped;
+    setPullDistance(damped);
+    event.preventDefault();
+  };
+
+  const endPull = async () => {
+    const state = pullStateRef.current;
+    if (!state.active) return;
+    const shouldRefresh = state.distance >= triggerPull && enablePullRefresh && !isRefreshing;
+    pullStateRef.current = { active: false, startY: 0, distance: 0 };
+
+    if (!shouldRefresh) {
+      setPullDistance(0);
+      return;
+    }
+
+    setIsRefreshing(true);
+    setPullDistance(triggerPull);
+    try {
+      await Promise.resolve(onPullRefresh?.());
+    } finally {
+      setPullDistance(0);
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <>
       <Header
@@ -56,7 +126,30 @@ export default function Layout({
         markAllRead={markAllRead}
         clearNotifications={clearNotifications}
       />
-      <main className="page-shell">{children}</main>
+      <main
+        ref={shellRef}
+        className={`page-shell${enablePullRefresh ? " page-shell-refreshable" : ""}`}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={endPull}
+        onTouchCancel={endPull}
+      >
+        {enablePullRefresh && (
+          <div
+            className={`page-pull-indicator${isRefreshing ? " refreshing" : ""}${pullDistance >= triggerPull ? " ready" : ""}`}
+            style={{ opacity: pullDistance > 0 || isRefreshing ? 1 : 0, transform: `translate(-50%, ${Math.max(-12, pullDistance - 26)}px)` }}
+            aria-hidden="true"
+          >
+            <i className={`fas ${isRefreshing ? "fa-spinner fa-spin" : "fa-rotate-right"}`}></i>
+          </div>
+        )}
+        <div
+          className="page-shell-content"
+          style={{ transform: enablePullRefresh ? `translateY(${pullDistance}px)` : undefined }}
+        >
+          {children}
+        </div>
+      </main>
       {showFooter && <Footer onNavigate={onFooterNavigate} language={language} region={region} wishlistCount={wishlistCount} onWishlistClick={onWishlistClick} />}
 
       <Suspense fallback={null}>
