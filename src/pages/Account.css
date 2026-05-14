@@ -277,7 +277,7 @@
 .account-confirm-overlay {
   position: fixed;
   inset: 0;
-  z-index: 3200;
+  z-index: 100000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2478,6 +2478,28 @@ body[data-theme="dark"] .faq-title {
 .account-detail-content .help-card,
 .account-detail-content .refunds-card {
   width: 100%;
+}
+
+body[data-theme="light"] .refunds-card h2,
+body[data-theme="light"] .wallet-history-copy strong,
+body[data-theme="light"] .rfd-demo-item strong,
+body[data-theme="light"] .rfd-demo-item p,
+body[data-theme="light"] .wallet-history-copy span {
+  color: #17324d !important;
+}
+
+body[data-theme="light"] .wallet-history-row,
+body[data-theme="light"] .rfd-demo-item,
+body[data-theme="light"] .wallet-tx {
+  border-color: rgba(203, 213, 225, 0.92) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,250,255,0.98)) !important;
+}
+
+body[data-theme="light"] .wallet-tx,
+body[data-theme="light"] .wallet-tx-row,
+body[data-theme="light"] .wallet-tx div,
+body[data-theme="light"] .wallet-tx strong {
+  color: #17324d !important;
 }
 
 .account-detail-content .account-content {

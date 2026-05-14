@@ -32,11 +32,16 @@ export default function Layout({
   showFooter = true,
   enablePullRefresh = false,
   onPullRefresh,
+  hideMobileGlassDock = false,
 }) {
   const shellRef = useRef(null);
   const pullStateRef = useRef({ active: false, startY: 0, distance: 0 });
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const showMobileGlassDock = ["home", "category", "product", "cart", "wishlist", "account"].includes(currentPage) && !hideMobileGlassDock;
+  const mobileDockBadge = (count) => (
+    count > 0 ? <span className="prime-mobile-dock-badge">{count > 99 ? "99+" : count}</span> : null
+  );
 
   useEffect(() => {
     if (!enablePullRefresh) {
@@ -128,6 +133,176 @@ export default function Layout({
 
   return (
     <>
+      <style>{`
+        .page-shell.has-mobile-glass-dock {
+          padding-bottom: 82px;
+        }
+        .prime-mobile-glass-dock {
+          position: fixed;
+          left: 50%;
+          bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+          transform: translateX(-50%);
+          width: min(88vw, 388px);
+          z-index: 99988;
+          display: none;
+          pointer-events: none;
+        }
+        .prime-mobile-glass-dock-shell {
+          pointer-events: auto;
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 2px;
+          padding: 5px;
+          border-radius: 20px;
+          border: 1px solid rgba(255,255,255,0.2);
+          background:
+            linear-gradient(135deg, rgba(255,255,255,0.36), rgba(255,255,255,0.16)),
+            linear-gradient(135deg, rgba(29,91,160,0.54), rgba(68,196,212,0.24));
+          box-shadow:
+            0 16px 34px rgba(10, 24, 48, 0.16),
+            inset 0 1px 0 rgba(255,255,255,0.22);
+          backdrop-filter: blur(20px) saturate(145%);
+          -webkit-backdrop-filter: blur(20px) saturate(145%);
+          animation: primeDockRise .38s cubic-bezier(.22,.9,.25,1);
+        }
+        .prime-mobile-dock-item {
+          position: relative;
+          border: none;
+          border-radius: 14px;
+          min-height: 46px;
+          padding: 5px 2px 4px;
+          background: transparent;
+          color: #174d8e;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          cursor: pointer;
+          font-family: inherit;
+          transition: transform .22s ease, color .22s ease, background .22s ease, box-shadow .22s ease;
+          overflow: hidden;
+        }
+        .prime-mobile-dock-item::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: 16px;
+          background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04));
+          opacity: 0;
+          transition: opacity .22s ease;
+        }
+        .prime-mobile-dock-item:hover,
+        .prime-mobile-dock-item:active {
+          transform: translateY(-2px) scale(1.01);
+        }
+        .prime-mobile-dock-item:hover::before,
+        .prime-mobile-dock-item:active::before,
+        .prime-mobile-dock-item.active::before {
+          opacity: 1;
+        }
+        .prime-mobile-dock-item.active {
+          color: #0f4e9d;
+          background: linear-gradient(180deg, rgba(255,255,255,0.48), rgba(233,242,255,0.24));
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28), 0 10px 20px rgba(10,24,48,0.1);
+        }
+        .prime-mobile-dock-item.active .prime-mobile-dock-icon {
+          transform: translateY(-1px) scale(1.04);
+          box-shadow: 0 8px 16px rgba(12, 39, 85, 0.12);
+        }
+        .prime-mobile-dock-icon {
+          position: relative;
+          width: 25px;
+          height: 25px;
+          border-radius: 9px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(255,255,255,0.22);
+          border: 1px solid rgba(255,255,255,0.2);
+          font-size: 11px;
+          transition: transform .22s ease, background .22s ease, box-shadow .22s ease;
+        }
+        .prime-mobile-dock-item.active .prime-mobile-dock-icon,
+        .prime-mobile-dock-item:hover .prime-mobile-dock-icon,
+        .prime-mobile-dock-item:active .prime-mobile-dock-icon {
+          background: rgba(255,255,255,0.34);
+        }
+        .prime-mobile-dock-label {
+          position: relative;
+          font-size: 8.2px;
+          font-weight: 800;
+          line-height: 1;
+          letter-spacing: 0.01em;
+          white-space: nowrap;
+        }
+        .prime-mobile-dock-badge {
+          position: absolute;
+          top: -5px;
+          right: -7px;
+          min-width: 16px;
+          height: 16px;
+          padding: 0 4px;
+          border-radius: 999px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #ff5b67, #ff7c8a);
+          color: #fff;
+          font-size: 8px;
+          font-weight: 900;
+          box-shadow: 0 8px 16px rgba(229, 62, 62, 0.28);
+          border: 1px solid rgba(255,255,255,0.6);
+        }
+        .prime-mobile-dock-user {
+          width: 16px;
+          height: 16px;
+          border-radius: 6px;
+          object-fit: cover;
+          box-shadow: 0 4px 10px rgba(10,24,48,0.16);
+        }
+        body[data-theme="dark"] .prime-mobile-glass-dock-shell {
+          border-color: rgba(116, 154, 219, 0.14);
+          background:
+            linear-gradient(135deg, rgba(15,27,44,0.72), rgba(8,16,30,0.56)),
+            linear-gradient(135deg, rgba(18,56,110,0.62), rgba(27,112,154,0.22));
+          box-shadow:
+            0 18px 38px rgba(0, 0, 0, 0.34),
+            inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        body[data-theme="dark"] .prime-mobile-dock-item {
+          color: rgba(220, 234, 255, 0.84);
+        }
+        body[data-theme="dark"] .prime-mobile-dock-item.active {
+          color: #ffffff;
+          background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
+          box-shadow: inset 0 0 0 1px rgba(174, 207, 255, 0.12), 0 10px 20px rgba(0,0,0,0.2);
+        }
+        body[data-theme="dark"] .prime-mobile-dock-icon {
+          background: rgba(255,255,255,0.07);
+          border-color: rgba(174, 207, 255, 0.08);
+        }
+        body[data-theme="light"] .prime-mobile-glass-dock-shell {
+          border-color: rgba(255,255,255,0.24);
+          background:
+            linear-gradient(135deg, rgba(255,255,255,0.46), rgba(255,255,255,0.2)),
+            linear-gradient(135deg, rgba(29,91,160,0.36), rgba(68,196,212,0.12));
+        }
+        @keyframes primeDockRise {
+          from { opacity: 0; transform: translate(-50%, 14px) scale(.96); }
+          to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+        @media (max-width: 768px) {
+          .prime-mobile-glass-dock {
+            display: block;
+          }
+        }
+        @media (min-width: 769px) {
+          .page-shell.has-mobile-glass-dock {
+            padding-bottom: 0;
+          }
+        }
+      `}</style>
       <Header
         onAccountClick={onAccountClick}
         isLoggedIn={isLoggedIn}
@@ -153,7 +328,7 @@ export default function Layout({
       />
       <main
         ref={shellRef}
-        className={`page-shell${enablePullRefresh ? " page-shell-refreshable" : ""}`}
+        className={`page-shell${enablePullRefresh ? " page-shell-refreshable" : ""}${showMobileGlassDock ? " has-mobile-glass-dock" : ""}`}
       >
         {enablePullRefresh && (
           <div
@@ -176,6 +351,64 @@ export default function Layout({
           {children}
         </div>
       </main>
+      {showMobileGlassDock && (
+        <nav className="prime-mobile-glass-dock" aria-label="Mobile navigation">
+          <div className="prime-mobile-glass-dock-shell">
+            <button
+              type="button"
+              className={`prime-mobile-dock-item${currentPage === "home" ? " active" : ""}`}
+              onClick={onLogoClick}
+            >
+              <span className="prime-mobile-dock-icon"><i className="fas fa-house"></i></span>
+              <span className="prime-mobile-dock-label">Home</span>
+            </button>
+            <button
+              type="button"
+              className={`prime-mobile-dock-item${currentPage === "category" ? " active" : ""}`}
+              onClick={() => onCategorySelect?.("all")}
+            >
+              <span className="prime-mobile-dock-icon"><i className="fas fa-table-cells-large"></i></span>
+              <span className="prime-mobile-dock-label">Categories</span>
+            </button>
+            <button
+              type="button"
+              className={`prime-mobile-dock-item${currentPage === "wishlist" ? " active" : ""}`}
+              onClick={onWishlistClick}
+            >
+              <span className="prime-mobile-dock-icon">
+                <i className="fas fa-heart"></i>
+                {mobileDockBadge(wishlistCount)}
+              </span>
+              <span className="prime-mobile-dock-label">Wishlist</span>
+            </button>
+            <button
+              type="button"
+              className={`prime-mobile-dock-item${currentPage === "cart" ? " active" : ""}`}
+              onClick={onCartClick}
+            >
+              <span className="prime-mobile-dock-icon">
+                <i className="fas fa-basket-shopping"></i>
+                {mobileDockBadge(cartCount)}
+              </span>
+              <span className="prime-mobile-dock-label">Basket</span>
+            </button>
+            <button
+              type="button"
+              className={`prime-mobile-dock-item${currentPage === "account" ? " active" : ""}`}
+              onClick={onAccountClick}
+            >
+              <span className="prime-mobile-dock-icon">
+                {isLoggedIn && user?.profileImage ? (
+                  <img className="prime-mobile-dock-user" src={user.profileImage} alt="Account" />
+                ) : (
+                  <i className="fas fa-user"></i>
+                )}
+              </span>
+              <span className="prime-mobile-dock-label">Account</span>
+            </button>
+          </div>
+        </nav>
+      )}
       {showFooter && <Footer onNavigate={onFooterNavigate} language={language} region={region} wishlistCount={wishlistCount} onWishlistClick={onWishlistClick} />}
 
       <Suspense fallback={null}>

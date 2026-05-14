@@ -80,6 +80,11 @@ Other important state is currently stored in the browser through `localStorage`,
 - SEO, crawler-discovery, sitemap, geo, and structured metadata are now aligned to the production domain
 - Public asset references are now route-safe, reducing broken-image risk on direct or nested entries
 - Homepage catalog sections now fail over faster to fallback data instead of remaining in long skeleton states during slow live fetches
+- Mobile glass bottom navigation is now integrated for key shopping/account flows with a lifted chatbot launcher and tighter dock sizing
+- Account flows now include safer logout confirmation and stricter wallet top-up amount handling
+- OTP verification UX now supports one-time-code autofill and smarter paste handling
+- Desktop account logout now uses the same visible confirmation behavior as mobile
+- The sign-in OTP flow now asks before auto-filling generated demo OTP values and presents the choice more clearly on mobile
 
 ## Current Limitations
 

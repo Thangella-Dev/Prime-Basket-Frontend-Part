@@ -43,6 +43,7 @@ export default function PhoneAuthModal({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [devOtp, setDevOtp] = useState("");
+  const [showGeneratedOtpPrompt, setShowGeneratedOtpPrompt] = useState(false);
 
   const baseUrl = apiBaseUrl || API_BASE_URL;
 
@@ -71,6 +72,7 @@ export default function PhoneAuthModal({
     setOtp("");
     setError("");
     setDevOtp("");
+    setShowGeneratedOtpPrompt(false);
     setSentPhone("");
     setShowDropdown(false);
   };
@@ -107,7 +109,13 @@ export default function PhoneAuthModal({
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || data.error || `HTTP ${response.status}`);
-      if (data.devOtp || data.otp) setDevOtp(data.devOtp || data.otp);
+      if (data.devOtp || data.otp) {
+        setDevOtp(data.devOtp || data.otp);
+        setShowGeneratedOtpPrompt(true);
+      } else {
+        setDevOtp("");
+        setShowGeneratedOtpPrompt(false);
+      }
       setSentPhone(phone);
       setStep("OTP");
     } catch (err) {
@@ -115,6 +123,7 @@ export default function PhoneAuthModal({
         try {
           const fallback = await sendDemoPhoneOtp({ phone, purpose: "LOGIN" });
           setDevOtp(fallback.otp || "");
+          setShowGeneratedOtpPrompt(Boolean(fallback.otp));
           setSentPhone(phone);
           setStep("OTP");
           setError("");
@@ -171,6 +180,37 @@ export default function PhoneAuthModal({
   };
 
   const handleBackToPhone = () => { setStep("PHONE"); setOtp(""); setError(""); setDevOtp(""); };
+  const fillGeneratedOtp = () => {
+    const normalizedOtp = String(devOtp || "").replace(/\D/g, "").slice(0, 6);
+    if (normalizedOtp.length === 6) {
+      setOtp(normalizedOtp);
+      setShowGeneratedOtpPrompt(false);
+    }
+  };
+
+  const handleOtpValue = (index, rawValue) => {
+    const digitsOnly = String(rawValue || "").replace(/\D/g, "");
+    if (!digitsOnly) {
+      setOtp((prev) => prev.slice(0, index) + prev.slice(index + 1));
+      return;
+    }
+
+    if (digitsOnly.length > 1) {
+      const merged = (otp.slice(0, index) + digitsOnly + otp.slice(index + digitsOnly.length)).slice(0, 6);
+      setOtp(merged);
+      const focusIndex = Math.min(5, index + digitsOnly.length - 1);
+      window.requestAnimationFrame(() => {
+        const target = document.getElementById(`otp-box-${focusIndex}`);
+        target?.focus();
+      });
+      return;
+    }
+
+    const next = (otp.slice(0, index) + digitsOnly + otp.slice(index + 1)).slice(0, 6);
+    setOtp(next);
+    const nb = document.getElementById(`otp-box-${index + 1}`);
+    if (nb) nb.focus();
+  };
 
   if (!isOpen) return null;
 
@@ -295,6 +335,46 @@ export default function PhoneAuthModal({
                 <div className="otp-sent-message">
                   {t.auth.otpSentTo} <strong>{sentPhone || fullPhone()}</strong>
                 </div>
+                {devOtp && showGeneratedOtpPrompt && (
+                  <div className="otp-choice-card">
+                    <div className="otp-choice-title">
+                      Use the generated OTP automatically?
+                    </div>
+                    <div className="otp-choice-actions">
+                      <button
+                        type="button"
+                        className="otp-choice-btn otp-choice-btn-primary"
+                        onClick={fillGeneratedOtp}
+                      >
+                        Auto Fill OTP
+                      </button>
+                      <button
+                        type="button"
+                        className="otp-choice-btn otp-choice-btn-secondary"
+                        onClick={() => setShowGeneratedOtpPrompt(false)}
+                      >
+                        Enter Manually
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  name="one-time-code"
+                  value={otp}
+                  onChange={(e) => handleOtpValue(0, e.target.value)}
+                  style={{
+                    position: "absolute",
+                    opacity: 0,
+                    pointerEvents: "none",
+                    width: 1,
+                    height: 1,
+                  }}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                />
 
                 {/* 6-box OTP entry like Amazon */}
                 <div className="otp-boxes">
@@ -304,20 +384,15 @@ export default function PhoneAuthModal({
                       id={`otp-box-${i}`}
                       type="text"
                       inputMode="numeric"
-                      maxLength={1}
+                      maxLength={i === 0 ? 6 : 1}
+                      autoComplete={i === 0 ? "one-time-code" : "off"}
+                      name={i === 0 ? "one-time-code" : `otp-${i}`}
                       className={`otp-box${otp[i] ? " filled" : ""}`}
                       value={otp[i] || ""}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/\D/g, "");
-                        if (!val) {
-                          setOtp(prev => prev.slice(0, i) + prev.slice(i + 1));
-                          return;
-                        }
-                        const next = (otp.slice(0, i) + val + otp.slice(i + 1)).slice(0, 6);
-                        setOtp(next);
-                        // Auto-focus next box
-                        const nb = document.getElementById(`otp-box-${i + 1}`);
-                        if (nb) nb.focus();
+                      onChange={(e) => handleOtpValue(i, e.target.value)}
+                      onPaste={(e) => {
+                        e.preventDefault();
+                        handleOtpValue(i, e.clipboardData.getData("text"));
                       }}
                       onKeyDown={(e) => {
                         if (e.key === "Backspace" && !otp[i]) {

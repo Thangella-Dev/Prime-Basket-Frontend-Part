@@ -236,7 +236,7 @@ export default function HeroSlider({ language = "en" }) {
 
         font-family:'Inter',sans-serif;
 
-        min-height:460px;
+        min-height:420px;
 
         touch-action:pan-y;
       }
@@ -272,11 +272,11 @@ export default function HeroSlider({ language = "en" }) {
         position:relative;
         z-index:2;
 
-        max-width:1180px;
+        max-width:1120px;
 
         margin:auto;
 
-        min-height:460px;
+        min-height:420px;
 
         display:grid;
 
@@ -286,7 +286,7 @@ export default function HeroSlider({ language = "en" }) {
 
         gap:10px;
 
-        padding:26px 34px 62px;
+        padding:22px 30px 54px;
       }
 
       /* ========================= */

@@ -149,7 +149,7 @@ export default function ProductCard({
     <>
       <div className="unit-modal-header">
         <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
-          <img src={p.imageUrl} alt={p.name} style={{ width: 44, height: 44, objectFit: "contain", borderRadius: 8, background: "#f8f9fa", padding: 4 }} />
+          <img src={p.imageUrl} alt={p.name} loading="lazy" decoding="async" style={{ width: 44, height: 44, objectFit: "contain", borderRadius: 8, background: "#f8f9fa", padding: 4 }} />
           <div>
             <h3 style={{ fontSize: 16, fontWeight: 800, color: "#253d4e", margin: 0 }}>{t.product.selectQuantity || "Select Quantity"}</h3>
             <p style={{ fontSize: 12, color: "#64748b", margin: 0 }}>{translatedName}</p>
@@ -246,7 +246,7 @@ export default function ProductCard({
 
       {/* Product Image */}
       <div className="pimg-v2">
-        <img src={p.imageUrl} alt={p.name} loading="lazy" />
+        <img src={p.imageUrl} alt={p.name} loading="lazy" decoding="async" />
       </div>
 
       {/* Content */}

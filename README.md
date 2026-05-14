@@ -32,6 +32,15 @@ Primary production domain: `https://prime-basket.in`
 - Desktop home-category sidebar now has an internal scroll area with a fuller category list instead of ending early with empty space
 - Home `Deals Of The Day` now supports a denser 3-column mobile layout and pads to six cards when the available deal pool is smaller
 - Cart removal/decrement actions now clear top-right cart feedback immediately when the removed item no longer exists in cart
+- Mobile glass bottom navigation is now smaller, theme-aware, and visually better integrated with the app shell
+- Mobile chatbot launcher now sits above the bottom dock instead of colliding with it
+- Mobile header actions are rebalanced so `Browse All Categories` stays readable while search remains accessible
+- Account logout now routes through a confirmation dialog across mobile and desktop account flows
+- Desktop `My Account` logout now correctly renders its confirmation dialog instead of failing silently
+- Wallet top-up now requires a valid numeric amount before users can continue
+- OTP verification now supports one-time-code autofill and smarter multi-digit paste behavior
+- Generated demo/dev OTP values can now be used through an explicit auto-fill choice in the sign-in flow
+- The OTP verification modal now uses a cleaner mobile-friendly choice card for `Auto Fill OTP` versus `Enter Manually`
 
 ## Tech Stack
 
@@ -105,6 +114,10 @@ What is already strong:
 - Better dark-mode coverage across shared navigation and key account flows
 - More polished checkout presentation and order-review flow
 - More stable overlay/modal behavior in cart and account flows
+- Better mobile bottom-dock/chatbot spacing and interaction
+- Stronger account logout, wallet-entry, and OTP verification behavior
+- Better desktop account confirmation visibility and light-mode wallet readability
+- Reduced auth bootstrapping overhead and added more lazy image decoding in shared UI surfaces
 
 What still needs work:
 
@@ -164,6 +177,11 @@ What still needs work:
 - Stabilized quantity modal close behavior so outside taps dismiss the modal without accidentally opening the product page
 - Refined mobile category sticky header/chip behavior and improved desktop account layout with a left navigation rail
 - Added curved-square account avatar presentation inside the mobile side menu account card
+- Added a glassmorphism bottom-dock navigation pattern for mobile home, category, product, cart, wishlist, and account flows
+- Refined mobile dock sizing, chatbot spacing, and lower header action balance after visual QA
+- Moved account logout through a confirmation dialog in mobile account-card navigation too
+- Tightened wallet amount entry rules and improved wallet/refund light-mode readability
+- Added OTP autofill and paste-friendly segmented verification handling
 
 ## Backend Attachment Direction
 
@@ -184,7 +202,7 @@ Detailed backend guidance is available in [docs/BACKEND_INTEGRATION_GUIDE.md](./
 See the `docs` folder for detailed project documentation:
 
 - [Manager Mail Update](./docs/Mail_Update.md)
-- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-13.md)
+- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-14.md)
 - [Application Overview](./docs/APPLICATION_OVERVIEW.md)
 - [Tech Stack and Architecture](./docs/TECH_STACK_AND_ARCHITECTURE.md)
 - [Backend Integration Guide](./docs/BACKEND_INTEGRATION_GUIDE.md)
@@ -197,5 +215,7 @@ See the `docs` folder for detailed project documentation:
 - Category browsing, cart-item layout, shared product-card density, and all-products mode were updated and revalidated in the latest pass
 - A focused code audit pass was completed on checkout, modal behavior, cart merging, chatbot currency handling, related-product/detail flows, and deployment-safe product-page behavior
 - Mobile category filter popup mounting, pull-to-refresh behavior, and malformed image URL handling were stabilized in the latest pass
+- Mobile dock/chatbot overlap, account logout confirmation, wallet amount validation, and OTP autofill behavior were improved in the latest pass
+- Desktop logout confirmation rendering and OTP modal choice-card UI were finalized in the latest pass
 - The app is suitable as a strong frontend demo/prototype
 - Final device-lab/browser QA and backend completion are still recommended before production use

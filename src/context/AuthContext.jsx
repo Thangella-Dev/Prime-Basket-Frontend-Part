@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 import React, { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext();
@@ -7,7 +6,6 @@ export function clearAuthStorage() {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
-  // Clear all user-specific data on logout
   localStorage.removeItem("pb_cart");
   localStorage.removeItem("pb_orders");
   localStorage.removeItem("pb_notifications");
@@ -24,11 +22,9 @@ export function clearAuthStorage() {
   localStorage.removeItem("wallet");
 }
 
-// Reads + validates session synchronously at call time.
-// Called as a useState initializer so it runs exactly once before the first render.
 function readSession() {
   try {
-    const token     = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const savedUser = localStorage.getItem("user");
 
     if (!token || !savedUser || savedUser === "undefined" || savedUser === "null") {
@@ -50,26 +46,23 @@ function readSession() {
 }
 
 export function AuthProvider({ children }) {
-  // Initialize synchronously — no useEffect, no flash on mount
-  const [isAuthenticated, setIsAuthenticated] = useState(() => readSession().isAuthenticated);
-  const [user, setUser]                       = useState(() => readSession().user);
+  const [session, setSession] = useState(readSession);
+  const { isAuthenticated, user } = session;
 
   const login = (userData, tokens) => {
-    setIsAuthenticated(true);
-    setUser(userData);
+    setSession({ isAuthenticated: true, user: userData });
     localStorage.setItem("user", JSON.stringify(userData));
-    if (tokens?.accessToken)  localStorage.setItem("accessToken",  tokens.accessToken);
+    if (tokens?.accessToken) localStorage.setItem("accessToken", tokens.accessToken);
     if (tokens?.refreshToken) localStorage.setItem("refreshToken", tokens.refreshToken);
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
+    setSession({ isAuthenticated: false, user: null });
     clearAuthStorage();
   };
 
   const updateUser = (userData) => {
-    setUser(userData);
+    setSession((prev) => ({ ...prev, user: userData }));
     localStorage.setItem("user", JSON.stringify(userData));
   };
 

@@ -169,11 +169,14 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
   const shouldOpenInitialDetail = initialSection && initialSection !== "profile";
   const [section, setSection] = useState(shouldOpenInitialDetail ? initialSection : "profile");
   const [viewMode, setViewMode] = useState(shouldOpenInitialDetail ? "detail" : "menu");
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const walletSectionLabel = language === "ke" ? "Pochi yangu" : "My Wallet";
 
   const menuItems = useMemo(() => ([
     { key: "profile", icon: "fa-user", label: t.account.profile, subtitle: "Manage your personal details" },
     { key: "orders", icon: "fa-box", label: t.account.orders, subtitle: "Track and manage your purchases" },
     { key: "refunds", icon: "fa-rotate-left", label: t.account.myRefunds, subtitle: "Review returns and refund requests" },
+    { key: "wallet", icon: "fa-wallet", label: walletSectionLabel, subtitle: "Add money, check balance, and review wallet activity" },
     { key: "addresses", icon: "fa-location-dot", label: t.account.addresses, subtitle: "Saved delivery locations" },
     { key: "giftcards", icon: "fa-gift", label: t.account.giftCards, subtitle: "Rewards, balances, and gift cards" },
     { key: "notifications", icon: "fa-bell", label: t.header.notifications, subtitle: "Latest alerts and updates" },
@@ -186,6 +189,7 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
     profile: { title: t.account.profile, subtitle: "Update your profile, phone, and email details." },
     orders: { title: t.account.orders, subtitle: "See placed orders, reorder items, and rate deliveries." },
     refunds: { title: t.account.myRefunds, subtitle: "Track refunds, return progress, and request updates." },
+    wallet: { title: walletSectionLabel, subtitle: "Add money to your wallet, track balance, and review wallet credits." },
     addresses: { title: t.account.addresses, subtitle: "Manage saved delivery addresses and location details." },
     giftcards: { title: t.account.giftCards, subtitle: "Handle rewards, promo balances, and gift card activity." },
     notifications: { title: t.header.notifications, subtitle: "Review recent account, order, and offer notifications." },
@@ -211,7 +215,7 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
 
   const openSection = (nextSection) => {
     if (nextSection === "logout") {
-      handleLogout();
+      setLogoutConfirmOpen(true);
       return;
     }
     setSection(nextSection);
@@ -244,6 +248,7 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
       {section === "orders" && <OrdersSection orders={propOrders} t={t} currSym={currSym} onOrderSummary={onOrderSummary} onRateOrder={onRateOrder} onOrderAgain={onOrderAgain} onDeleteOrder={onDeleteOrder} language={language} />}
       {section === "addresses" && <AddressSection t={t} language={language} region={region} />}
       {section === "refunds" && <RefundsDemoSection t={t} currSym={currSym} region={region} language={language} />}
+      {section === "wallet" && <WalletSection t={t} currSym={currSym} region={region} language={language} />}
       {section === "giftcards" && <GiftCardsSection t={t} currSym={currSym} language={language} />}
       {section === "notifications" && <NotificationsSection t={t} language={language} notifications={notifications} onClearNotifications={onClearNotifications} />}
       {section === "payments" && <PaymentsSection t={t} region={region} language={language} />}
@@ -253,63 +258,79 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
 
   if (isDesktopLayout) {
     return (
-      <div className="account-container account-desktop-layout">
-        <aside className="account-sidebar">
-          <div className="account-sidebar-header">
-            <div className="account-title-row">
-              <h2>{t.account.title}</h2>
-              <button type="button" className="account-back-btn account-home-btn account-desktop-home" onClick={onGoHome}>
-                <i className="fas fa-house"></i>
-                <span>{t.cart?.breadcrumbHome || "Home"}</span>
-              </button>
+      <>
+        <div className="account-container account-desktop-layout">
+          <aside className="account-sidebar">
+            <div className="account-sidebar-header">
+              <div className="account-title-row">
+                <h2>{t.account.title}</h2>
+                <button type="button" className="account-back-btn account-home-btn account-desktop-home" onClick={onGoHome}>
+                  <i className="fas fa-house"></i>
+                  <span>{t.cart?.breadcrumbHome || "Home"}</span>
+                </button>
+              </div>
+              <p className="account-sidebar-subtitle">
+                {user?.name ? `${user.name.split(" ")[0]}, manage everything from one place.` : "Manage everything from one place."}
+              </p>
             </div>
-            <p className="account-sidebar-subtitle">
-              {user?.name ? `${user.name.split(" ")[0]}, manage everything from one place.` : "Manage everything from one place."}
-            </p>
-          </div>
 
-          <div className="account-menu">
-            {menuItems.map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                className={`account-item${section === item.key ? " active" : ""}${item.tone === "logout" ? " logout" : ""}`}
-                onClick={() => {
-                  if (item.key === "logout") {
-                    handleLogout();
-                    return;
-                  }
-                  setSection(item.key);
-                  onSectionChange && onSectionChange(item.key);
-                }}
-              >
-                <i className={`fas ${item.icon}`}></i>
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </aside>
+            <div className="account-menu">
+              {menuItems.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  className={`account-item${section === item.key ? " active" : ""}${item.tone === "logout" ? " logout" : ""}`}
+                  onClick={() => {
+                    if (item.key === "logout") {
+                      setLogoutConfirmOpen(true);
+                      return;
+                    }
+                    setSection(item.key);
+                    onSectionChange && onSectionChange(item.key);
+                  }}
+                >
+                  <i className={`fas ${item.icon}`}></i>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </aside>
 
-        <main className="account-content">
-          <div className="account-desktop-panel">
-            <div className="account-desktop-panel-head">
-              <div className="account-menu-eyebrow">{t.account.title}</div>
-              <h2>{sectionMeta[section]?.title || t.account.title}</h2>
-              <p>{sectionMeta[section]?.subtitle || "Manage your account section details."}</p>
+          <main className="account-content">
+            <div className="account-desktop-panel">
+              <div className="account-desktop-panel-head">
+                <div className="account-menu-eyebrow">{t.account.title}</div>
+                <h2>{sectionMeta[section]?.title || t.account.title}</h2>
+                <p>{sectionMeta[section]?.subtitle || "Manage your account section details."}</p>
+              </div>
+              <div className="account-detail-content">
+                {renderSectionContent()}
+              </div>
             </div>
-            <div className="account-detail-content">
-              {renderSectionContent()}
-            </div>
-          </div>
-        </main>
-      </div>
+          </main>
+        </div>
+        <ConfirmDialog
+          open={logoutConfirmOpen}
+          title={language === "ke" ? "Una uhakika unataka kutoka?" : "Are you sure you want to log out?"}
+          message={language === "ke" ? "Utatoka kwenye akaunti hii na utahitaji kuingia tena ili kufikia maelezo yako." : "You will be signed out of this account and will need to sign in again to access your details."}
+          confirmLabel={language === "ke" ? "Toka" : "Log out"}
+          cancelLabel={language === "ke" ? "Ghairi" : "Cancel"}
+          tone="danger"
+          onConfirm={() => {
+            setLogoutConfirmOpen(false);
+            handleLogout();
+          }}
+          onClose={() => setLogoutConfirmOpen(false)}
+        />
+      </>
     );
   }
 
   return (
-    <div className={`account-container reveal ${viewMode === "detail" ? "detail-open" : "menu-open"}`}>
-      {viewMode === "menu" ? (
-        <div className="account-menu-stage">
+    <>
+      <div className={`account-container reveal ${viewMode === "detail" ? "detail-open" : "menu-open"}`}>
+        {viewMode === "menu" ? (
+          <div className="account-menu-stage">
           <div className="account-menu-hero">
             <div className="account-title-row">
               <div className="account-menu-eyebrow">{t.account.title}</div>
@@ -341,9 +362,9 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
               </button>
             ))}
           </div>
-        </div>
-      ) : (
-        <div className="account-detail-stage">
+          </div>
+        ) : (
+          <div className="account-detail-stage">
           <div className="account-detail-bar">
             <div className="account-detail-actions">
               <button type="button" className="account-back-btn" onClick={backToMenu}>
@@ -367,9 +388,23 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
           <div className="account-detail-content">
             {renderSectionContent()}
           </div>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+      <ConfirmDialog
+        open={logoutConfirmOpen}
+        title={language === "ke" ? "Una uhakika unataka kutoka?" : "Are you sure you want to log out?"}
+        message={language === "ke" ? "Utatoka kwenye akaunti hii na utahitaji kuingia tena ili kufikia maelezo yako." : "You will be signed out of this account and will need to sign in again to access your details."}
+        confirmLabel={language === "ke" ? "Toka" : "Log out"}
+        cancelLabel={language === "ke" ? "Ghairi" : "Cancel"}
+        tone="danger"
+        onConfirm={() => {
+          setLogoutConfirmOpen(false);
+          handleLogout();
+        }}
+        onClose={() => setLogoutConfirmOpen(false)}
+      />
+    </>
   );
 }
 
@@ -464,6 +499,8 @@ function Profile({ user, updateUser, t, language = "en", region = "in" }) {
               src={photo || displayPhoto}
               alt="Profile"
               className="profile-photo"
+              loading="lazy"
+              decoding="async"
             />
           ) : (
             <div className="profile-photo profile-photo-fallback">
@@ -899,7 +936,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
             </div>
             <div className="ret-body">
               <div className="ret-summary">
-                {returnModal.item?.imageUrl && <img src={returnModal.item.imageUrl} alt={getTranslatedName(returnModal.item?.name)} />}
+                {returnModal.item?.imageUrl && <img src={returnModal.item.imageUrl} alt={getTranslatedName(returnModal.item?.name)} loading="lazy" decoding="async" />}
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontWeight: 800, color: "#253d4e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{getTranslatedName(returnModal.item?.name) || "Order item"}</div>
                   <div style={{ color: "#64748b", fontSize: 12, marginTop: 3 }}>Refund amount: <strong>{currSym}{returnModal.amount.toFixed(2)}</strong></div>
@@ -1067,7 +1104,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
                 <div className="ord-thumbs">
                   {itemsPreview.map((item, j) => (
                     <div key={item._uid || j} className="ord-thumb">
-                      <img src={item.image || item.imageUrl} alt={getTranslatedName(item.name)} />
+                      <img src={item.image || item.imageUrl} alt={getTranslatedName(item.name)} loading="lazy" decoding="async" />
                     </div>
                   ))}
                   {extraCount > 0 && (
@@ -1095,7 +1132,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
                     return (
                       <div key={makeOrderItemId(order, item, itemIndex)} className="ord-line-item">
                         <div className="ord-line-img">
-                          {(item.image || item.imageUrl) ? <img src={item.image || item.imageUrl} alt={itemName} /> : <i className="fas fa-box" style={{ color: "#94a3b8" }}></i>}
+                          {(item.image || item.imageUrl) ? <img src={item.image || item.imageUrl} alt={itemName} loading="lazy" decoding="async" /> : <i className="fas fa-box" style={{ color: "#94a3b8" }}></i>}
                         </div>
                         <div style={{ minWidth: 0 }}>
                           <div className="ord-line-name">{itemName}</div>
@@ -1318,11 +1355,17 @@ function AddBalanceModal({ isOpen, onClose, currSym, region, t, onSuccess }) {
   const [error, setError] = useState("");
 
   const predefinedAmounts = [100, 200, 1000];
+  const numericAmount = Number.parseFloat(amount);
+  const hasValidAmount = Number.isFinite(numericAmount) && numericAmount > 0 && numericAmount <= 100000;
 
   const handleTopUp = () => {
-    const numAmount = Number(amount);
-    if (!numAmount || numAmount <= 0) {
+    const numAmount = Number.parseFloat(amount);
+    if (!Number.isFinite(numAmount) || numAmount <= 0) {
       setError("Please enter a valid amount.");
+      return;
+    }
+    if (numAmount > 100000) {
+      setError("Amount cannot exceed 100000 in a single top-up.");
       return;
     }
 
@@ -1367,9 +1410,15 @@ function AddBalanceModal({ isOpen, onClose, currSym, region, t, onSuccess }) {
             <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", fontWeight: 700, color: "#253d4e" }}>{currSym}</span>
             <input 
               type="number" 
+              inputMode="decimal"
+              min="1"
+              step="0.01"
               value={amount}
               onChange={(e) => {
-                setAmount(e.target.value);
+                const sanitized = e.target.value
+                  .replace(/[^\d.]/g, "")
+                  .replace(/^(\d*\.?\d{0,2}).*$/, "$1");
+                setAmount(sanitized);
                 if (error) setError("");
               }}
               placeholder="0.00"
@@ -1436,12 +1485,12 @@ function AddBalanceModal({ isOpen, onClose, currSym, region, t, onSuccess }) {
 
         <button 
           onClick={handleTopUp}
-          disabled={isProcessing || !amount}
+          disabled={isProcessing || !hasValidAmount}
           style={{
             width: "100%", padding: "16px", background: "#1d5ba0", color: "white",
             border: "none", borderRadius: "12px", fontSize: "1rem", fontWeight: 800,
             cursor: isProcessing ? "not-allowed" : "pointer",
-            opacity: isProcessing || !amount ? 0.7 : 1,
+            opacity: isProcessing || !hasValidAmount ? 0.7 : 1,
             display: "flex", alignItems: "center", justifyContent: "center", gap: "10px"
           }}
         >
@@ -1450,7 +1499,7 @@ function AddBalanceModal({ isOpen, onClose, currSym, region, t, onSuccess }) {
               <i className="fas fa-spinner fa-spin"></i> Processing...
             </>
           ) : (
-            `Add ${currSym}${amount || "0"}`
+            `Add ${currSym}${hasValidAmount ? numericAmount.toFixed(2) : "0.00"}`
           )}
         </button>
 
@@ -1469,25 +1518,21 @@ function AddBalanceModal({ isOpen, onClose, currSym, region, t, onSuccess }) {
 
 /* ─── Refunds & Wallet Component ─────────────────────────────────── */
 
-function RefundsDemoSection({ t, currSym, region }) {
-  const [refunds, setRefunds] = useState(loadRefundRequests);
+function WalletSection({ t, currSym, region, language = "en" }) {
   const [wallet, setWallet] = useState(loadWallet);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
-    const syncRefunds = () => setRefunds(loadRefundRequests());
     const syncWallet = () => setWallet(loadWallet());
-    window.addEventListener("refund-requests-updated", syncRefunds);
     window.addEventListener("wallet-updated", syncWallet);
-    window.addEventListener("storage", syncRefunds);
     window.addEventListener("storage", syncWallet);
     return () => {
-      window.removeEventListener("refund-requests-updated", syncRefunds);
       window.removeEventListener("wallet-updated", syncWallet);
-      window.removeEventListener("storage", syncRefunds);
       window.removeEventListener("storage", syncWallet);
     };
   }, []);
+
+  const topWalletTransactions = (wallet.transactions || []).slice(0, 6);
 
   return (
     <div className="refunds-card">
@@ -1499,6 +1544,110 @@ function RefundsDemoSection({ t, currSym, region }) {
         .wallet-balance { font-size:30px; font-weight:900; font-family:'Quicksand',sans-serif; margin-top:4px; }
         .wallet-tx { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.22); border-radius:12px; padding:10px 12px; min-width:220px; }
         .wallet-tx-row { display:flex; justify-content:space-between; gap:14px; font-size:12px; padding:4px 0; }
+        .wallet-history { margin-top: 18px; display: grid; gap: 12px; }
+        .wallet-history-row { display:flex; justify-content:space-between; gap:16px; align-items:center; padding:14px 16px; border:1px solid #ececec; border-radius:14px; background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(247,250,255,0.98)); }
+        .wallet-history-copy { min-width:0; display:grid; gap:4px; }
+        .wallet-history-copy strong { color:#253d4e; }
+        .wallet-history-copy span { color:#64748b; font-size:12px; }
+        .wallet-history-amount { color:#1d5ba0; font-weight:900; font-size:15px; white-space:nowrap; }
+        @media(max-width:700px){ .wallet-card{ flex-direction:column; align-items:flex-start; } .wallet-tx{ width:100%; } .wallet-history-row{ flex-direction:column; align-items:flex-start; } }
+      `}</style>
+      <h2 style={{ display: "flex", alignItems: "center", gap: "10px", color: "#17324d" }}>
+        <i className="fas fa-wallet" style={{ color: "#1d5ba0" }}></i> {language === "ke" ? "Pochi yangu" : "My Wallet"}
+      </h2>
+      <div className="wallet-card">
+        <div>
+          <div style={{ opacity: .85, fontWeight: 800, fontSize: 13 }}>{language === "ke" ? "Salio la Prime-Basket" : "Prime-Basket Wallet"}</div>
+          <div className="wallet-balance">{currSym}{Number(wallet.balance || 0).toFixed(2)}</div>
+          <div style={{ opacity: .86, fontSize: 12, marginTop: 4, color: "rgba(255,255,255,0.96)" }}>
+            {language === "ke" ? "Ongeza pesa kwa pochi yako kwa malipo ya haraka na uhifadhi salio lako hapa." : "Add money to your wallet for faster checkout and keep your balance ready here."}
+          </div>
+          <button className="wallet-add-btn" onClick={() => setIsAddModalOpen(true)}>
+            <i className="fas fa-plus-circle"></i> {language === "ke" ? "Ongeza pesa" : "Add Money"}
+          </button>
+        </div>
+        <div className="wallet-tx">
+          <div style={{ fontSize: 12, fontWeight: 900, marginBottom: 4, color: "rgba(255,255,255,0.98)" }}>{language === "ke" ? "Muhtasari wa hivi karibuni" : "Recent wallet activity"}</div>
+          {topWalletTransactions.length === 0 ? (
+            <div style={{ fontSize: 12, opacity: .75 }}>{language === "ke" ? "Hakuna miamala ya pochi bado." : "No wallet transactions yet."}</div>
+          ) : (
+            topWalletTransactions.slice(0, 3).map((tx) => (
+              <div key={tx.requestId} className="wallet-tx-row">
+                <span>{tx.orderId || "Wallet Top-up"}</span>
+                <strong>+{currSym}{Number(tx.amount || 0).toFixed(2)}</strong>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <AddBalanceModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        currSym={currSym}
+        region={region}
+        t={t}
+        onSuccess={(amount, method) => {
+          const updatedWallet = {
+            balance: Number(wallet.balance || 0) + amount,
+            transactions: [
+              {
+                requestId: "TOPUP" + Date.now().toString().slice(-4),
+                orderId: language === "ke" ? "Ongezeko la pochi" : "Wallet Top-up",
+                amount,
+                date: new Date().toLocaleDateString(),
+                status: "Completed",
+                method,
+              },
+              ...(wallet.transactions || []),
+            ],
+          };
+          saveWallet(updatedWallet);
+          setWallet(updatedWallet);
+          window.dispatchEvent(new Event("wallet-updated"));
+          setIsAddModalOpen(false);
+        }}
+      />
+
+      <div className="wallet-history">
+        {topWalletTransactions.length === 0 ? (
+          <EmptySectionState
+            icon="fa-wallet"
+            title={language === "ke" ? "Hakuna shughuli za pochi bado" : "No wallet activity yet"}
+            description={language === "ke" ? "Ongeza pesa au subiri marejesho ya wallet yaonekane hapa." : "Add money or wait for wallet refunds to show up here."}
+          />
+        ) : (
+          topWalletTransactions.map((tx) => (
+            <div key={tx.requestId} className="wallet-history-row">
+              <div className="wallet-history-copy">
+                <strong>{tx.orderId || (language === "ke" ? "Ongezeko la pochi" : "Wallet Top-up")}</strong>
+                <span>{tx.date} · {tx.method || (language === "ke" ? "Mkopo" : "Credit")}</span>
+              </div>
+              <div className="wallet-history-amount">+{currSym}{Number(tx.amount || 0).toFixed(2)}</div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function RefundsDemoSection({ t, currSym, region }) {
+  const [refunds, setRefunds] = useState(loadRefundRequests);
+
+  useEffect(() => {
+    const syncRefunds = () => setRefunds(loadRefundRequests());
+    window.addEventListener("refund-requests-updated", syncRefunds);
+    window.addEventListener("storage", syncRefunds);
+    return () => {
+      window.removeEventListener("refund-requests-updated", syncRefunds);
+      window.removeEventListener("storage", syncRefunds);
+    };
+  }, []);
+
+  return (
+    <div className="refunds-card">
+      <style>{`
         .rfd-demo-item { border:1px solid #ececec; border-radius:12px; padding:16px; margin-bottom:12px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:start; }
         .rfd-demo-product { display:flex; gap:12px; min-width:0; }
         .rfd-demo-img { width:52px; height:52px; border-radius:10px; border:1px solid #edf2f7; background:#fafafa; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
@@ -1513,62 +1662,11 @@ function RefundsDemoSection({ t, currSym, region }) {
         .rfd-step.done,.rfd-step.active { color:#1d5ba0; }
         .rfd-step.done .rfd-step-dot { background:#16a34a; }
         .rfd-step.active .rfd-step-dot { background:#1d5ba0; animation:pulse 1.2s infinite; }
-        @media(max-width:700px){ .rfd-demo-item{ grid-template-columns:1fr; } .wallet-card{ flex-direction:column; align-items:flex-start; } .wallet-tx{ width:100%; } }
+        @media(max-width:700px){ .rfd-demo-item{ grid-template-columns:1fr; } }
       `}</style>
-      <h2 style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <h2 style={{ display: "flex", alignItems: "center", gap: "10px", color: "#17324d" }}>
         <i className="fas fa-undo" style={{ color: "#1d5ba0" }}></i> {t.account.myRefunds}
       </h2>
-      <div className="wallet-card">
-        <div>
-          <div style={{ opacity: .85, fontWeight: 800, fontSize: 13 }}>Prime-Basket Wallet</div>
-          <div className="wallet-balance">{currSym}{Number(wallet.balance || 0).toFixed(2)}</div>
-          <div style={{ opacity: .78, fontSize: 12, marginTop: 4 }}>Completed wallet refunds are credited here instantly.</div>
-          <button className="wallet-add-btn" onClick={() => setIsAddModalOpen(true)}>
-            <i className="fas fa-plus-circle"></i> Add Balance
-          </button>
-        </div>
-        <div className="wallet-tx">
-          <div style={{ fontSize: 12, fontWeight: 900, marginBottom: 4 }}>Recent wallet credits</div>
-          {(wallet.transactions || []).slice(0, 3).length === 0 ? (
-            <div style={{ fontSize: 12, opacity: .75 }}>No wallet transactions yet.</div>
-          ) : (
-            (wallet.transactions || []).slice(0, 3).map(tx => (
-              <div key={tx.requestId} className="wallet-tx-row">
-                <span>#{tx.orderId}</span>
-                <strong>+{currSym}{Number(tx.amount || 0).toFixed(2)}</strong>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      <AddBalanceModal 
-        isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)} 
-        currSym={currSym}
-        region={region}
-        t={t}
-        onSuccess={(amount, method) => {
-          const updatedWallet = {
-            balance: Number(wallet.balance || 0) + amount,
-            transactions: [
-              {
-                requestId: "TOPUP" + Date.now().toString().slice(-4),
-                orderId: "Wallet Top-up",
-                amount: amount,
-                date: new Date().toLocaleDateString(),
-                status: "Completed",
-                method: method
-              },
-              ...(wallet.transactions || [])
-            ]
-          };
-          saveWallet(updatedWallet);
-          setWallet(updatedWallet);
-          window.dispatchEvent(new Event("wallet-updated"));
-          setIsAddModalOpen(false);
-        }}
-      />
 
       <div className="refunds-list" style={{ marginTop: "20px" }}>
         {refunds.length === 0 ? (
@@ -1585,7 +1683,7 @@ function RefundsDemoSection({ t, currSym, region }) {
               <div key={rfd.id} className="rfd-demo-item">
                 <div className="rfd-demo-product">
                   <div className="rfd-demo-img">
-                    {(rfd.image || rfd.productImage) ? <img src={rfd.image || rfd.productImage} alt={rfd.productName} /> : <i className="fas fa-box" style={{ color: "#94a3b8" }}></i>}
+                    {(rfd.image || rfd.productImage) ? <img src={rfd.image || rfd.productImage} alt={rfd.productName} loading="lazy" decoding="async" /> : <i className="fas fa-box" style={{ color: "#94a3b8" }}></i>}
                   </div>
                   <div style={{ minWidth: 0 }}>
                     <strong style={{ color: "#253d4e" }}>{rfd.productName || "Order item"}</strong>

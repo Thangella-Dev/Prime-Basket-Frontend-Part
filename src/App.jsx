@@ -70,6 +70,7 @@ export default function App() {
   const { startTracking, activeOrder, completedOrder, setCompletedOrder } = useTracking();
   const [bootVisualReady, setBootVisualReady] = useState(false);
   const [refreshSignal, setRefreshSignal] = useState(0);
+  const [hideMobileGlassDock, setHideMobileGlassDock] = useState(false);
   const initialNavRef = useRef(null);
   if (initialNavRef.current === null) {
     initialNavRef.current = readStoredJson(NAV_STATE_KEY, {});
@@ -188,6 +189,12 @@ export default function App() {
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute("content", theme === "dark" ? "#08111f" : "#1f5ca1");
   }, [theme]);
+
+  useEffect(() => {
+    if (page !== "category" && hideMobileGlassDock) {
+      setHideMobileGlassDock(false);
+    }
+  }, [hideMobileGlassDock]);
 
 
   // ── Navigation state ──
@@ -954,6 +961,7 @@ export default function App() {
           language={language}
           region={region}
           refreshSignal={refreshSignal}
+          onMobileOverlayChange={setHideMobileGlassDock}
         />
       );
     }
@@ -1047,6 +1055,7 @@ export default function App() {
         clearNotifications={clearNotifications}
         enablePullRefresh={refreshablePages.has(page)}
         onPullRefresh={handlePullRefresh}
+        hideMobileGlassDock={hideMobileGlassDock}
       >
         <Suspense fallback={<PremiumPageLoader />}>
           {renderPage()}

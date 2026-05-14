@@ -880,31 +880,14 @@ export default function Header({
               <button
                 type="button"
                 className="mobile-search-launch"
-                onClick={handleNavigate(onWishlistClick)}
-                title={t.header.wishlist}
-                aria-label={t.header.wishlist}
-              >
-                <i className="fas fa-heart"></i>
-                <Badge count={wishlistCount} />
-              </button>
-              <button
-                type="button"
-                className="mobile-search-launch"
-                onClick={handleNavigate(onCartClick)}
-                title={t.header.basket}
-                aria-label={t.header.basket}
-              >
-                <i className="fas fa-basket-shopping"></i>
-                <Badge count={cartCount} />
-              </button>
-              <button
-                type="button"
-                className="mobile-search-launch"
                 onClick={() => setSearchOpen(true)}
                 title={language === "ke" ? "Tafuta" : "Search"}
                 aria-label={language === "ke" ? "Tafuta" : "Search"}
               >
                 <i className="fas fa-magnifying-glass"></i>
+                <span className="mobile-search-launch-text">
+                  {language === "ke" ? "Tafuta bidhaa au aina..." : "Search products or categories..."}
+                </span>
               </button>
             </div>
             <div className="search-wrapper header-search-shell search-row-shell">

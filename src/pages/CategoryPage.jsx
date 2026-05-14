@@ -183,6 +183,7 @@ export default function CategoryPage({
   language = "en",
   region = "in",
   refreshSignal = 0,
+  onMobileOverlayChange,
 }) {
   const t = useT(language);
   const isKenya = region === "ke";
@@ -329,6 +330,11 @@ export default function CategoryPage({
       document.body.style.overflow = previousOverflow;
     };
   }, [filterOpen, isMobileViewport]);
+
+  useEffect(() => {
+    onMobileOverlayChange?.(isMobileViewport && (filterOpen || mobileSortOpen));
+    return () => onMobileOverlayChange?.(false);
+  }, [filterOpen, isMobileViewport, mobileSortOpen, onMobileOverlayChange]);
 
   // ── Load products ──────────────────────────────────────────────────────────
   useEffect(() => {

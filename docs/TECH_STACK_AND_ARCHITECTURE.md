@@ -45,6 +45,9 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 - `src/components/Header.jsx`
   Handles header behavior, region/language UI, notification dropdown, search overlay, and mobile drawer.
 
+- `src/components/ChatbotWidget.jsx`
+  Handles the floating assistant launcher, mobile/desktop chat panel behavior, footer-aware floating controls, and quantity/auth overlay suppression.
+
 - `src/components/Footer.jsx`
   Shared footer.
 
@@ -54,7 +57,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 ### State and Context
 
 - `src/context/AuthContext.jsx`
-  Manages session and user data with localStorage-backed persistence.
+  Manages session and user data with localStorage-backed persistence and consolidated session bootstrapping for lower startup overhead.
 
 - `src/context/TrackingContext.jsx`
   Handles active order tracking simulation and wallet state.
@@ -69,6 +72,8 @@ This means the current visual system is powerful but mixed. A future cleanup cou
   Handles cart, mobile checkout presentation, promo flow, address selection, and recommended/special-deal product surfaces.
 - `src/pages/PaymentPage.jsx`
 - `src/pages/AccountPage.jsx`
+- `src/components/PhoneAuthModal.jsx`
+  Handles phone sign-in, OTP verification, generated-OTP choice prompting, segmented OTP autofill/paste behavior, and verification UI state.
 - `src/pages/WishlistPage.jsx`
 - `src/pages/OrderSuccessPage.jsx`
 - `src/pages/OrderTrackingPage.jsx`
@@ -85,6 +90,9 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 
 - `src/utils/productUtils.js`
   Product normalization and currency formatting utilities.
+
+- `src/utils/demoPhoneAuth.js`
+  Demo OTP generation and verification fallback used when backend phone-auth endpoints are unavailable.
 
 - `src/config/paymentConfig.js`
   Payment configuration logic.

@@ -220,6 +220,12 @@ export default function ChatbotWidget({
           align-items: flex-end;
           gap: 12px;
         }
+        @media (max-width: 768px) {
+          .prime-float-stack {
+            right: 16px;
+            bottom: calc(152px + env(safe-area-inset-bottom, 0px));
+          }
+        }
         body.prime-auth-open .prime-float-stack {
           opacity: 0;
           pointer-events: none;
@@ -366,7 +372,7 @@ export default function ChatbotWidget({
         @media (max-width: 768px) {
           .prime-float-stack {
             right: 14px;
-            bottom: 14px;
+            bottom: calc(154px + env(safe-area-inset-bottom, 0px));
             gap: 10px;
           }
           .prime-chat-trigger {
