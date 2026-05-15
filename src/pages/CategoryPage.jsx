@@ -10,6 +10,11 @@ import { formatCurrencyDisplay } from "../utils/currency";
 import { getLocalizedProductName, getSearchHintSuggestions } from "../utils/translationUtils";
 import { sanitizeImageUrl } from "../utils/productUtils";
 import ProductCard from "../components/ProductCard";
+import {
+  CategorySkeletonLoader,
+  InlinePanelSkeleton,
+  SkeletonCard,
+} from "../components/SkeletonLoaders";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const CATEGORIES_DATA = [
@@ -975,20 +980,7 @@ export default function CategoryPage({
   const renderSkeleton = () => (
     <div className="cp-grid">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="premium-product-skeleton premium-skeleton-surface" aria-hidden="true">
-          <div className="premium-skeleton-media" />
-          <div className="premium-skeleton-body">
-            <span className="premium-skeleton-pill" />
-            <span className="premium-skeleton-line premium-skeleton-line-lg" />
-            <span className="premium-skeleton-line premium-skeleton-line-md" />
-            <span className="premium-skeleton-line premium-skeleton-line-sm" />
-            <div className="premium-skeleton-price-row">
-              <span className="premium-skeleton-price" />
-              <span className="premium-skeleton-price-muted" />
-            </div>
-            <span className="premium-skeleton-cta" />
-          </div>
-        </div>
+        <SkeletonCard key={i} />
       ))}
     </div>
   );
@@ -1477,27 +1469,37 @@ export default function CategoryPage({
           <div className="cp-cat-nav">
             <div className="cp-cat-nav-title">Categories</div>
             <div className="cp-cat-nav-list">
-              <div
-                className={`cp-cat-item${isAllView ? " active" : ""}`}
-                onClick={() => onCategoryChange?.("all")}
-              >
-                <span className="cp-cat-icon">
-                  <i className="fas fa-th" />
-                </span>
-                <span className="cp-cat-label">{t.home?.allCategories || "All Categories"}</span>
-              </div>
-              {CATEGORIES_DATA.map((cat) => (
-                <div
-                  key={cat.value}
-                  className={`cp-cat-item${cat.value === category ? " active" : ""}`}
-                  onClick={() => onCategoryChange?.(cat.value)}
-                >
-                  <span className="cp-cat-icon">
-                    <i className={`fas ${cat.icon}`} />
-                  </span>
-                  <span className="cp-cat-label">{t.categories?.[cat.key] || cat.value}</span>
-                </div>
-              ))}
+              {loading ? (
+                <>
+                  {Array.from({ length: 8 }).map((_, index) => (
+                    <CategorySkeletonLoader key={`category-skeleton-${index}`} />
+                  ))}
+                </>
+              ) : (
+                <>
+                  <div
+                    className={`cp-cat-item${isAllView ? " active" : ""}`}
+                    onClick={() => onCategoryChange?.("all")}
+                  >
+                    <span className="cp-cat-icon">
+                      <i className="fas fa-th" />
+                    </span>
+                    <span className="cp-cat-label">{t.home?.allCategories || "All Categories"}</span>
+                  </div>
+                  {CATEGORIES_DATA.map((cat) => (
+                    <div
+                      key={cat.value}
+                      className={`cp-cat-item${cat.value === category ? " active" : ""}`}
+                      onClick={() => onCategoryChange?.(cat.value)}
+                    >
+                      <span className="cp-cat-icon">
+                        <i className={`fas ${cat.icon}`} />
+                      </span>
+                      <span className="cp-cat-label">{t.categories?.[cat.key] || cat.value}</span>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           </div>
 
@@ -1508,83 +1510,91 @@ export default function CategoryPage({
 
           {/* Desktop toolbar */}
           <div className="cp-toolbar-shell" onClick={(e) => e.stopPropagation()}>
-          <div className="cp-toolbar">
-            <div className="cp-toolbar-meta">
-              <strong>{activeLabel}</strong>
-              {!loading ? <span>{filteredProducts.length} results</span> : null}
-            </div>
-            <div className="cp-search-wrap">
-              <i className="fas fa-search" />
-              <input
-                type="text"
-                className="cp-search-input"
-                placeholder="Search products or brands..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => {
-                  if (isMobileViewport) {
-                    mobileSearchScrollRef.current = window.scrollY || 0;
-                  }
-                }}
-                onBlur={() => {
-                  if (!isMobileViewport) return;
-                  const restoreY = mobileSearchScrollRef.current;
-                  window.setTimeout(() => {
-                    window.scrollTo({ top: restoreY, behavior: "auto" });
-                  }, 60);
-                }}
-              />
-              {!searchQuery && (
-                <span className="cp-search-suggestion">
-                  search {searchSuggestions[searchHintIndex]}
-                </span>
-              )}
-            </div>
-            <div className="cp-toolbar-actions">
-              <button className="cp-btn" onClick={handleAllDeals}>
-                <i className="fas fa-tags" />
-                {t.home?.allDeals || "All Deals"}
-              </button>
-
-              <button className="cp-btn" onClick={() => {
-                setFilterOpen(false);
-                setDesktopFiltersOpen((open) => {
-                  const next = !open;
-                  if (next) {
-                    window.setTimeout(scrollFiltersIntoView, 30);
-                  }
-                  return next;
-                });
-              }}>
-                <i className="fas fa-sliders-h" />
-                Filters
-                {activeFilterCount > 0 && <span className="cp-badge">{activeFilterCount}</span>}
-              </button>
-
-              {/* Sort dropdown */}
-              <div className="cp-sort-wrap" onClick={(e) => e.stopPropagation()}>
-                <button className="cp-btn" onClick={() => setSortOpen((v) => !v)}>
-                  <i className="fas fa-sort-amount-down" />
-                  <span style={{ color: p.accent }}>{sortLabel}</span>
-                  <i className={`fas fa-chevron-${sortOpen ? "up" : "down"}`} style={{ fontSize: 10, color: p.textFaint }} />
-                </button>
-                {sortOpen && (
-                  <div className="cp-sort-menu">
-                    {getSortOptions(t).map((opt) => (
-                      <div
-                        key={opt.value}
-                        className={`cp-sort-item${sortBy === opt.value ? " active" : ""}`}
-                        onClick={() => { setSortBy(opt.value); setSortOpen(false); }}
-                      >
-                        {opt.label}
-                        {sortBy === opt.value && <i className="fas fa-check" style={{ fontSize: 11 }} />}
-                      </div>
-                    ))}
-                  </div>
-                )}
+            {loading ? (
+              <div className="premium-category-toolbar-skeleton premium-skeleton-surface" aria-hidden="true">
+                <span className="premium-skeleton-line premium-skeleton-line-md"></span>
+                <span className="premium-skeleton-line premium-skeleton-line-lg"></span>
+                <span className="premium-skeleton-pill"></span>
+                <span className="premium-skeleton-pill"></span>
               </div>
-            </div>
-          </div>
+            ) : (
+              <div className="cp-toolbar">
+                <div className="cp-toolbar-meta">
+                  <strong>{activeLabel}</strong>
+                  {!loading ? <span>{filteredProducts.length} results</span> : null}
+                </div>
+                <div className="cp-search-wrap">
+                  <i className="fas fa-search" />
+                  <input
+                    type="text"
+                    className="cp-search-input"
+                    placeholder="Search products or brands..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => {
+                      if (isMobileViewport) {
+                        mobileSearchScrollRef.current = window.scrollY || 0;
+                      }
+                    }}
+                    onBlur={() => {
+                      if (!isMobileViewport) return;
+                      const restoreY = mobileSearchScrollRef.current;
+                      window.setTimeout(() => {
+                        window.scrollTo({ top: restoreY, behavior: "auto" });
+                      }, 60);
+                    }}
+                  />
+                  {!searchQuery && (
+                    <span className="cp-search-suggestion">
+                      search {searchSuggestions[searchHintIndex]}
+                    </span>
+                  )}
+                </div>
+                <div className="cp-toolbar-actions">
+                  <button className="cp-btn" onClick={handleAllDeals}>
+                    <i className="fas fa-tags" />
+                    {t.home?.allDeals || "All Deals"}
+                  </button>
+
+                  <button className="cp-btn" onClick={() => {
+                    setFilterOpen(false);
+                    setDesktopFiltersOpen((open) => {
+                      const next = !open;
+                      if (next) {
+                        window.setTimeout(scrollFiltersIntoView, 30);
+                      }
+                      return next;
+                    });
+                  }}>
+                    <i className="fas fa-sliders-h" />
+                    Filters
+                    {activeFilterCount > 0 && <span className="cp-badge">{activeFilterCount}</span>}
+                  </button>
+
+                  <div className="cp-sort-wrap" onClick={(e) => e.stopPropagation()}>
+                    <button className="cp-btn" onClick={() => setSortOpen((v) => !v)}>
+                      <i className="fas fa-sort-amount-down" />
+                      <span style={{ color: p.accent }}>{sortLabel}</span>
+                      <i className={`fas fa-chevron-${sortOpen ? "up" : "down"}`} style={{ fontSize: 10, color: p.textFaint }} />
+                    </button>
+                    {sortOpen && (
+                      <div className="cp-sort-menu">
+                        {getSortOptions(t).map((opt) => (
+                          <div
+                            key={opt.value}
+                            className={`cp-sort-item${sortBy === opt.value ? " active" : ""}`}
+                            onClick={() => { setSortBy(opt.value); setSortOpen(false); }}
+                          >
+                            {opt.label}
+                            {sortBy === opt.value && <i className="fas fa-check" style={{ fontSize: 11 }} />}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Mobile products wrapper */}
@@ -1672,7 +1682,12 @@ export default function CategoryPage({
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
         >
-          {desktopFiltersOpen ? renderDesktopFilterPanel() : null}
+          {loading && desktopFiltersOpen ? (
+            <div style={{ display: "grid", gap: 16 }}>
+              <InlinePanelSkeleton lines={4} />
+              <InlinePanelSkeleton lines={4} />
+            </div>
+          ) : desktopFiltersOpen ? renderDesktopFilterPanel() : null}
         </aside>
       </div>
 

@@ -1494,5 +1494,21 @@ export const translations = {
   },
 };
 
+translations.te = {
+  ...translations.en,
+  header: {
+    ...translations.en.header,
+    language: "Telugu",
+  },
+};
+
+translations.hi = {
+  ...translations.en,
+  header: {
+    ...translations.en.header,
+    language: "Hindi",
+  },
+};
+
 // Simple hook-like helper — import and use in any component
 export const useT = (lang) => translations[lang] || translations.en;

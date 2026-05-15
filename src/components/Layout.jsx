@@ -142,7 +142,7 @@ export default function Layout({
           left: 50%;
           bottom: calc(8px + env(safe-area-inset-bottom, 0px));
           transform: translateX(-50%);
-          width: min(88vw, 388px);
+          width: min(90vw, 404px);
           z-index: 99988;
           display: none;
           pointer-events: none;
@@ -152,8 +152,8 @@ export default function Layout({
           display: grid;
           grid-template-columns: repeat(5, minmax(0, 1fr));
           gap: 2px;
-          padding: 5px;
-          border-radius: 20px;
+          padding: 6px;
+          border-radius: 22px;
           border: 1px solid rgba(255,255,255,0.2);
           background:
             linear-gradient(135deg, rgba(255,255,255,0.36), rgba(255,255,255,0.16)),
@@ -169,8 +169,8 @@ export default function Layout({
           position: relative;
           border: none;
           border-radius: 14px;
-          min-height: 46px;
-          padding: 5px 2px 4px;
+          min-height: 50px;
+          padding: 6px 3px 5px;
           background: transparent;
           color: #174d8e;
           display: flex;
@@ -212,15 +212,15 @@ export default function Layout({
         }
         .prime-mobile-dock-icon {
           position: relative;
-          width: 25px;
-          height: 25px;
+          width: 27px;
+          height: 27px;
           border-radius: 9px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           background: rgba(255,255,255,0.22);
           border: 1px solid rgba(255,255,255,0.2);
-          font-size: 11px;
+          font-size: 12px;
           transition: transform .22s ease, background .22s ease, box-shadow .22s ease;
         }
         .prime-mobile-dock-item.active .prime-mobile-dock-icon,
@@ -230,7 +230,7 @@ export default function Layout({
         }
         .prime-mobile-dock-label {
           position: relative;
-          font-size: 8.2px;
+          font-size: 8.8px;
           font-weight: 800;
           line-height: 1;
           letter-spacing: 0.01em;

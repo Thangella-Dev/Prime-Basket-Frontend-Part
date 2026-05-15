@@ -3,6 +3,14 @@ import { useAuth } from "./context/AuthContext";
 import Layout from "./components/Layout";
 import PhoneAuthModal from "./components/PhoneAuthModal";
 import PremiumPageLoader from "./components/PremiumPageLoader";
+import {
+  AccountDashboardSkeleton,
+  CartPageSkeleton,
+  CategoryPageSkeleton,
+  CheckoutSummarySkeleton,
+  HomePageSkeleton,
+  ProductDetailSkeleton,
+} from "./components/SkeletonLoaders";
 import HomePage from "./pages/HomePage";
 import { translations } from "./i18n/translations";
 import { useTracking } from "./context/TrackingContext";
@@ -30,8 +38,33 @@ const GenericStaticPage = lazy(() => import("./pages/GenericStaticPage"));
 const NAV_STATE_KEY = "pb_nav_state_v2";
 const NAV_SCROLL_KEY = "pb_nav_scroll_v2";
 
+const getAllowedLanguagesForRegion = (regionValue = "in") =>
+  regionValue === "ke" ? ["en", "ke"] : ["en", "hi", "te"];
+
 const getDefaultLanguageForRegion = (regionValue = "in") =>
   regionValue === "ke" ? "ke" : "en";
+
+const sanitizeLanguageForRegion = (nextLanguage, regionValue = "in") => {
+  const allowed = getAllowedLanguagesForRegion(regionValue);
+  return allowed.includes(nextLanguage)
+    ? nextLanguage
+    : getDefaultLanguageForRegion(regionValue);
+};
+
+const deriveRegionFromPhone = (phone = "") => {
+  const digits = String(phone || "").replace(/\D/g, "");
+  if (
+    digits.startsWith("254") ||
+    (digits.length === 10 && (digits.startsWith("07") || digits.startsWith("01"))) ||
+    (digits.length === 9 && (digits.startsWith("7") || digits.startsWith("1")))
+  ) {
+    return "ke";
+  }
+  if (digits.startsWith("91") || (digits.length === 10 && /^[6-9]/.test(digits))) {
+    return "in";
+  }
+  return null;
+};
 
 const readStoredJson = (key, fallback = null) => {
   try {
@@ -78,7 +111,14 @@ export default function App() {
   const initialNav = initialNavRef.current || {};
 
   // ── Language & Region ──
-  const [language, setLanguage] = useState(() => localStorage.getItem("pb_lang") || "en");
+  const [language, setLanguage] = useState(() => {
+    const userStored = JSON.parse(localStorage.getItem("user") || "null");
+    const inferredRegion = deriveRegionFromPhone(userStored?.phone);
+    if (inferredRegion) return getDefaultLanguageForRegion(inferredRegion);
+    const storedLanguage = localStorage.getItem("pb_lang") || "en";
+    const storedRegion = localStorage.getItem("pb_region") || "in";
+    return sanitizeLanguageForRegion(storedLanguage, storedRegion);
+  });
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem("pb_theme");
     if (saved === "dark" || saved === "light") return saved;
@@ -86,19 +126,16 @@ export default function App() {
   });
   const [region, setRegion] = useState(() => {
     const userStored = JSON.parse(localStorage.getItem("user") || "null");
-    if (userStored?.phone) {
-      const d = userStored.phone.replace(/\D/g, "");
-      if (d.startsWith("254") || (d.length === 10 && (d.startsWith("07") || d.startsWith("01"))) || (d.length === 9 && (d.startsWith("7") || d.startsWith("1")))) return "ke";
-      if (d.startsWith("91") || (d.length === 10 && /^[6-9]/.test(d))) return "in";
-    }
+    const inferredRegion = deriveRegionFromPhone(userStored?.phone);
+    if (inferredRegion) return inferredRegion;
     const stored = localStorage.getItem("pb_region");
     if (stored) return stored;
     return (language === "ke" ? "ke" : "in");
   });
 
   const handleLanguageChange = useCallback((nextLanguage) => {
-    setLanguage(nextLanguage);
-  }, []);
+    setLanguage(sanitizeLanguageForRegion(nextLanguage, region));
+  }, [region]);
 
   const handleRegionChange = useCallback((nextRegion) => {
     const safeRegion = nextRegion === "ke" ? "ke" : "in";
@@ -148,7 +185,7 @@ export default function App() {
       if (lastNotifiedStatusRef.current === statusKey) return;
       lastNotifiedStatusRef.current = statusKey;
 
-      const tNote = translations[language].notifications;
+      const tNote = (translations[language] || translations.en).notifications;
 
       if (activeOrder.status === "Delivered") {
         setCompletedOrder(activeOrder);
@@ -175,6 +212,20 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("pb_region", region);
   }, [region]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user?.phone) return;
+    const inferredRegion = deriveRegionFromPhone(user.phone);
+    if (!inferredRegion) return;
+    const inferredLanguage = getDefaultLanguageForRegion(inferredRegion);
+
+    if (region !== inferredRegion) {
+      setRegion(inferredRegion);
+    }
+    if (language !== inferredLanguage) {
+      setLanguage(inferredLanguage);
+    }
+  }, [isAuthenticated, user?.phone, region, language]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setBootVisualReady(true), 900);
@@ -653,10 +704,10 @@ export default function App() {
     setWishlist((prev) => {
       const exists = prev.find((item) => item._uid === product._uid);
       if (exists) {
-        showToast(translations[language].toasts.removedFromWishlist);
+        showToast((translations[language] || translations.en).toasts.removedFromWishlist);
         return prev.filter((item) => item._uid !== product._uid);
       }
-      showToast(translations[language].toasts.addedToWishlist);
+      showToast((translations[language] || translations.en).toasts.addedToWishlist);
       return [...prev, sanitizeStoredProduct(product)];
     });
   };
@@ -680,19 +731,9 @@ export default function App() {
     const userData = data?.user ?? { id: data?.id, name: data?.name || "User", phone: data?.phone || "", email: data?.email || "", role: data?.role || "CUSTOMER" };
     
     // Auto-detect region from phone number if available
-    const raw = String(userData.phone || "");
-    const digits = raw.replace(/\D/g, "");
-    
-    const isKenya = digits.startsWith("254") || 
-                   (digits.length === 10 && (digits.startsWith("07") || digits.startsWith("01"))) ||
-                   (digits.length === 9 && (digits.startsWith("7") || digits.startsWith("1")));
-
-    const isIndia = digits.startsWith("91") || (digits.length === 10 && /^[6-9]/.test(digits));
-
-    if (isKenya) {
-      handleRegionChange("ke");
-    } else if (isIndia) {
-      handleRegionChange("in");
+    const inferredRegion = deriveRegionFromPhone(userData.phone);
+    if (inferredRegion) {
+      handleRegionChange(inferredRegion);
     }
 
     // Clear guest cart/wishlist/orders for fresh login experience as requested
@@ -1016,6 +1057,17 @@ export default function App() {
     );
   };
 
+  const renderPageSkeleton = () => {
+    if (page === "account") return <AccountDashboardSkeleton />;
+    if (page === "cart" || page === "wishlist") return <CartPageSkeleton />;
+    if (page === "payment" || page === "order-success" || page === "order-tracking") return <CheckoutSummarySkeleton />;
+    if (page === "order-detail" || page === "rate-order") return <AccountDashboardSkeleton />;
+    if (page === "category") return <CategoryPageSkeleton />;
+    if (page === "product") return <ProductDetailSkeleton />;
+    if (page === "home") return <HomePageSkeleton />;
+    return <PremiumPageLoader />;
+  };
+
   if (!bootVisualReady) {
     return <PremiumPageLoader fullScreen />;
   }
@@ -1057,7 +1109,7 @@ export default function App() {
         onPullRefresh={handlePullRefresh}
         hideMobileGlassDock={hideMobileGlassDock}
       >
-        <Suspense fallback={<PremiumPageLoader />}>
+        <Suspense fallback={renderPageSkeleton()}>
           {renderPage()}
         </Suspense>
       </Layout>

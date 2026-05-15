@@ -8,6 +8,13 @@ import { formatCurrencyDisplay } from "../utils/currency";
 import { safeSessionGet, safeSessionRemove, safeSessionSet } from "../utils/safeStorage";
 import HeroSlider from "../components/HeroSlider";
 import ProductCard from "../components/ProductCard";
+import {
+  CategorySkeletonLoader,
+  DealSkeletonCard,
+  HeroSkeleton,
+  RailSkeletonCard,
+  SkeletonCard,
+} from "../components/SkeletonLoaders";
 import { Flame, Bolt, Compass, Crown, ChevronRight, ChevronLeft, ShoppingCart, Heart, ArrowRight } from "lucide-react";
 import { getLocalizedProductName } from "../utils/translationUtils";
 
@@ -307,50 +314,6 @@ export default function HomePage({
     };
   }, [isKenya, language, refreshSignal]);
 
-  const SkeletonCard = () => (
-    <div className="premium-product-skeleton premium-skeleton-surface" aria-hidden="true">
-      <div className="premium-skeleton-media"></div>
-      <div className="premium-skeleton-body">
-        <span className="premium-skeleton-pill"></span>
-        <span className="premium-skeleton-line premium-skeleton-line-lg"></span>
-        <span className="premium-skeleton-line premium-skeleton-line-md"></span>
-        <span className="premium-skeleton-line premium-skeleton-line-sm"></span>
-        <div className="premium-skeleton-price-row">
-          <span className="premium-skeleton-price"></span>
-          <span className="premium-skeleton-price-muted"></span>
-        </div>
-        <span className="premium-skeleton-cta"></span>
-      </div>
-    </div>
-  );
-
-  const DealSkeletonCard = () => (
-    <div className="premium-deal-skeleton premium-skeleton-surface" aria-hidden="true">
-      <div className="premium-skeleton-media"></div>
-      <div className="premium-skeleton-body">
-        <span className="premium-skeleton-pill"></span>
-        <span className="premium-skeleton-line premium-skeleton-line-lg"></span>
-        <span className="premium-skeleton-line premium-skeleton-line-md"></span>
-        <div className="premium-skeleton-price-row">
-          <span className="premium-skeleton-price"></span>
-          <span className="premium-skeleton-price-muted"></span>
-        </div>
-        <span className="premium-skeleton-cta"></span>
-      </div>
-    </div>
-  );
-
-  const RailSkeletonCard = () => (
-    <div className="premium-rail-skeleton premium-skeleton-surface" aria-hidden="true">
-      <span className="premium-skeleton-thumb"></span>
-      <div className="premium-rail-skeleton-copy">
-        <span className="premium-skeleton-line premium-skeleton-line-lg"></span>
-        <span className="premium-skeleton-line premium-skeleton-line-md"></span>
-        <span className="premium-skeleton-line"></span>
-      </div>
-    </div>
-  );
-
   const curatedSections = [
     { key: "topSelling", title: t.home.topSelling, items: (multiCols.topSelling || []).filter(Boolean) },
     { key: "trending", title: t.home.trending, items: (multiCols.trending || []).filter(Boolean) },
@@ -559,7 +522,7 @@ export default function HomePage({
         <div className="container">
           <div className="home-showcase-grid">
             <div className="home-showcase-hero">
-              <HeroSlider language={language} /> 
+              {loading ? <HeroSkeleton /> : <HeroSlider language={language} />} 
             </div>
           </div>
         </div>
@@ -604,7 +567,9 @@ export default function HomePage({
             <div className="sidebar">
               <div className="cat-box">
                 <h3>{t.home.category}</h3>
-                {[
+                {(loading
+                  ? Array.from({ length: 9 }).map((_, index) => ({ key: `skeleton-${index}`, skeleton: true }))
+                  : [
                   { key: "fruits", icon: "fa-solid fa-apple-whole", label: t.categories.freshFruits },
                   { key: "vegetables", icon: "fa-solid fa-carrot", label: t.categories.vegetables },
                   { key: "dairyProducts", icon: "fa-solid fa-cheese", label: t.categories.dairyProducts },
@@ -618,7 +583,10 @@ export default function HomePage({
                   { key: "oralCare", icon: "fa-solid fa-tooth", label: t.categories.oralCare },
                   { key: "biscuitsAndCookies", icon: "fa-solid fa-cookie", label: t.categories.biscuitsCookies },
                   { key: "milkPowders", icon: "fa-solid fa-glass-whiskey", label: t.categories.milkPowders },
-                ].map((c) => (
+                ]).map((c) => (
+                  c.skeleton ? (
+                    <CategorySkeletonLoader key={c.key} />
+                  ) : (
                   <div key={c.key} className="cat-item" style={{ cursor: "pointer" }} onClick={() => onCategorySelect && onCategorySelect(c.key)}>
                     <div className="cat-item-l">
                       <div className="cicon"><i className={`fas ${c.icon}`}></i></div>
@@ -626,6 +594,7 @@ export default function HomePage({
                     </div>
                     <ChevronRight size={14} style={{ color: "#bbb" }} />
                   </div>
+                  )
                 ))} 
               </div>
             </div>

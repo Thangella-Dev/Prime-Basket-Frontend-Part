@@ -7,6 +7,7 @@ import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
 import { enhanceProduct, formatCurrency, parsePrice } from "../utils/productUtils";
 import ProductCard from "../components/ProductCard";
 import { getLocalizedProductName } from "../utils/translationUtils";
+import { SkeletonCard } from "../components/SkeletonLoaders";
 
 const allCoupons_en = [
   { code: "ONECARD",  text: "Get 5% off with OneCard"                  },

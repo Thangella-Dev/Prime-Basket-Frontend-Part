@@ -116,12 +116,14 @@ export default function Header({
   const [locationError, setLocationError] = useState("");
   const [locationNotice, setLocationNotice] = useState("");
   const [mobileLanguageOpen, setMobileLanguageOpen] = useState(false);
+  const [desktopLocaleOpen, setDesktopLocaleOpen] = useState(false);
   const [expandedDrawerGroup, setExpandedDrawerGroup] = useState("fresh");
   const browseRef = useRef(null);
   const mobileBrowseRef = useRef(null);
   const notesRef = useRef(null);
   const mobileNotesRef = useRef(null);
   const mobileLanguageRef = useRef(null);
+  const desktopLocaleRef = useRef(null);
   const brandTimerRef = useRef(null);
   const locationNoticeTimerRef = useRef(null);
   const lastScrollYRef = useRef(0);
@@ -207,9 +209,11 @@ export default function Header({
       const clickedInsideMobileBrowse = mobileBrowseRef.current?.contains(e.target);
       const clickedInsideDesktopNotes = notesRef.current?.contains(e.target);
       const clickedInsideMobileNotes = mobileNotesRef.current?.contains(e.target);
+      const clickedInsideDesktopLocale = desktopLocaleRef.current?.contains(e.target);
       if (!clickedInsideDesktopBrowse && !clickedInsideMobileBrowse) setDropdownOpen(false);
       if (!clickedInsideDesktopNotes && !clickedInsideMobileNotes) setNotesOpen(false);
       if (mobileLanguageRef.current && !mobileLanguageRef.current.contains(e.target)) setMobileLanguageOpen(false);
+      if (!clickedInsideDesktopLocale) setDesktopLocaleOpen(false);
     };
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
@@ -248,6 +252,7 @@ export default function Header({
     setSearchOpen(false);
     setNotesOpen(false);
     setMobileLanguageOpen(false);
+    setDesktopLocaleOpen(false);
   };
 
   const handleDetectLocation = async (silent = false) => {
@@ -309,14 +314,56 @@ export default function Header({
   const mobileLocationBarTitle =
     language === "ke" ? "Inapeleka hadi" : "Delivering to";
   const showMobileLocationBar = isHomePage && !drawerOpen && Boolean(locationState?.fullAddress || locationState?.label);
-  const languageOptions = [
-    { value: "en", label: "English" },
-    { value: "ke", label: "Swahili" },
-  ];
   const regionOptions = [
-    { value: "in", label: "India", meta: "INR" },
-    { value: "ke", label: "Kenya", meta: "KES" },
+    { value: "in", label: "India", meta: "INR", flag: "🇮🇳", accent: "from-orange-400 via-white to-green-400" },
+    { value: "ke", label: "Kenya", meta: "KES", flag: "🇰🇪", accent: "from-green-500 via-red-500 to-black" },
   ];
+  const languageOptionsByRegion = {
+    in: [
+      { value: "en", label: "English", native: "English", meta: "India default" },
+      { value: "te", label: "Telugu", native: "తెలుగు", meta: "Regional" },
+    ],
+    ke: [
+      { value: "en", label: "English", native: "English", meta: "Kenya option" },
+      { value: "ke", label: "Swahili", native: "Kiswahili", meta: "Kenya default" },
+    ],
+  };
+  const activeRegion = region === "ke" ? "ke" : "in";
+  const languageOptions = languageOptionsByRegion[activeRegion];
+  const currentRegionOption = regionOptions.find((option) => option.value === activeRegion) || regionOptions[0];
+  const currentLanguageOption =
+    languageOptions.find((option) => option.value === language) || languageOptions[0];
+  const profileRegionOptions = [
+    { value: "in", label: "India", meta: "INR", flag: "\uD83C\uDDEE\uD83C\uDDF3" },
+    { value: "ke", label: "Kenya", meta: "KES", flag: "\uD83C\uDDF0\uD83C\uDDEA" },
+  ];
+  const profileLanguageOptionsByRegion = {
+    in: [
+      { value: "en", label: "English", native: "English", meta: "India default" },
+      { value: "hi", label: "Hindi", native: "\u0939\u093F\u0928\u094D\u0926\u0940", meta: "National" },
+      { value: "te", label: "Telugu", native: "\u0C24\u0C46\u0C32\u0C41\u0C17\u0C41", meta: "Regional" },
+    ],
+    ke: [
+      { value: "en", label: "English", native: "English", meta: "Kenya option" },
+      { value: "ke", label: "Swahili", native: "Kiswahili", meta: "Kenya default" },
+    ],
+  };
+  const profileActiveRegion = region === "ke" ? "ke" : "in";
+  const profileLanguageOptions = profileLanguageOptionsByRegion[profileActiveRegion];
+  const profileCurrentRegionOption =
+    profileRegionOptions.find((option) => option.value === profileActiveRegion) || profileRegionOptions[0];
+  const profileCurrentLanguageOption =
+    profileLanguageOptions.find((option) => option.value === language) || profileLanguageOptions[0];
+  const localePanelTitle = language === "ke" ? "Country and language" : "Country and language";
+  const localePanelCopy = profileActiveRegion === "ke"
+    ? "Kenya profile keeps Kenya products with English and Kiswahili only."
+    : "India profile keeps India products with English, Hindi, and Telugu.";
+
+  useEffect(() => {
+    if (!profileLanguageOptions.some((option) => option.value === language)) {
+      onLanguageChange?.(activeRegion === "ke" ? "ke" : "en");
+    }
+  }, [activeRegion, language, onLanguageChange, profileLanguageOptions]);
 
   const Badge = ({ count, color = "#e53e3e" }) => {
     if (!count || count <= 0) return null;
@@ -534,27 +581,57 @@ export default function Header({
               <i className={`fas ${locationLoading ? "fa-spinner fa-spin" : "fa-location-crosshairs"}`}></i>
               <span className="nav-utility-label">{locationLabel}</span>
             </button>
-            <label className="nav-select-chip" title={t.topbar?.language || "Language"}>
-              <i className="fas fa-globe"></i>
-              <select value={language} onChange={(e) => onLanguageChange?.(e.target.value)}>
-                {languageOptions.map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
-            </label>
-            {onRegionChange && (
-              <label className="nav-select-chip" title="Region">
-                <i className="fas fa-earth-africa"></i>
-                <select
-                  value={region}
-                  onChange={(e) => onRegionChange?.(e.target.value)}
-                >
-                  {regionOptions.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
-              </label>
-            )}
+            <div className="nav-locale-picker" ref={desktopLocaleRef}>
+              <button
+                type="button"
+                className={`nav-select-chip nav-locale-chip${desktopLocaleOpen ? " open" : ""}`}
+                onClick={() => setDesktopLocaleOpen((prev) => !prev)}
+                aria-expanded={desktopLocaleOpen}
+                title={localePanelTitle}
+              >
+                <span className="nav-select-flag" aria-hidden="true">{profileCurrentRegionOption.flag}</span>
+                <span className="nav-locale-chip-copy">
+                  <strong>{profileCurrentLanguageOption.label}</strong>
+                  <small>{profileCurrentRegionOption.label}</small>
+                </span>
+                <i className="fas fa-chevron-down"></i>
+              </button>
+              {desktopLocaleOpen && (
+                <div className="desktop-locale-menu">
+                  <div className="desktop-locale-menu-head">
+                    <strong>{localePanelTitle}</strong>
+                    <span>Products, currency, and language stay matched to your signed-in phone region.</span>
+                  </div>
+                  <div className="desktop-locale-profile">
+                    <div className="desktop-locale-profile-flag" aria-hidden="true">{profileCurrentRegionOption.flag}</div>
+                    <div className="desktop-locale-profile-copy">
+                      <strong>{profileCurrentRegionOption.label}</strong>
+                      <span>{profileCurrentRegionOption.meta} · {profileCurrentLanguageOption.native || profileCurrentLanguageOption.label}</span>
+                    </div>
+                  </div>
+                  <div className="desktop-locale-language-grid">
+                    {profileLanguageOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className={`desktop-locale-language-btn${language === option.value ? " active" : ""}`}
+                        onClick={() => {
+                          onLanguageChange?.(option.value);
+                          setDesktopLocaleOpen(false);
+                        }}
+                      >
+                        <span className="desktop-locale-language-flag" aria-hidden="true">{profileCurrentRegionOption.flag}</span>
+                        <span className="desktop-locale-language-copy">
+                          <strong>{option.label}</strong>
+                          <small>{option.native || option.label}</small>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="desktop-locale-note">{localePanelCopy}</div>
+                </div>
+              )}
+            </div>
             <button
               type="button"
               className="nav-utility-chip nav-theme-toggle"
@@ -675,21 +752,17 @@ export default function Header({
                 {onRegionChange && (
                   <div className="mobile-settings-group">
                     <div className="mobile-settings-head">
-                      <strong>{language === "ke" ? "Nchi" : "Country"}</strong>
-                      <span>{language === "ke" ? "Huweka sarafu na lugha chaguomsingi" : "Sets currency and default language"}</span>
+                      <strong>{language === "ke" ? "Country profile" : "Country profile"}</strong>
+                      <span>{language === "ke" ? "Currency and catalog are locked to your current number" : "Currency and catalog stay aligned to the signed-in phone region"}</span>
                     </div>
                     <div className="mobile-settings-grid">
-                      {regionOptions.map((option) => (
-                        <button
-                          key={option.value}
-                          type="button"
-                          className={`mobile-settings-chip${region === option.value ? " active" : ""}`}
-                          onClick={() => onRegionChange?.(option.value)}
-                        >
-                          <span>{option.label}</span>
-                          <small>{option.meta}</small>
-                        </button>
-                      ))}
+                      <div className="mobile-settings-chip active">
+                          <span className="mobile-settings-chip-flag" aria-hidden="true">{profileCurrentRegionOption.flag}</span>
+                          <span className="mobile-settings-chip-text">
+                            <span className="mobile-settings-chip-title">{profileCurrentRegionOption.label}</span>
+                            <small>{profileCurrentRegionOption.meta}</small>
+                          </span>
+                        </div>
                     </div>
                   </div>
                 )}
@@ -700,7 +773,7 @@ export default function Header({
                     <span>{language === "ke" ? "Badili kwa mkono ukitaka" : "Change it manually if you prefer"}</span>
                   </div>
                   <div className="mobile-settings-grid">
-                    {languageOptions.map((option) => (
+                    {profileLanguageOptions.map((option) => (
                       <button
                         key={option.value}
                         type="button"
@@ -709,18 +782,24 @@ export default function Header({
                           onLanguageChange?.(option.value);
                           setMobileLanguageOpen(false);
                         }}
-                      >
-                        <span>{option.label}</span>
+                        >
+                        <span className="mobile-settings-chip-flag mobile-settings-chip-flag-lang" aria-hidden="true">
+                          {profileCurrentRegionOption.flag}
+                        </span>
+                        <span className="mobile-settings-chip-text">
+                          <span className="mobile-settings-chip-title">{option.label}</span>
+                          <small>{option.native || option.label}</small>
+                        </span>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="mobile-settings-note">
-                  {language === "ke"
-                    ? "Kuchagua nchi hubadili sarafu na lugha ya msingi. Unaweza kubadili lugha baadaye."
-                    : "Choosing a country updates the currency and default language. You can still change the language manually."}
-                </div>
+                  <div className="mobile-settings-note">
+                  {profileActiveRegion === "ke"
+                    ? "Kenya profiles keep English and Kiswahili only, and the catalog stays aligned to Kenya shopping."
+                    : "India profiles keep English, Hindi, and Telugu only, and the catalog stays aligned to India shopping."}
+                  </div>
               </div>
             )}
           </div>

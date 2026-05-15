@@ -104,6 +104,7 @@ export default function ChatbotWidget({
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
   const [nearFooter, setNearFooter] = useState(false);
+  const [isHomeAtTop, setIsHomeAtTop] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [panelKey, setPanelKey] = useState(0);
@@ -131,12 +132,14 @@ export default function ChatbotWidget({
 
     const handleScroll = () => {
       const viewportHeight = window.innerHeight || 0;
+      const nextY = window.scrollY || 0;
       const footer = document.querySelector(".footer");
       const footerRect = footer?.getBoundingClientRect();
       const isNearFooter = footerRect ? footerRect.top <= viewportHeight - 32 : false;
 
       setShowScrollTop(isNearFooter);
       setNearFooter(isNearFooter);
+      setIsHomeAtTop(nextY <= 36);
       setIsUserScrolling(true);
       if (scrollStopTimer) clearTimeout(scrollStopTimer);
       scrollStopTimer = setTimeout(() => setIsUserScrolling(false), 180);
@@ -181,8 +184,17 @@ export default function ChatbotWidget({
   }, [authModalOpen]);
 
   const showChatLauncher = useMemo(
-    () => isHome && !open && !isUserScrolling && !nearFooter && !drawerOpen && !authModalOpen,
-    [authModalOpen, drawerOpen, isHome, open, isUserScrolling, nearFooter]
+    () => (
+      !open &&
+      !drawerOpen &&
+      !authModalOpen &&
+      (
+        isHome
+          ? isHomeAtTop
+          : (!isUserScrolling && !nearFooter)
+      )
+    ),
+    [authModalOpen, drawerOpen, isHome, isHomeAtTop, isUserScrolling, nearFooter, open]
   );
 
   const showTopButton = useMemo(
