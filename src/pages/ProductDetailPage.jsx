@@ -193,13 +193,13 @@ export default function ProductDetailPage({
           padding-bottom: 60px;
           font-family: 'Nunito', sans-serif;
         }
-        .pdp-crumb { background:#fff; border-bottom:1px solid var(--border); padding:11px 0; }
-        .pdp-crumb-inner { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--body); }
-        .pdp-crumb-back { display:flex; align-items:center; gap:5px; color:#1d5ba0; font-weight:700; cursor:pointer; }
-        .pdp-crumb-back:hover { text-decoration:underline; }
-        .pdp-crumb-sep { font-size:10px; }
-        .pdp-crumb-cat { color:#1d5ba0; font-weight:600; cursor:pointer; text-transform:capitalize; }
-        .pdp-crumb-cat:hover { text-decoration:underline; }
+        .pdp-crumb { background:linear-gradient(180deg, rgba(255,255,255,0.97), rgba(246,250,255,0.96)); border-bottom:1px solid rgba(203,213,225,0.78); padding:13px 0; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+        .pdp-crumb-inner { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--body); }
+        .pdp-crumb-back { display:inline-flex; align-items:center; gap:7px; color:#1d5ba0; font-weight:800; cursor:pointer; padding:8px 13px; border-radius:999px; border:1px solid rgba(191,219,254,0.98); background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(237,244,255,0.98)); box-shadow:0 10px 20px rgba(29,91,160,0.08); transition:transform .22s ease, box-shadow .22s ease, color .22s ease; }
+        .pdp-crumb-back:hover { transform:translateY(-1px); box-shadow:0 16px 28px rgba(29,91,160,0.14); }
+        .pdp-crumb-sep { font-size:10px; color:#9aa9bf; }
+        .pdp-crumb-cat { color:#1d5ba0; font-weight:700; cursor:pointer; text-transform:capitalize; transition:color .2s ease; }
+        .pdp-crumb-cat:hover { color:#143e72; }
         .pdp-crumb-name { color:var(--dark); font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:300px; }
 
         .pdp-body { display:grid; grid-template-columns:500px 1fr; gap:32px; align-items:start; padding:28px 0 0; }

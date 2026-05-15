@@ -3,7 +3,7 @@ import { ADDRESSES_KEY } from "./AccountPage";
 import { useT } from "../i18n/translations";
 import AddressModal from "../components/AddressModal";
 import { formatPhoneForDisplay } from "../utils/phoneValidation";
-import { enhanceProduct, formatCurrency, getProductPrices, parsePrice, sanitizeImageUrl } from "../utils/productUtils";
+import { enhanceProduct, formatCurrency, getProductPrices, parsePrice, resolveProductImage } from "../utils/productUtils";
 import { getFallbackDeals } from "../data/catalogFallback";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
 import { getLocalizedProductName } from "../utils/translationUtils";
@@ -255,12 +255,19 @@ export default function CartPage({
         }
         .cart-crumb-back {
           color: #1d5ba0;
-          font-weight: 700;
+          font-weight: 800;
           cursor: pointer;
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          gap: 6px;
+          gap: 7px;
+          padding: 8px 13px;
+          border-radius: 999px;
+          border: 1px solid rgba(191,219,254,0.98);
+          background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(237,244,255,0.98));
+          box-shadow: 0 10px 20px rgba(29,91,160,0.08);
+          transition: transform .22s ease, box-shadow .22s ease, color .22s ease;
         }
+        .cart-crumb-back:hover { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(29,91,160,0.14); }
         .cart-wrap {
           display: grid;
           grid-template-columns: minmax(0, 1fr) 340px;
@@ -1352,7 +1359,7 @@ export default function CartPage({
                       <article key={`${product._uid || product.name}_${index}`} className="cart-special-card">
                         <div className="cart-special-card-inner">
                           <div className="cart-special-thumb">
-                            <img src={sanitizeImageUrl(product.imageUrl)} alt={getTranslatedName(product.name)} loading="lazy" />
+                            <img src={resolveProductImage(product)} alt={getTranslatedName(product.name)} loading="lazy" />
                           </div>
                           <div className="cart-special-copy">
                             <div className="cart-special-title">{getTranslatedName(product.name)}</div>
@@ -1420,7 +1427,7 @@ export default function CartPage({
                       return (
                         <article key={`${item._uid}_${item.selectedUnit || "default"}`} className="cart-item-row">
                           <div className="cart-item-thumb" onClick={() => onOpenProduct?.(item)}>
-                            <img src={sanitizeImageUrl(item.imageUrl)} alt={translatedName} loading="lazy" />
+                            <img src={resolveProductImage(item)} alt={translatedName} loading="lazy" />
                           </div>
 
                           <div className="cart-item-content">
@@ -1596,7 +1603,7 @@ export default function CartPage({
                           <span className="cart-rec-wish">
                             <i className="far fa-heart"></i>
                           </span>
-                          <img src={sanitizeImageUrl(product.imageUrl)} alt={getTranslatedName(product.name)} loading="lazy" />
+                          <img src={resolveProductImage(product)} alt={getTranslatedName(product.name)} loading="lazy" />
                         </div>
                         <div className="cart-rec-name">{getTranslatedName(product.name)}</div>
                         <div className="cart-rec-price">

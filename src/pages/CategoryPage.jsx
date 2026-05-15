@@ -8,7 +8,7 @@ import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
 import { mergeCategoryProducts } from "../data/catalogFallback";
 import { formatCurrencyDisplay } from "../utils/currency";
 import { getLocalizedProductName, getSearchHintSuggestions } from "../utils/translationUtils";
-import { sanitizeImageUrl } from "../utils/productUtils";
+import { resolveProductImage } from "../utils/productUtils";
 import ProductCard from "../components/ProductCard";
 import {
   CategorySkeletonLoader,
@@ -926,7 +926,7 @@ export default function CategoryPage({
         </button>
 
         <div className="pimg">
-          <img src={sanitizeImageUrl(item.imageUrl)} alt={name} loading="lazy" />
+          <img src={resolveProductImage(item)} alt={name} loading="lazy" />
         </div>
 
         <div className="pbrand">{item.brand}</div>

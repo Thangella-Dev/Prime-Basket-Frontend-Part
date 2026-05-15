@@ -192,10 +192,10 @@ export default function RateOrderPage({ order, onGoBack, onSubmit, language = "e
     <>
       <style>{`
         .ro-page { background:var(--bg); min-height:100vh; padding:0 0 60px; font-family:'Nunito',sans-serif; }
-        .ro-crumb { background:#fff; border-bottom:1px solid var(--border); padding:12px 0; }
-        .ro-crumb-inner { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--body); }
-        .ro-crumb-back { color:#1d5ba0; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; }
-        .ro-crumb-back:hover { text-decoration:underline; }
+        .ro-crumb { background:linear-gradient(180deg, rgba(255,255,255,0.97), rgba(246,250,255,0.96)); border-bottom:1px solid rgba(203,213,225,0.78); padding:13px 0; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+        .ro-crumb-inner { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--body); }
+        .ro-crumb-back { color:#1d5ba0; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:7px; padding:8px 13px; border-radius:999px; border:1px solid rgba(191,219,254,0.98); background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(237,244,255,0.98)); box-shadow:0 10px 20px rgba(29,91,160,0.08); transition:transform .22s ease, box-shadow .22s ease, color .22s ease; }
+        .ro-crumb-back:hover { transform:translateY(-1px); box-shadow:0 16px 28px rgba(29,91,160,0.14); }
         .ro-container { max-width:640px; margin:0 auto; padding:28px 20px; }
         .ro-card {
           background:#fff; border-radius:16px; border:1px solid var(--border);

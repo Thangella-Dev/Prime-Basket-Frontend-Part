@@ -37,10 +37,10 @@ export default function OrderDetailPage({ order, onGoBack, onGoRate, onOrderAgai
     <>
       <style>{`
         .od-page { background:var(--bg); min-height:100vh; padding:0 0 60px; font-family:'Nunito',sans-serif; }
-        .od-crumb { background:#fff; border-bottom:1px solid var(--border); padding:12px 0; }
-        .od-crumb-inner { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--body); }
-        .od-crumb-back { color:#1d5ba0; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; }
-        .od-crumb-back:hover { text-decoration:underline; }
+        .od-crumb { background:linear-gradient(180deg, rgba(255,255,255,0.97), rgba(246,250,255,0.96)); border-bottom:1px solid rgba(203,213,225,0.78); padding:13px 0; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+        .od-crumb-inner { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--body); }
+        .od-crumb-back { color:#1d5ba0; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:7px; padding:8px 13px; border-radius:999px; border:1px solid rgba(191,219,254,0.98); background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(237,244,255,0.98)); box-shadow:0 10px 20px rgba(29,91,160,0.08); transition:transform .22s ease, box-shadow .22s ease, color .22s ease; }
+        .od-crumb-back:hover { transform:translateY(-1px); box-shadow:0 16px 28px rgba(29,91,160,0.14); }
 
         .od-container { max-width:800px; margin:0 auto; padding:28px 20px; }
 

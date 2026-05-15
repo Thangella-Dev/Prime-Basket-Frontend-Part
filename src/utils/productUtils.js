@@ -195,6 +195,62 @@ export function sanitizeImageUrl(url) {
   return raw;
 }
 
+const CATEGORY_IMAGE_FALLBACKS = {
+  oil: "/assets/olive-oil.png",
+  "wheat-flour": "/assets/grocery-items.png",
+  salt: "/assets/grocery-items.png",
+  sugar: "/assets/grocery-items.png",
+  "chilli-powder": "/assets/organic-food.png",
+  "turmeric-powder": "/assets/organic-food.png",
+  pulses: "/assets/grocery-items.png",
+  masala: "/assets/organic-food.png",
+  dairyProducts: "/assets/milk.png",
+  feminineHygiene: "/assets/fresh&clean.png",
+  homeNeeds: "/assets/fresh&clean.png",
+  babyCare: "/assets/puppy.png",
+  instantFood: "/assets/chocolates.png",
+  milkPowders: "/assets/milk.png",
+  chipsAndNamkeens: "/assets/chocolates.png",
+  oralCare: "/assets/fresh&clean.png",
+  bodyCare: "/assets/fresh&clean.png",
+  meat: "/assets/fresh-eggs.webp",
+};
+
+const SUSPICIOUS_IMAGE_KEYWORDS_BY_CATEGORY = {
+  oil: ["mushroom", "soft-drink", "fanta", "mirinda", "coke", "sprite", "rice", "atta", "pear", "melon"],
+  "wheat-flour": ["rice", "soft-drink", "mushroom", "chips", "cookie", "biscuit"],
+  salt: ["garlic", "biscuit", "cookie", "orange-cream", "fruit", "pear", "melon"],
+  sugar: ["pear", "fruit", "biscuit", "cookie", "garlic"],
+  "turmeric-powder": ["soup", "ramen", "biscuit", "cookie"],
+  pulses: ["ramen", "snack", "chips", "cookie", "biscuit"],
+  masala: ["ramen", "peanuts", "chips", "cookie", "biscuit"],
+  dairyProducts: ["biscuit", "cookie", "chips", "snack"],
+  feminineHygiene: ["biscuit", "cookie", "snack"],
+  homeNeeds: ["soft-drink", "biscuit", "cookie", "snack"],
+  babyCare: ["corn", "biscuit", "cookie", "snack"],
+  instantFood: ["chips", "crisps"],
+  milkPowders: ["biscuit", "cookie"],
+  chipsAndNamkeens: ["tooth", "oral", "paste"],
+  oralCare: ["chips", "crisps", "snack"],
+  bodyCare: ["melon", "fruit", "pulses", "beans"],
+  meat: ["pine", "coconut"],
+};
+
+export function resolveProductImage(product) {
+  if (!product || typeof product !== "object") return "";
+  const imageUrl = sanitizeImageUrl(product.imageUrl || product.image);
+  const category = product._cat || "";
+  if (!imageUrl) return CATEGORY_IMAGE_FALLBACKS[category] || "";
+
+  const lowered = imageUrl.toLowerCase();
+  const suspiciousKeywords = SUSPICIOUS_IMAGE_KEYWORDS_BY_CATEGORY[category] || [];
+  if (suspiciousKeywords.some((keyword) => lowered.includes(keyword))) {
+    return CATEGORY_IMAGE_FALLBACKS[category] || imageUrl;
+  }
+
+  return imageUrl;
+}
+
 /**
  * Enhances a product with dynamic weight/unit options if they don't exist.
  */
@@ -204,7 +260,7 @@ export function enhanceProduct(p, region = "in", isDeal = false) {
   // If already enhanced or has units, just return
   if (p.units && p.units.length > 0) return p;
 
-  const sanitizedImageUrl = sanitizeImageUrl(p.imageUrl || p.image);
+  const sanitizedImageUrl = resolveProductImage(p);
   const cat = p._cat || "";
   const nameLower = (p.name || "").toLowerCase();
   const imgLower = sanitizedImageUrl.toLowerCase();

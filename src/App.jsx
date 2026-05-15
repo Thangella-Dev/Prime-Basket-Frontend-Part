@@ -15,7 +15,7 @@ import HomePage from "./pages/HomePage";
 import { translations } from "./i18n/translations";
 import { useTracking } from "./context/TrackingContext";
 import TrackingPopup from "./components/TrackingPopup";
-import { formatCurrency, parsePrice, sanitizeImageUrl } from "./utils/productUtils";
+import { formatCurrency, parsePrice, resolveProductImage, sanitizeImageUrl } from "./utils/productUtils";
 
 const AccountPage = lazy(() => import("./pages/AccountPage"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
@@ -79,8 +79,8 @@ const sanitizeStoredProduct = (product) => {
   if (!product || typeof product !== "object") return product;
   return {
     ...product,
-    imageUrl: sanitizeImageUrl(product.imageUrl || product.image),
-    image: sanitizeImageUrl(product.image || product.imageUrl),
+    imageUrl: resolveProductImage(product),
+    image: resolveProductImage(product),
   };
 };
 

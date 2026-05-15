@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { useT } from "../i18n/translations";
 import { useTracking } from "../context/TrackingContext";
-import { formatCurrency, parsePrice } from "../utils/productUtils";
+import { formatCurrency, parsePrice, resolveProductImage } from "../utils/productUtils";
 
 import { PAYMENT_CONFIG } from "../config/paymentConfig";
 import PaymentMethods from "../components/payment/PaymentMethods";
@@ -139,10 +139,10 @@ export default function PaymentPage({ cart, total, delivery, vat = 0, handlingFe
           font-family:'Nunito',sans-serif;
           color: var(--dark);
         }
-        .pay-crumb { background:#fff; border-bottom:1px solid var(--border); padding:11px 0; }
-        .pay-crumb-inner { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--body); }
-        .pay-crumb-back { display:flex; align-items:center; gap:5px; color:#1d5ba0; font-weight:700; cursor:pointer; }
-        .pay-crumb-back:hover { text-decoration:underline; }
+        .pay-crumb { background:linear-gradient(180deg, rgba(255,255,255,0.97), rgba(246,250,255,0.96)); border-bottom:1px solid rgba(203,213,225,0.78); padding:13px 0; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+        .pay-crumb-inner { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--body); }
+        .pay-crumb-back { display:inline-flex; align-items:center; gap:7px; color:#1d5ba0; font-weight:800; cursor:pointer; padding:8px 13px; border-radius:999px; border:1px solid rgba(191,219,254,0.98); background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(237,244,255,0.98)); box-shadow:0 10px 20px rgba(29,91,160,0.08); transition:transform .22s ease, box-shadow .22s ease, color .22s ease; }
+        .pay-crumb-back:hover { transform:translateY(-1px); box-shadow:0 16px 28px rgba(29,91,160,0.14); }
 
         .pay-steps { background:#fff; border-bottom:1px solid var(--border); padding:12px 0; }
         .pay-steps-inner { display:flex; align-items:center; gap:0; justify-content:center; }
@@ -538,7 +538,7 @@ export default function PaymentPage({ cart, total, delivery, vat = 0, handlingFe
                   return (
                     <div key={idx} className="pay-summary-item">
                       <div className="pay-summary-img">
-                        <img src={item.imageUrl} alt={item.name} />
+                        <img src={resolveProductImage(item)} alt={item.name} />
                       </div>
                       <div className="pay-summary-copy">
                         <div className="pay-summary-name">{getTranslatedName(item.name)}</div>
