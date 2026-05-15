@@ -522,7 +522,7 @@ export default function HomePage({
         <div className="container">
           <div className="home-showcase-grid">
             <div className="home-showcase-hero">
-              {loading ? <HeroSkeleton /> : <HeroSlider language={language} />} 
+              {loading ? <HeroSkeleton /> : <HeroSlider language={language} onCategorySelect={onCategorySelect} />} 
             </div>
           </div>
         </div>

@@ -2325,7 +2325,7 @@ body[data-theme="dark"] .browse-btn .chevron {
 /* ── SECTION HEADER ── */
 .sec-header { display: flex; align-items: flex-start; justify-content: left; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
 .sec-title { font-size: 24px; font-family: 'Outfit', 'Quicksand', sans-serif; font-weight: 800; color: var(--navy); letter-spacing: -0.03em; }
-.sec-title::after { content: ''; display: block; width: 56px; height: 4px; background: linear-gradient(90deg, var(--green), var(--blue)); border-radius: 999px; margin-top: 8px; }
+.sec-title::after { display: none; content: none; }
 .view-all { color: #1d5ba0; font-weight: 700; font-size: 13px; align-self: center; }
 .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
 .tab-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); font-size: 12px; font-weight: 600; cursor: pointer; background: #fff; color: var(--body); transition: .2s; font-family: inherit; }

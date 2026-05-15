@@ -2647,3 +2647,146 @@ body[data-theme="dark"] .account-desktop-panel-head h2 {
     font-size: 0.82rem;
   }
 }
+
+.buy-again-card {
+  width: 100%;
+}
+
+.buy-again-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.buy-again-item {
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,249,255,0.98));
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.buy-again-thumb {
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(180deg, #fbfdff, #edf4ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.buy-again-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.buy-again-copy {
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.buy-again-brand {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: #6b86aa;
+}
+
+.buy-again-copy h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+  color: #17324d;
+}
+
+.buy-again-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #64748b;
+  font-size: 0.82rem;
+  flex-wrap: wrap;
+}
+
+.buy-again-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.buy-again-footer strong {
+  color: #1d5ba0;
+  font-size: 1.08rem;
+  font-weight: 900;
+}
+
+.buy-again-btn {
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1d5ba0, #2d73c7);
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(29, 91, 160, 0.16);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.buy-again-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 28px rgba(29, 91, 160, 0.22);
+}
+
+body[data-theme="dark"] .buy-again-item {
+  background: linear-gradient(180deg, rgba(14, 24, 39, 0.98), rgba(17, 31, 49, 0.98));
+  border-color: rgba(87, 111, 148, 0.24);
+  box-shadow: 0 20px 38px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="dark"] .buy-again-thumb {
+  background: linear-gradient(180deg, rgba(18, 31, 49, 0.96), rgba(15, 25, 40, 0.98));
+}
+
+body[data-theme="dark"] .buy-again-brand {
+  color: #9fb6d6;
+}
+
+body[data-theme="dark"] .buy-again-copy h3,
+body[data-theme="dark"] .buy-again-footer strong {
+  color: #f8fbff;
+}
+
+body[data-theme="dark"] .buy-again-meta {
+  color: rgba(203, 213, 225, 0.82);
+}
+
+@media (max-width: 720px) {
+  .buy-again-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .buy-again-copy {
+    padding: 14px;
+  }
+
+  .buy-again-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .buy-again-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -838,10 +838,10 @@ export default function App() {
 
     if (page === "account" && isAuthenticated) {
       return (
-          <AccountPage
-            user={user}
-            onGoHome={goHome}
-            orders={orders}
+        <AccountPage
+          user={user}
+          onGoHome={goHome}
+          orders={orders}
             notifications={notifications}
             onClearNotifications={clearNotifications}
             initialSection={accountSection}
@@ -850,10 +850,11 @@ export default function App() {
             region={region}
             onLogout={handleLogout}
             onOrderSummary={handleOrderSummary}
-            onRateOrder={handleRateOrder}
-            onOrderAgain={handleOrderAgain}
-            onDeleteOrder={deleteOrder}
-          />
+          onRateOrder={handleRateOrder}
+          onOrderAgain={handleOrderAgain}
+          onBuyAgainItem={addToCart}
+          onDeleteOrder={deleteOrder}
+        />
       );
     }
     if (page === "cart") {
@@ -1107,7 +1108,7 @@ export default function App() {
         clearNotifications={clearNotifications}
         enablePullRefresh={refreshablePages.has(page)}
         onPullRefresh={handlePullRefresh}
-        hideMobileGlassDock={hideMobileGlassDock}
+        hideMobileGlassDock={hideMobileGlassDock || isLoginModalOpen}
       >
         <Suspense fallback={renderPageSkeleton()}>
           {renderPage()}

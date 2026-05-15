@@ -159,10 +159,11 @@ function ConfirmDialog({
   );
 }
 
-function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSectionChange, orders: propOrders = [], notifications = [], onClearNotifications, language = "en", region = "in", onOrderSummary, onRateOrder, onOrderAgain, onDeleteOrder }) {
+function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSectionChange, orders: propOrders = [], notifications = [], onClearNotifications, language = "en", region = "in", onOrderSummary, onRateOrder, onOrderAgain, onBuyAgainItem, onDeleteOrder }) {
   const t = useT(language);
   const { logout, user, updateUser } = useAuth();
   const currSym = region === "ke" ? "KES " : "\u20b9";
+  const buyAgainLabel = language === "ke" ? "Nunua Tena" : "Buy Again";
   const [isDesktopLayout, setIsDesktopLayout] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth > 900 : true
   );
@@ -175,6 +176,7 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
   const menuItems = useMemo(() => ([
     { key: "profile", icon: "fa-user", label: t.account.profile, subtitle: "Manage your personal details" },
     { key: "orders", icon: "fa-box", label: t.account.orders, subtitle: "Track and manage your purchases" },
+    { key: "buyAgain", icon: "fa-rotate-right", label: buyAgainLabel, subtitle: "Quickly reorder products you purchased before" },
     { key: "refunds", icon: "fa-rotate-left", label: t.account.myRefunds, subtitle: "Review returns and refund requests" },
     { key: "wallet", icon: "fa-wallet", label: walletSectionLabel, subtitle: "Add money, check balance, and review wallet activity" },
     { key: "addresses", icon: "fa-location-dot", label: t.account.addresses, subtitle: "Saved delivery locations" },
@@ -183,11 +185,12 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
     { key: "payments", icon: "fa-credit-card", label: t.footer.paymentMethods, subtitle: "Cards, wallets, and secure payments" },
     { key: "help", icon: "fa-circle-question", label: t.links.helpTicket, subtitle: "Support and help tickets" },
     { key: "logout", icon: "fa-right-from-bracket", label: t.account.logout, subtitle: "Sign out of your account", tone: "logout" },
-  ]), [t]);
+  ]), [buyAgainLabel, t, walletSectionLabel]);
 
   const sectionMeta = useMemo(() => ({
     profile: { title: t.account.profile, subtitle: "Update your profile, phone, and email details." },
     orders: { title: t.account.orders, subtitle: "See placed orders, reorder items, and rate deliveries." },
+    buyAgain: { title: buyAgainLabel, subtitle: "Reorder the exact products from your previous deliveries, one item at a time." },
     refunds: { title: t.account.myRefunds, subtitle: "Track refunds, return progress, and request updates." },
     wallet: { title: walletSectionLabel, subtitle: "Add money to your wallet, track balance, and review wallet credits." },
     addresses: { title: t.account.addresses, subtitle: "Manage saved delivery addresses and location details." },
@@ -195,7 +198,7 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
     notifications: { title: t.header.notifications, subtitle: "Review recent account, order, and offer notifications." },
     payments: { title: t.footer.paymentMethods, subtitle: "Manage secure payment methods, wallets, and payment info." },
     help: { title: t.links.helpTicket, subtitle: "Open support requests and browse help resources." },
-  }), [t]);
+  }), [buyAgainLabel, t, walletSectionLabel]);
 
   // Sync when parent changes initialSection (e.g. navigating from OrderSuccessPage)
   useEffect(() => {
@@ -246,6 +249,7 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
     <>
       {section === "profile" && <Profile user={user} updateUser={updateUser} t={t} language={language} region={region} />}
       {section === "orders" && <OrdersSection orders={propOrders} t={t} currSym={currSym} onOrderSummary={onOrderSummary} onRateOrder={onRateOrder} onOrderAgain={onOrderAgain} onDeleteOrder={onDeleteOrder} language={language} />}
+      {section === "buyAgain" && <BuyAgainSection orders={propOrders} t={t} currSym={currSym} language={language} onBuyAgainItem={onBuyAgainItem} />}
       {section === "addresses" && <AddressSection t={t} language={language} region={region} />}
       {section === "refunds" && <RefundsDemoSection t={t} currSym={currSym} region={region} language={language} />}
       {section === "wallet" && <WalletSection t={t} currSym={currSym} region={region} language={language} />}
@@ -590,6 +594,74 @@ function Profile({ user, updateUser, t, language = "en", region = "in" }) {
 
 
 /* ─── Orders Component ───────────────────────────────────────────── */
+
+function BuyAgainSection({ orders = [], t, currSym = "\u20b9", language = "en", onBuyAgainItem }) {
+  const buyAgainItems = useMemo(() => {
+    const flattened = orders.flatMap((order) =>
+      (order.items || []).map((item, index) => ({
+        ...item,
+        _buyAgainKey: `${order.orderId}_${item?._uid || item?.id || item?.name || index}`,
+        _orderId: order.orderId,
+      }))
+    );
+
+    const deduped = new Map();
+    flattened.forEach((item) => {
+      const key = `${item._uid || item.name}_${item.selectedUnit || item.standard || item.unit || "default"}`;
+      if (!deduped.has(key)) deduped.set(key, item);
+    });
+
+    return Array.from(deduped.values());
+  }, [orders]);
+
+  return (
+    <div className="buy-again-card">
+      <div className="account-panel-head">
+        <h2>{language === "ke" ? "Nunua bidhaa zako tena" : "Buy your favourites again"}</h2>
+      </div>
+
+      {buyAgainItems.length === 0 ? (
+        <EmptySectionState
+          icon="fa-rotate-right"
+          title={language === "ke" ? "Hakuna bidhaa za kununua tena bado" : "No buy again products yet"}
+          description={
+            language === "ke"
+              ? "Bidhaa kutoka kwa oda zako zilizowasilishwa zitaonekana hapa ili uweze kuzinunua tena haraka."
+              : "Products from your delivered orders will appear here so you can reorder them quickly."
+          }
+        />
+      ) : (
+        <div className="buy-again-grid">
+          {buyAgainItems.map((item) => {
+            const translatedName = getLocalizedProductName(item.name, t);
+            return (
+              <article key={item._buyAgainKey} className="buy-again-item">
+                <div className="buy-again-thumb">
+                  <img src={item.imageUrl} alt={translatedName} loading="lazy" decoding="async" />
+                </div>
+                <div className="buy-again-copy">
+                  <div className="buy-again-brand">{item.brand || (language === "ke" ? "Bidhaa ya zamani" : "Previous order item")}</div>
+                  <h3>{translatedName}</h3>
+                  <div className="buy-again-meta">
+                    <span>{item.selectedUnit || item.standard || item.unit || "1 unit"}</span>
+                    <span>{language === "ke" ? "Oda" : "Order"} #{item._orderId}</span>
+                  </div>
+                  <div className="buy-again-footer">
+                    <strong>{item.price || `${currSym}0.00`}</strong>
+                    <button type="button" className="buy-again-btn" onClick={() => onBuyAgainItem?.(item)}>
+                      <i className="fas fa-cart-plus"></i>
+                      <span>{language === "ke" ? "Nunua tena" : "Buy Again"}</span>
+                    </button>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onRateOrder, onOrderAgain, onDeleteOrder }) {
   const [loading, setLoading] = useState(true);

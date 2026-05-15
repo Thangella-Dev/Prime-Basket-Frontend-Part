@@ -12,7 +12,7 @@ import { useT } from "../i18n/translations";
 
 const AUTO_SLIDE_MS = 2000;
 
-export default function HeroSlider({ language = "en" }) {
+export default function HeroSlider({ language = "en", onCategorySelect }) {
   const t = useT(language);
 
   const BLUE_PRIMARY = "#1d5ba0";
@@ -41,6 +41,7 @@ export default function HeroSlider({ language = "en" }) {
         alt: "Fresh fruits",
         badge: "🍊 Fresh Picks",
         tag: "Fruits & More",
+        targetCategory: "fruits",
       },
       {
         title: t.hero[1].title,
@@ -49,6 +50,7 @@ export default function HeroSlider({ language = "en" }) {
         alt: "Organic vegetables",
         badge: "🥦 Organic",
         tag: "Farm Fresh",
+        targetCategory: "vegetables",
       },
       {
         title: t.hero[2].title,
@@ -57,6 +59,7 @@ export default function HeroSlider({ language = "en" }) {
         alt: "Tropical fruits",
         badge: "🥭 Tropical",
         tag: "Exotic Range",
+        targetCategory: "fruits",
       },
       {
         title: t.hero[3].title,
@@ -65,6 +68,7 @@ export default function HeroSlider({ language = "en" }) {
         alt: "Dairy products",
         badge: "🥛 Daily Fresh",
         tag: "Dairy & Eggs",
+        targetCategory: "dairyProducts",
       },
     ],
     [t]
@@ -392,7 +396,9 @@ export default function HeroSlider({ language = "en" }) {
           );
 
         color:white;
-
+        border:none;
+        cursor:pointer;
+        font-family:inherit;
         text-decoration:none;
 
         font-size:14px;
@@ -600,51 +606,6 @@ export default function HeroSlider({ language = "en" }) {
 
       /* ========================= */
 
-      .hs-nav{
-        position:absolute;
-
-        right:20px;
-        bottom:12px;
-
-        display:flex;
-
-        gap:10px;
-
-        z-index:30;
-      }
-
-      .hs-nav-btn{
-        width:42px;
-        height:42px;
-
-        border:none;
-
-        border-radius:50%;
-
-        cursor:pointer;
-
-        background:rgba(255,255,255,.9);
-
-        backdrop-filter:blur(12px);
-
-        color:${BLUE_PRIMARY};
-
-        font-size:14px;
-
-        transition:.3s ease;
-
-        box-shadow:
-          0 10px 24px rgba(0,0,0,.08);
-      }
-
-      .hs-nav-btn:hover{
-        background:${BLUE_PRIMARY};
-
-        color:white;
-
-        transform:scale(1.06);
-      }
-
       /* =========================
          MOBILE
       ========================= */
@@ -757,21 +718,6 @@ export default function HeroSlider({ language = "en" }) {
           opacity:.24;
         }
 
-        .hs-nav{
-          right:10px;
-
-          bottom:6px;
-
-          gap:6px;
-        }
-
-        .hs-nav-btn{
-          width:30px;
-          height:30px;
-
-          font-size:10px;
-        }
-
         .hs-dots{
           bottom:8px;
         }
@@ -825,10 +771,14 @@ export default function HeroSlider({ language = "en" }) {
               {slide.desc}
             </p>
 
-            <a href="#pGrid" className="hs-cta">
+            <button
+              type="button"
+              className="hs-cta"
+              onClick={() => slide.targetCategory && onCategorySelect?.(slide.targetCategory)}
+            >
               {heroUi.secondaryCta}
               <i className="fas fa-arrow-right"></i>
-            </a>
+            </button>
 
           </div>
 
@@ -882,28 +832,6 @@ export default function HeroSlider({ language = "en" }) {
               onClick={() => goTo(i)}
             />
           ))}
-
-        </div>
-
-        {/* NAVIGATION */}
-
-        <div className="hs-nav">
-
-          <button
-            type="button"
-            className="hs-nav-btn"
-            onClick={() => go(-1)}
-          >
-            <i className="fas fa-arrow-left"></i>
-          </button>
-
-          <button
-            type="button"
-            className="hs-nav-btn"
-            onClick={() => go(1)}
-          >
-            <i className="fas fa-arrow-right"></i>
-          </button>
 
         </div>
 

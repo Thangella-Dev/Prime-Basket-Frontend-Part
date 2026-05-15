@@ -162,6 +162,12 @@ export default function ChatbotWidget({
   }, [authModalOpen, drawerOpen]);
 
   useEffect(() => {
+    if (!isHome && open) {
+      setOpen(false);
+    }
+  }, [isHome, open]);
+
+  useEffect(() => {
     if (open) {
       lockBodyScroll("chatbot-panel");
     } else {
@@ -175,26 +181,23 @@ export default function ChatbotWidget({
 
   useEffect(() => {
     const handleOpenChatbot = () => {
-      if (authModalOpen) return;
+      if (authModalOpen || !isHome) return;
       setOpen(true);
     };
 
     window.addEventListener("open-chatbot", handleOpenChatbot);
     return () => window.removeEventListener("open-chatbot", handleOpenChatbot);
-  }, [authModalOpen]);
+  }, [authModalOpen, isHome]);
 
   const showChatLauncher = useMemo(
     () => (
       !open &&
       !drawerOpen &&
       !authModalOpen &&
-      (
-        isHome
-          ? isHomeAtTop
-          : (!isUserScrolling && !nearFooter)
-      )
+      isHome &&
+      isHomeAtTop
     ),
-    [authModalOpen, drawerOpen, isHome, isHomeAtTop, isUserScrolling, nearFooter, open]
+    [authModalOpen, drawerOpen, isHome, isHomeAtTop, open]
   );
 
   const showTopButton = useMemo(

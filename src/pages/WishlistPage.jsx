@@ -16,6 +16,10 @@ export default function WishlistPage({
   const t = useT(language);
 
   const getTranslatedName = (name) => getLocalizedProductName(name, t);
+  const handleMoveToCart = (item) => {
+    onAddCart && onAddCart(item);
+    toggleWishlist && toggleWishlist(item);
+  };
 
   return (
     <>
@@ -298,12 +302,12 @@ export default function WishlistPage({
                               -
                             </button>
                             <span className="wl-qty-val">{qty}</span>
-                            <button className="wl-qty-btn" onClick={() => onAddCart && onAddCart(item)}>
+                            <button className="wl-qty-btn" onClick={() => handleMoveToCart(item)}>
                               +
                             </button>
                           </div>
                         ) : (
-                          <button className="wl-add-btn" onClick={() => onAddCart && onAddCart(item)}>
+                          <button className="wl-add-btn" onClick={() => handleMoveToCart(item)}>
                             <i className="fas fa-shopping-cart"></i> {t.home.add} {t.header.cart}
                           </button>
                         )}
