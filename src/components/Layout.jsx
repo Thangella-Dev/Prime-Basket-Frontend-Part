@@ -294,8 +294,8 @@ export default function Layout({
             linear-gradient(135deg, rgba(29,91,160,0.36), rgba(68,196,212,0.12));
         }
         @keyframes primeDockRise {
-          from { opacity: 0; transform: translate(-50%, 14px) scale(.96); }
-          to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+          from { opacity: 0; transform: translateY(14px) scale(.96); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes primeDockTap {
           0% { transform: translateY(-1px) scale(1); }
