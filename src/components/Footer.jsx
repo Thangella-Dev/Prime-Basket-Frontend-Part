@@ -26,7 +26,7 @@ function FooterLink({ children, href = "#", className, page }) {
   );
 }
 
-export default function Footer({ language = "en", region = "in" }) {
+export default function Footer({ language = "en", region = "in", hasMobileDock = false }) {
   const t = useT(language);
   const isKenya = region === "ke";
 
@@ -39,7 +39,7 @@ export default function Footer({ language = "en", region = "in" }) {
   const supportPhoneTwo = isKenya ? "+254 700 648 888" : "1900-648-888";
 
   return (
-    <footer className="footer">
+    <footer className={`footer${hasMobileDock ? " footer-with-mobile-dock" : ""}`}>
       <div className="footer-top">
         <div className="footer-col footer-brand">
           <a href="#" className="brand-logo" onClick={(event) => event.preventDefault()}>

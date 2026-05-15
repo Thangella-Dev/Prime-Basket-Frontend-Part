@@ -1,3 +1,4 @@
+import { INDIA_ALL_PRODUCTS } from "./india_products";
 import { KENYA_ALL_PRODUCTS } from "./kenya_products";
 
 function normalizeCategory(category) {
@@ -42,16 +43,25 @@ function withCatalogMeta(product, category, index) {
 }
 
 export function getFallbackCategoryProducts(category) {
-  const targetCategory = normalizeCategory(category);
+  return getFallbackCategoryProductsByRegion(category, "in");
+}
 
-  return KENYA_ALL_PRODUCTS.filter((product) => {
+function getCatalogForRegion(region = "in") {
+  return region === "ke" ? KENYA_ALL_PRODUCTS : INDIA_ALL_PRODUCTS;
+}
+
+export function getFallbackCategoryProductsByRegion(category, region = "in") {
+  const targetCategory = normalizeCategory(category);
+  const catalog = getCatalogForRegion(region);
+
+  return catalog.filter((product) => {
     return normalizeCategory(product._cat) === targetCategory;
   }).map((product, index) => withCatalogMeta(product, category, index));
 }
 
-export function mergeCategoryProducts(category, liveProducts = []) {
+export function mergeCategoryProducts(category, liveProducts = [], region = "in") {
   const merged = new Map(
-    getFallbackCategoryProducts(category).map((product) => [product._uid, product])
+    getFallbackCategoryProductsByRegion(category, region).map((product) => [product._uid, product])
   );
 
   liveProducts.forEach((product, index) => {
@@ -65,14 +75,14 @@ export function mergeCategoryProducts(category, liveProducts = []) {
 export function getFallbackProductByUid(category, uid) {
   if (!uid) return null;
 
-  const directMatch = KENYA_ALL_PRODUCTS.find((product) => product._uid === uid);
+  const directMatch = [...INDIA_ALL_PRODUCTS, ...KENYA_ALL_PRODUCTS].find((product) => product._uid === uid);
   if (directMatch) {
     return directMatch;
   }
 
   const targetCategory = normalizeCategory(category);
   return (
-    KENYA_ALL_PRODUCTS.find((product) => {
+    [...INDIA_ALL_PRODUCTS, ...KENYA_ALL_PRODUCTS].find((product) => {
       return (
         normalizeCategory(product._cat) === targetCategory &&
         `${product._cat}_${product._index}` === uid
@@ -81,6 +91,6 @@ export function getFallbackProductByUid(category, uid) {
   );
 }
 
-export function getFallbackDeals(limit = 4) {
-  return KENYA_ALL_PRODUCTS.filter((product) => product.oldPrice).slice(0, limit);
+export function getFallbackDeals(limit = 4, region = "in") {
+  return getCatalogForRegion(region).filter((product) => product.oldPrice).slice(0, limit);
 }

@@ -26,6 +26,7 @@ export default function CartPage({
   onGoAccount,
   onCheckout,
   onAddCart,
+  onMobileOverlayChange,
   language = "en",
   region = "in",
   user,
@@ -82,6 +83,11 @@ export default function CartPage({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addressNotice, setAddressNotice] = useState("");
+
+  useEffect(() => {
+    onMobileOverlayChange?.(isModalOpen);
+    return () => onMobileOverlayChange?.(false);
+  }, [isModalOpen, onMobileOverlayChange]);
 
   const baseTotal = subtotal + vat + handlingFee + delivery;
   const promoDiscount = appliedPromo ? Math.min(appliedPromo.amount, baseTotal) : 0;
@@ -166,8 +172,8 @@ export default function CartPage({
 
   const specialDeals = useMemo(() => {
     if (!isKenya) return [];
-    return getFallbackDeals(6);
-  }, [isKenya]);
+    return getFallbackDeals(6, region);
+  }, [isKenya, region]);
 
   const recommendedProducts = useMemo(() => {
     if (!isKenya) return [];
@@ -191,6 +197,26 @@ export default function CartPage({
       selectedUnit,
       price: prices.price,
       oldPrice: prices.originalPrice,
+    });
+  };
+
+  const handleProceedCheckout = () => {
+    if (cart.length === 0) return;
+    if (!selectedAddress) {
+      setAddressNotice("");
+      setIsModalOpen(true);
+      return;
+    }
+    onCheckout?.({
+      subtotal,
+      total,
+      delivery,
+      vat,
+      handlingFee,
+      saving,
+      promoDiscount,
+      promoCode: appliedPromo?.code || "",
+      address: selectedAddress,
     });
   };
 
@@ -1687,20 +1713,8 @@ export default function CartPage({
                 <button
                   type="button"
                   className="cart-summary-btn"
-                  disabled={cart.length === 0 || !selectedAddress}
-                  onClick={() =>
-                    onCheckout?.({
-                      subtotal,
-                      total,
-                      delivery,
-                      vat,
-                      handlingFee,
-                      saving,
-                      promoDiscount,
-                      promoCode: appliedPromo?.code || "",
-                      address: selectedAddress,
-                    })
-                  }
+                  disabled={cart.length === 0}
+                  onClick={handleProceedCheckout}
                 >
                   {selectedAddress ? t.cart.checkout : t.cart.selectAddressFirst}
                 </button>
@@ -1731,20 +1745,8 @@ export default function CartPage({
             <button
               type="button"
               className="cart-mobile-sticky-btn"
-              disabled={cart.length === 0 || !selectedAddress}
-              onClick={() =>
-                onCheckout?.({
-                  subtotal,
-                  total,
-                  delivery,
-                  vat,
-                  handlingFee,
-                  saving,
-                  promoDiscount,
-                  promoCode: appliedPromo?.code || "",
-                  address: selectedAddress,
-                })
-              }
+              disabled={cart.length === 0}
+              onClick={handleProceedCheckout}
             >
               <span>{stickyButtonLabel}</span>
               <i className="fas fa-chevron-right"></i>

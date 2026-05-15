@@ -1,5 +1,20 @@
 # Improvements and Gap Analysis
 
+## Latest Stability Pass
+
+- Fixed India-region catalog bleed-through by introducing an India-safe fallback dataset and region-aware fallback helpers
+- Made shared search fallback indexing region-aware so India search results no longer surface Kenya-only products
+- Normalized cart merging by product + selected unit to reduce duplicate line items for the same item
+- Kept wishlist product-only even when the item already exists in cart with a higher quantity
+- Hid the mobile glass dock during address-entry overlays so checkout address forms are fully visible
+- Consolidated desktop locale selection into one country-language control with flag emojis and valid per-country language options
+- Fixed Kenya `English` switching so authenticated Kenya users are no longer forced back to `Swahili`
+- Restricted the chatbot launcher to home and kept it above the mobile dock
+- Improved the mobile dock’s motion and hid it during login/auth and mobile filter/sort overlays
+- Added `Buy Again` to account flows and direct address-entry opening from checkout when no saved address exists
+- Fixed the latest `App.jsx` temporal-dead-zone runtime crash caused by an effect reading `page` before initialization
+- Revalidated the app with `npm run build`
+
 ## Improvements Completed So Far
 
 The following improvements were implemented during the recent Prime Basket frontend improvement cycle.

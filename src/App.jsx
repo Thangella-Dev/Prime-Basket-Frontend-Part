@@ -98,6 +98,12 @@ const buildCartToastPayload = (product, qty, action = "added") => ({
   action,
 });
 
+const normalizeUnitKey = (value) =>
+  String(value || "default")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+
 export default function App() {
   const { isAuthenticated, user, login, logout } = useAuth();
   const { startTracking, activeOrder, completedOrder, setCompletedOrder } = useTracking();
@@ -241,11 +247,6 @@ export default function App() {
       ?.setAttribute("content", theme === "dark" ? "#08111f" : "#1f5ca1");
   }, [theme]);
 
-  useEffect(() => {
-    if (page !== "category" && hideMobileGlassDock) {
-      setHideMobileGlassDock(false);
-    }
-  }, [hideMobileGlassDock]);
 
 
   // ── Navigation state ──
@@ -299,6 +300,12 @@ export default function App() {
 
   // ── Under-development page ──
   const [underDevLabel, setUnderDevLabel] = useState(() => initialNav.underDevLabel || "");
+
+  useEffect(() => {
+    if (!["category", "cart"].includes(page) && hideMobileGlassDock) {
+      setHideMobileGlassDock(false);
+    }
+  }, [hideMobileGlassDock, page]);
 
   const hasMountedNavigationRef = useRef(false);
   // Scroll to top on in-app navigation, but not on initial boot/refresh restore
@@ -566,7 +573,7 @@ export default function App() {
 
   const resolveCartUnit = useCallback((item) => {
     if (!item) return "default";
-    return item.selectedUnit || item.baseUnit || item.standard || item.unit || item.quantityLabel || "default";
+    return normalizeUnitKey(item.selectedUnit || item.baseUnit || item.standard || item.unit || item.quantityLabel || "default");
   }, []);
 
   const normalizeCartProduct = useCallback((product) => {
@@ -708,7 +715,9 @@ export default function App() {
         return prev.filter((item) => item._uid !== product._uid);
       }
       showToast((translations[language] || translations.en).toasts.addedToWishlist);
-      return [...prev, sanitizeStoredProduct(product)];
+      const sanitizedProduct = sanitizeStoredProduct(product);
+      const { quantity, selectedUnit, ...wishlistProduct } = sanitizedProduct || {};
+      return [...prev, wishlistProduct];
     });
   };
 
@@ -868,6 +877,7 @@ export default function App() {
           onGoAccount={() => { if (isAuthenticated) { setAccountSection("profile"); setPage("account"); } else setIsLoginModalOpen(true); }}
           onCheckout={goCheckout}
           onAddCart={addToCart}
+          onMobileOverlayChange={setHideMobileGlassDock}
           language={language}
           region={region}
           user={user}

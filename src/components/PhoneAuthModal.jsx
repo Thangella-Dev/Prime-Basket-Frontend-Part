@@ -138,7 +138,13 @@ export default function PhoneAuthModal({
     }
   };
 
-  const handleSendOtp = async (e) => { e.preventDefault(); await performSendOtp(); };
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    await performSendOtp();
+  };
   const handleResendOtp = async () => { await performSendOtp(); };
 
   const handleVerifyOtp = async (e) => {

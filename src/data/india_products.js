@@ -1,0 +1,72 @@
+export const INDIA_ALL_PRODUCTS = [
+  { _uid: "in_r_001", _cat: "rice", _index: 0, imageUrl: "https://i.ibb.co/B2vRrm6B/daawat-basmati-rice.avif", name: "Daawat Basmati Rice", brand: "Daawat", badge: "premium", price: "₹220", oldPrice: "₹253", stars: "4.7", reviews: 312, standard: "1kg" },
+  { _uid: "in_r_002", _cat: "rice", _index: 1, imageUrl: "https://i.ibb.co/HfkcM1SM/amana-basmati-rice.avif", name: "India Gate Classic Rice", brand: "India Gate", badge: "bestseller", price: "₹190", oldPrice: "₹225", stars: "4.6", reviews: 228, standard: "1kg" },
+
+  { _uid: "in_o_001", _cat: "oil", _index: 0, imageUrl: "https://i.ibb.co/BHy4q3f5/mushroom.jpg", name: "Fortune Sunflower Oil", brand: "Fortune", badge: "sale", price: "₹180", oldPrice: "₹210", stars: "4.5", reviews: 198, standard: "1L" },
+  { _uid: "in_o_002", _cat: "oil", _index: 1, imageUrl: "https://i.ibb.co/C53jjF76/Mirinda-Fruity-Soft-Drink.jpg", name: "Saffola Gold Oil", brand: "Saffola", badge: "healthy", price: "₹240", oldPrice: "₹280", stars: "4.4", reviews: 165, standard: "1L" },
+
+  { _uid: "in_w_001", _cat: "wheat-flour", _index: 0, imageUrl: "https://i.ibb.co/KptPjChj/basmati-rice.jpg", name: "Aashirvaad Atta", brand: "Aashirvaad", badge: "bestseller", price: "₹65", oldPrice: "₹75", stars: "4.8", reviews: 456, standard: "1kg" },
+  { _uid: "in_w_002", _cat: "wheat-flour", _index: 1, imageUrl: "https://i.ibb.co/HfkcM1SM/amana-basmati-rice.avif", name: "Pillsbury Chakki Fresh Atta", brand: "Pillsbury", badge: null, price: "₹60", oldPrice: null, stars: "4.5", reviews: 243, standard: "1kg" },
+
+  { _uid: "in_sa_001", _cat: "salt", _index: 0, imageUrl: "https://i.ibb.co/fGxBC68y/garlic.jpg", name: "Tata Salt", brand: "Tata", badge: "essential", price: "₹28", oldPrice: null, stars: "4.6", reviews: 301, standard: "1kg" },
+  { _uid: "in_sa_002", _cat: "salt", _index: 1, imageUrl: "https://i.ibb.co/5zHGbq3/Manji-Orange-Cream-Biscuit.jpg", name: "Aashirvaad Pink Salt", brand: "Aashirvaad", badge: "new", price: "₹60", oldPrice: "₹72", stars: "4.2", reviews: 82, standard: "1kg" },
+
+  { _uid: "in_su_001", _cat: "sugar", _index: 0, imageUrl: "https://i.ibb.co/qYYyBL1r/sugercane.jpg", name: "Madhur Sugar", brand: "Madhur", badge: null, price: "₹48", oldPrice: null, stars: "4.4", reviews: 190, standard: "1kg" },
+  { _uid: "in_su_002", _cat: "sugar", _index: 1, imageUrl: "https://i.ibb.co/Hfy43qYG/pear.jpg", name: "Dhampure Sugar", brand: "Dhampure", badge: "sale", price: "₹52", oldPrice: "₹58", stars: "4.1", reviews: 76, standard: "1kg" },
+
+  { _uid: "in_c_001", _cat: "chilli-powder", _index: 0, imageUrl: "https://i.ibb.co/7dYqHNJR/top-food-cajun-spice-blend.avif", name: "Aachi Chilli Powder", brand: "Aachi", badge: "sale", price: "₹85", oldPrice: "₹99", stars: "4.6", reviews: 211, standard: "1kg" },
+  { _uid: "in_c_002", _cat: "chilli-powder", _index: 1, imageUrl: "https://i.ibb.co/vvTFYLJ5/Top-Food-Indian-Chat-Masala.avif", name: "Everest Red Chilli Powder", brand: "Everest", badge: null, price: "₹90", oldPrice: null, stars: "4.5", reviews: 187, standard: "1kg" },
+
+  { _uid: "in_t_001", _cat: "turmeric-powder", _index: 0, imageUrl: "https://i.ibb.co/0pLH2fFC/Shan-Shahi-Haleem-Masala-Mix.avif", name: "Aashirvaad Turmeric Powder", brand: "Aashirvaad", badge: null, price: "₹55", oldPrice: null, stars: "4.5", reviews: 171, standard: "500g" },
+  { _uid: "in_t_002", _cat: "turmeric-powder", _index: 1, imageUrl: "https://i.ibb.co/pBFzX5r8/Kikkoman-Egg-Soup-Mix-Hot-Sour.avif", name: "Catch Haldi Powder", brand: "Catch", badge: "fresh", price: "₹48", oldPrice: "₹58", stars: "4.2", reviews: 101, standard: "500g" },
+
+  { _uid: "in_p_001", _cat: "pulses", _index: 0, imageUrl: "https://i.ibb.co/fzcNb8hF/Daawat-Pulses-Green-Grams.avif", name: "Tata Sampann Toor Dal", brand: "Tata Sampann", badge: "bestseller", price: "₹150", oldPrice: "₹168", stars: "4.7", reviews: 332, standard: "1kg" },
+  { _uid: "in_p_002", _cat: "pulses", _index: 1, imageUrl: "https://i.ibb.co/4gM0TxYN/Nongshim-Shin-Ramyun-With-Cheese.avif", name: "24 Mantra Moong Dal", brand: "24 Mantra", badge: "organic", price: "₹135", oldPrice: null, stars: "4.4", reviews: 126, standard: "1kg" },
+
+  { _uid: "in_m_001", _cat: "masala", _index: 0, imageUrl: "https://i.ibb.co/1GRPFdHD/Ottogi-Cheese-Ramen.avif", name: "Everest Garam Masala", brand: "Everest", badge: "premium", price: "₹95", oldPrice: "₹110", stars: "4.6", reviews: 208, standard: "200g" },
+  { _uid: "in_m_002", _cat: "masala", _index: 1, imageUrl: "https://i.ibb.co/HTdb5JCZ/Enso-Wasabi-Peanuts.avif", name: "Catch Kitchen King Masala", brand: "Catch", badge: null, price: "₹88", oldPrice: null, stars: "4.3", reviews: 91, standard: "200g" },
+
+  { _uid: "in_f_001", _cat: "fruits", _index: 0, imageUrl: "https://i.ibb.co/xn1Ch3W/apple.jpg", name: "Shimla Apple", brand: "Fresh Farm", badge: "fresh", price: "₹180", oldPrice: "₹220", stars: "4.5", reviews: 267, standard: "1kg" },
+  { _uid: "in_f_002", _cat: "fruits", _index: 1, imageUrl: "https://i.ibb.co/JjhTVg3F/tota-puri-mango.jpg", name: "Alphonso Mango", brand: "Fresh Farm", badge: "premium", price: "₹260", oldPrice: "₹320", stars: "4.8", reviews: 194, standard: "1kg" },
+
+  { _uid: "in_v_001", _cat: "vegetables", _index: 0, imageUrl: "https://i.ibb.co/VWrM3Xyw/tomatoes.jpg", name: "Farm Tomatoes", brand: "Fresh Farm", badge: "fresh", price: "₹30", oldPrice: null, stars: "4.2", reviews: 144, standard: "1kg" },
+  { _uid: "in_v_002", _cat: "vegetables", _index: 1, imageUrl: "https://i.ibb.co/BKB8Vt8W/potato.jpg", name: "Ooty Potato", brand: "Fresh Farm", badge: null, price: "₹28", oldPrice: "₹36", stars: "4.1", reviews: 99, standard: "1kg" },
+
+  { _uid: "in_d_001", _cat: "dairyProducts", _index: 0, imageUrl: "https://i.ibb.co/8nzSYVjz/Manji-Assorted-Cream-Biscuits.jpg", name: "Amul Butter", brand: "Amul", badge: "bestseller", price: "₹58", oldPrice: null, stars: "4.8", reviews: 412, standard: "500g" },
+  { _uid: "in_d_002", _cat: "dairyProducts", _index: 1, imageUrl: "https://i.ibb.co/PGwJMn3K/bisconni-cocomo-biscuits.jpg", name: "Nandini Milk", brand: "Nandini", badge: null, price: "₹32", oldPrice: null, stars: "4.6", reviews: 281, standard: "500ml" },
+
+  { _uid: "in_fh_001", _cat: "feminineHygiene", _index: 0, imageUrl: "https://i.ibb.co/jZ6QvD3J/Bisconni-Cocomo-Chocolate-Filled-Biscuits.jpg", name: "Whisper Ultra Pads", brand: "Whisper", badge: "care", price: "₹120", oldPrice: "₹145", stars: "4.5", reviews: 166, standard: "1 pack" },
+  { _uid: "in_fh_002", _cat: "feminineHygiene", _index: 1, imageUrl: "https://i.ibb.co/Znc7fNN/Manji-Shortcake-Biscuit.jpg", name: "Sofy Tampons", brand: "Sofy", badge: "new", price: "₹120", oldPrice: null, stars: "4.2", reviews: 87, standard: "1 pack" },
+
+  { _uid: "in_hn_001", _cat: "homeNeeds", _index: 0, imageUrl: "https://i.ibb.co/C53jjF76/Mirinda-Fruity-Soft-Drink.jpg", name: "Surf Excel Liquid", brand: "Surf Excel", badge: "bestseller", price: "₹210", oldPrice: "₹250", stars: "4.6", reviews: 205, standard: "1L" },
+  { _uid: "in_hn_002", _cat: "homeNeeds", _index: 1, imageUrl: "https://i.ibb.co/5zHGbq3/Manji-Orange-Cream-Biscuit.jpg", name: "Vim Dishwash Gel", brand: "Vim", badge: null, price: "₹95", oldPrice: null, stars: "4.3", reviews: 119, standard: "500ml" },
+
+  { _uid: "in_bc_001", _cat: "babyCare", _index: 0, imageUrl: "https://i.ibb.co/ccNtsBhR/baby-corn.jpg", name: "Pampers Baby Diapers", brand: "Pampers", badge: "premium", price: "₹350", oldPrice: "₹399", stars: "4.7", reviews: 264, standard: "1 pack" },
+  { _uid: "in_bc_002", _cat: "babyCare", _index: 1, imageUrl: "https://i.ibb.co/8L0b9PP9/Lotus-Biscoff-Caramel-Biscuits.jpg", name: "Mee Mee Baby Wipes", brand: "Mee Mee", badge: null, price: "₹130", oldPrice: null, stars: "4.3", reviews: 93, standard: "1 pack" },
+
+  { _uid: "in_if_001", _cat: "instantFood", _index: 0, imageUrl: "https://i.ibb.co/p6kc1Rv0/Krackles-Barbeque-Potato-Chips.jpg", name: "Maggi 2-Minute Noodles", brand: "Maggi", badge: "bestseller", price: "₹15", oldPrice: null, stars: "4.8", reviews: 520, standard: "1 pack" },
+  { _uid: "in_if_002", _cat: "instantFood", _index: 1, imageUrl: "https://i.ibb.co/3yLddyKV/Tropical-Heat-Snacks-Tomato-Potato-Crisps.jpg", name: "Yippee Magic Masala", brand: "Sunfeast", badge: "sale", price: "₹14", oldPrice: "₹18", stars: "4.4", reviews: 185, standard: "1 pack" },
+
+  { _uid: "in_mp_001", _cat: "milkPowders", _index: 0, imageUrl: "https://i.ibb.co/rR0yxhY5/Manji-Digestive-Biscuit.jpg", name: "Nestle Everyday Dairy Whitener", brand: "Nestle", badge: null, price: "₹230", oldPrice: "₹260", stars: "4.5", reviews: 143, standard: "500g" },
+  { _uid: "in_mp_002", _cat: "milkPowders", _index: 1, imageUrl: "https://i.ibb.co/LWGtg8C/Nu-Vita-Digestive-Biscuits.jpg", name: "Amulya Milk Powder", brand: "Amul", badge: "new", price: "₹210", oldPrice: null, stars: "4.2", reviews: 77, standard: "500g" },
+
+  { _uid: "in_cn_001", _cat: "chipsAndNamkeens", _index: 0, imageUrl: "https://i.ibb.co/B2MmrN0h/Pringles-Original-Flavour-Crisps.jpg", name: "Haldiram Aloo Bhujia", brand: "Haldiram", badge: "bestseller", price: "₹45", oldPrice: null, stars: "4.6", reviews: 322, standard: "1 pack" },
+  { _uid: "in_cn_002", _cat: "chipsAndNamkeens", _index: 1, imageUrl: "https://i.ibb.co/tMjnYLnN/Norda-Urban-Bites-Nyama-Choma-Potato-Crisps.jpg", name: "Bingo Mad Angles", brand: "Bingo", badge: "sale", price: "₹30", oldPrice: "₹35", stars: "4.3", reviews: 141, standard: "1 pack" },
+
+  { _uid: "in_oc_001", _cat: "oralCare", _index: 0, imageUrl: "https://i.ibb.co/VcnCPNMZ/Tropical-Heat-Snacks-Waves-Potato-Salted-Crisps.jpg", name: "Colgate Toothpaste", brand: "Colgate", badge: null, price: "₹95", oldPrice: "₹110", stars: "4.5", reviews: 188, standard: "200g" },
+  { _uid: "in_oc_002", _cat: "oralCare", _index: 1, imageUrl: "https://i.ibb.co/tPq6vXVr/Tropical-Heat-Waves-Crisps-Fruit-Chutney.jpg", name: "Oral-B Toothbrush", brand: "Oral-B", badge: "care", price: "₹55", oldPrice: null, stars: "4.1", reviews: 74, standard: "1 unit" },
+
+  { _uid: "in_bi_001", _cat: "biscuitsAndCookies", _index: 0, imageUrl: "https://i.ibb.co/FbY3TLg0/Oreo-Biscuit.jpg", name: "Oreo Vanilla Creme", brand: "Oreo", badge: "bestseller", price: "₹35", oldPrice: null, stars: "4.7", reviews: 280, standard: "1 pack" },
+  { _uid: "in_bi_002", _cat: "biscuitsAndCookies", _index: 1, imageUrl: "https://i.ibb.co/v6LmpftZ/Britannia-Cashew-Biscuits.jpg", name: "Britannia Good Day", brand: "Britannia", badge: "sale", price: "₹30", oldPrice: "₹36", stars: "4.5", reviews: 198, standard: "1 pack" },
+
+  { _uid: "in_cd_001", _cat: "coolDrinks", _index: 0, imageUrl: "https://i.ibb.co/R4HjG6hn/Coca-Cola-Pet.jpg", name: "Coca Cola", brand: "Coca-Cola", badge: null, price: "₹40", oldPrice: null, stars: "4.4", reviews: 201, standard: "500ml" },
+  { _uid: "in_cd_002", _cat: "coolDrinks", _index: 1, imageUrl: "https://i.ibb.co/WWQfQPHb/Fanta-Orange-Pet.jpg", name: "Sprite Lemon", brand: "Sprite", badge: "fresh", price: "₹40", oldPrice: null, stars: "4.3", reviews: 157, standard: "500ml" },
+
+  { _uid: "in_bo_001", _cat: "bodyCare", _index: 0, imageUrl: "https://i.ibb.co/fG4v9ryR/musk-melon.jpg", name: "Dove Body Wash", brand: "Dove", badge: "premium", price: "₹150", oldPrice: "₹190", stars: "4.6", reviews: 172, standard: "500ml" },
+  { _uid: "in_bo_002", _cat: "bodyCare", _index: 1, imageUrl: "https://i.ibb.co/fzcNb8hF/Daawat-Pulses-Green-Grams.avif", name: "Santoor Soap", brand: "Santoor", badge: null, price: "₹38", oldPrice: null, stars: "4.2", reviews: 96, standard: "1 unit" },
+
+  { _uid: "in_me_001", _cat: "meat", _index: 0, imageUrl: "https://i.ibb.co/prZMpPKQ/pine-apple.jpg", name: "Farm Fresh Eggs", brand: "Farm Fresh", badge: "bestseller", price: "₹90", oldPrice: "₹100", stars: "4.7", reviews: 240, standard: "6 pcs" },
+  { _uid: "in_me_002", _cat: "meat", _index: 1, imageUrl: "https://i.ibb.co/BKN9vp07/tender-coconut.jpg", name: "Fresh Chicken Curry Cut", brand: "TenderCuts", badge: "fresh", price: "₹280", oldPrice: null, stars: "4.5", reviews: 129, standard: "500g" },
+];
+
+export const INDIA_DEALS = INDIA_ALL_PRODUCTS.filter((product) => product.oldPrice).slice(0, 6);

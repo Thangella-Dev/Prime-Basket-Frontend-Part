@@ -3,7 +3,7 @@ import { database, hasFirebaseConfig } from "../firebase";
 import { ref, get } from "firebase/database";
 import { useT } from "../i18n/translations";
 import { KENYA_ALL_PRODUCTS, KENYA_DEALS, KENYA_SECTIONS } from "../data/kenya_products";
-import { getFallbackCategoryProducts, mergeCategoryProducts } from "../data/catalogFallback";
+import { getFallbackCategoryProductsByRegion, mergeCategoryProducts } from "../data/catalogFallback";
 import { formatCurrencyDisplay } from "../utils/currency";
 import { safeSessionGet, safeSessionRemove, safeSessionSet } from "../utils/safeStorage";
 import HeroSlider from "../components/HeroSlider";
@@ -73,7 +73,7 @@ const fetchCategory = (cat) =>
     const liveProducts = val
       ? Object.values(val).map((p, i) => ({ ...p, _cat: cat, _index: i }))
       : [];
-    return mergeCategoryProducts(cat, liveProducts);
+    return mergeCategoryProducts(cat, liveProducts, "in");
   });
 
 const fetchWithCache = async (cat) => {
@@ -82,7 +82,7 @@ const fetchWithCache = async (cat) => {
   if (cached) {
     try {
       const saved = JSON.parse(cached);
-      return mergeCategoryProducts(cat, saved);
+      return mergeCategoryProducts(cat, saved, "in");
     } catch {
       safeSessionRemove(cacheKey);
     }
@@ -119,14 +119,14 @@ const ensureMinimumItems = (items, minimum) => {
   return expanded;
 };
 
-const buildFallbackHomeSections = () => {
-  const topSelling = getFallbackCategoryProducts(MULTICOL_CATS.topSelling).slice(0, 6);
-  const trending = getFallbackCategoryProducts(MULTICOL_CATS.trending).slice(0, 6);
-  const recentlyAdded = getFallbackCategoryProducts(MULTICOL_CATS.recentlyAdded).slice(0, 6);
-  const topRated = getFallbackCategoryProducts(MULTICOL_CATS.topRated).slice(0, 6);
-  const allPopular = ALL_CATS.flatMap((category) => getFallbackCategoryProducts(category));
+const buildFallbackHomeSections = (region = "in") => {
+  const topSelling = getFallbackCategoryProductsByRegion(MULTICOL_CATS.topSelling, region).slice(0, 6);
+  const trending = getFallbackCategoryProductsByRegion(MULTICOL_CATS.trending, region).slice(0, 6);
+  const recentlyAdded = getFallbackCategoryProductsByRegion(MULTICOL_CATS.recentlyAdded, region).slice(0, 6);
+  const topRated = getFallbackCategoryProductsByRegion(MULTICOL_CATS.topRated, region).slice(0, 6);
+  const allPopular = ALL_CATS.flatMap((category) => getFallbackCategoryProductsByRegion(category, region));
   const allDeals = DEAL_CATS.flatMap((category) =>
-    getFallbackCategoryProducts(category).filter((product) => product.oldPrice)
+    getFallbackCategoryProductsByRegion(category, region).filter((product) => product.oldPrice)
   );
 
   return {
@@ -244,7 +244,7 @@ export default function HomePage({
     }
 
     if (!hasFirebaseConfig || !database) {
-      const fallbackSections = buildFallbackHomeSections();
+      const fallbackSections = buildFallbackHomeSections(region);
       if (!cancelled) {
         setPopular15(fallbackSections.popular15);
         setDeals(fallbackSections.deals);
@@ -260,7 +260,7 @@ export default function HomePage({
     const load = async () => {
       setLoading(!keepContentVisible);
       try {
-        const fallbackSections = buildFallbackHomeSections();
+        const fallbackSections = buildFallbackHomeSections(region);
         const withTimeout = (promise, ms = 4000) =>
           Promise.race([
             promise,
@@ -298,7 +298,7 @@ export default function HomePage({
       } catch (err) {
         console.error("HomePage fetch error:", err);
         if (!cancelled) {
-          const fallbackSections = buildFallbackHomeSections();
+          const fallbackSections = buildFallbackHomeSections(region);
           setPopular15(fallbackSections.popular15);
           setDeals(fallbackSections.deals);
           setMultiCols(fallbackSections.multiCols);
@@ -312,7 +312,7 @@ export default function HomePage({
     return () => {
       cancelled = true;
     };
-  }, [isKenya, language, refreshSignal]);
+  }, [isKenya, language, refreshSignal, region]);
 
   const curatedSections = [
     { key: "topSelling", title: t.home.topSelling, items: (multiCols.topSelling || []).filter(Boolean) },

@@ -37,16 +37,16 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 ### App Shell
 
 - `src/App.jsx`
-  Controls top-level state such as page navigation, region, language, theme, cart, wishlist, checkout state, orders, and login modal state.
+  Controls top-level state such as page navigation, region, language, theme, cart, wishlist, checkout state, orders, login modal state, locale enforcement by phone-region, and mobile dock visibility rules.
 
 - `src/components/Layout.jsx`
-  Wraps the shared page shell.
+  Wraps the shared page shell, mobile glass bottom dock, pull-to-refresh handling, and shared overlay-aware dock suppression.
 
 - `src/components/Header.jsx`
   Handles header behavior, region/language UI, notification dropdown, search overlay, and mobile drawer.
 
 - `src/components/ChatbotWidget.jsx`
-  Handles the floating assistant launcher, mobile/desktop chat panel behavior, footer-aware floating controls, and quantity/auth overlay suppression.
+  Handles the floating assistant launcher, mobile/desktop chat panel behavior, home-only launcher visibility, footer-aware floating controls, and quantity/auth overlay suppression.
 
 - `src/components/Footer.jsx`
   Shared footer.
@@ -91,6 +91,12 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 - `src/utils/productUtils.js`
   Product normalization and currency formatting utilities.
 
+- `src/data/india_products.js`
+  India fallback catalog data used when live India catalog access is unavailable.
+
+- `src/data/kenya_products.js`
+  Kenya fallback catalog data and curated Kenya home/category product surfaces.
+
 - `src/utils/demoPhoneAuth.js`
   Demo OTP generation and verification fallback used when backend phone-auth endpoints are unavailable.
 
@@ -115,8 +121,9 @@ This works, but a future production refactor could move more navigation to a cle
 ### Catalog
 
 - Firebase Realtime Database for live catalog paths
-- local data fallback for some region-specific flows
+- local data fallback for region-specific flows in both India and Kenya
 - timeout-backed fallback protection on key homepage catalog surfaces to avoid prolonged skeleton-only states when live fetches stall
+- region-aware search fallback indexing so category/search results stay aligned to the active phone-region profile
 
 ### User and commerce state
 
@@ -127,6 +134,14 @@ This works, but a future production refactor could move more navigation to a cle
 - client-side chatbot UI
 - AI service prompt-building logic
 - should be moved behind a backend proxy for safer production use
+
+### Commerce interaction rules
+
+- Cart line merging is normalized by product identity plus selected unit
+- Wishlist persistence is product-only and does not store live cart quantity
+- Mobile address-entry overlays signal the shared app shell so the mobile dock hides while forms are open
+- Login/auth overlays and mobile category filter/sort sheets also signal mobile dock suppression
+- Wishlist move-to-cart behavior removes the product from wishlist immediately after adding it to cart
 
 ## Current Architecture Quality
 

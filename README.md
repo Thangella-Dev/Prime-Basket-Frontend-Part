@@ -8,10 +8,10 @@ Primary production domain: `https://prime-basket.in`
 
 - Home, category, product detail, cart, wishlist, payment, and account pages
 - Region switching for `India` and `Kenya`
-- Language switching for `English` and `Swahili`
+- Language switching for `English`, `Hindi`, `Telugu`, and `Swahili`
 - Region-aware currency presentation
 - Firebase-backed live catalog support for configured flows
-- Local fallback/demo data for some region flows
+- Local fallback/demo data for both India and Kenya region flows
 - Chatbot panel and shopping assistant UI
 - Premium mobile-first UI improvements across core screens
 - Ongoing desktop and mobile dark-mode refinement across header, account, and promotional surfaces
@@ -41,6 +41,24 @@ Primary production domain: `https://prime-basket.in`
 - OTP verification now supports one-time-code autofill and smarter multi-digit paste behavior
 - Generated demo/dev OTP values can now be used through an explicit auto-fill choice in the sign-in flow
 - The OTP verification modal now uses a cleaner mobile-friendly choice card for `Auto Fill OTP` versus `Enter Manually`
+- India phone-region users now default to India catalog/language rules, while Kenya phone-region users stay locked to Kenya catalog/language rules
+- Search fallback indexing is now region-aware, so India no longer falls back to Kenya products when live catalog data is unavailable
+- Wishlist now stays product-only even when the same item already exists in cart, and moving wishlist items to cart still removes them from wishlist immediately
+- Cart merging now normalizes unit keys before comparison, reducing duplicate line-items when the same product is added repeatedly
+- The mobile dock now hides correctly for address-entry overlays, including the checkout address modal
+- Desktop locale selection is now consolidated into one premium country-language control with flag emojis and country-valid language options only
+- India locale options now include `English`, `Hindi`, and `Telugu`, while Kenya locale options stay limited to `English` and `Swahili`
+- Kenya users can now switch back from `Swahili` to `English` without the app forcing the region default language again
+- The mobile glass bottom dock now uses a cleaner vertical entry animation, slightly larger tap targets, and stronger active-button feedback
+- The chatbot launcher now shows only on the home page and remains lifted clear of the mobile dock
+- The home hero `Explore now` CTA now opens the matching category flow for the active slide, and the manual slideshow arrows were removed
+- Shared section-title divider lines such as the one after `Popular Products` were removed for a cleaner premium heading style
+- Login/auth overlays now suppress the mobile dock, and OTP send now dismisses the mobile keyboard automatically
+- Checkout `Select address to continue` now jumps directly into address entry when no saved address exists
+- Wishlist/cart interaction is more isolated so wishlist taps do not accidentally trigger neighboring cart actions
+- `Buy Again` is now available in `My Account` for reordering previous items individually
+- The mobile dock now hides while mobile category filter/sort sheets are open
+- A runtime crash in `App.jsx` caused by reading `page` before navigation-state initialization was fixed
 
 ## Tech Stack
 
@@ -202,7 +220,7 @@ Detailed backend guidance is available in [docs/BACKEND_INTEGRATION_GUIDE.md](./
 See the `docs` folder for detailed project documentation:
 
 - [Manager Mail Update](./docs/Mail_Update.md)
-- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-14.md)
+- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-15.md)
 - [Application Overview](./docs/APPLICATION_OVERVIEW.md)
 - [Tech Stack and Architecture](./docs/TECH_STACK_AND_ARCHITECTURE.md)
 - [Backend Integration Guide](./docs/BACKEND_INTEGRATION_GUIDE.md)
@@ -217,5 +235,7 @@ See the `docs` folder for detailed project documentation:
 - Mobile category filter popup mounting, pull-to-refresh behavior, and malformed image URL handling were stabilized in the latest pass
 - Mobile dock/chatbot overlap, account logout confirmation, wallet amount validation, and OTP autofill behavior were improved in the latest pass
 - Desktop logout confirmation rendering and OTP modal choice-card UI were finalized in the latest pass
+- Region-aware India fallback catalog, search indexing, wishlist/cart merge behavior, and address-modal mobile dock suppression were finalized in the latest pass
+- Locale selector consolidation, Kenya-English switching, home-only chatbot visibility, mobile dock/filter suppression, hero CTA routing, account `Buy Again`, and the latest `App.jsx` runtime crash fix were finalized in the latest pass
 - The app is suitable as a strong frontend demo/prototype
 - Final device-lab/browser QA and backend completion are still recommended before production use

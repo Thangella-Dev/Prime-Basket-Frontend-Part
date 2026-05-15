@@ -238,7 +238,9 @@ export default function ProductCard({
 
       {/* Wishlist Button */}
       <button 
+        type="button"
         className={`pwish-v2 ${isWished ? "active" : ""}`}
+        onPointerDown={(e) => e.stopPropagation()}
         onClick={(e) => { e.stopPropagation(); toggleWishlist && toggleWishlist(p); }}
       >
         <Heart size={18} fill={isWished ? "currentColor" : "none"} stroke={isWished ? "#ff3b81" : "currentColor"} color={isWished ? "#ff3b81" : "currentColor"} />
@@ -293,12 +295,12 @@ export default function ProductCard({
       <div className="p-action-row-v2" onClick={(e) => e.stopPropagation()}>
         {qty > 0 ? (
           <div className="qty-v2">
-            <button className="qty-btn-v2" onClick={handleDecrease}>-</button>
+            <button type="button" className="qty-btn-v2" onPointerDown={(e) => e.stopPropagation()} onClick={handleDecrease}>-</button>
             <span className="qty-val-v2">{qty}</span>
-            <button className="qty-btn-v2" onClick={handleAdd}>+</button>
+            <button type="button" className="qty-btn-v2" onPointerDown={(e) => e.stopPropagation()} onClick={handleAdd}>+</button>
           </div>
         ) : (
-          <button className="padd-v2" onClick={handleAdd}>
+          <button type="button" className="padd-v2" onPointerDown={(e) => e.stopPropagation()} onClick={handleAdd}>
             <ShoppingBasket size={16} strokeWidth={2} style={{ marginRight: 8 }} />
             {t.home.add || "ADD"}
           </button>

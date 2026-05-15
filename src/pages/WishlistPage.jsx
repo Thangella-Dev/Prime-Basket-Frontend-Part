@@ -25,10 +25,29 @@ export default function WishlistPage({
     <>
       <style>{`
         .wl-page { background: var(--bg); min-height: 100vh; padding-bottom: 60px; }
-        .wl-crumb { background:#fff; border-bottom:1px solid var(--border); padding:12px 0; }
-        .wl-crumb-inner { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--body); }
-        .wl-crumb-back { color:#1d5ba0; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; }
-        .wl-crumb-back:hover { text-decoration:underline; }
+        .wl-crumb {
+          background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(247,250,255,0.96));
+          border-bottom: 1px solid rgba(203,213,225,0.72);
+          padding: 14px 0;
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+        }
+        .wl-crumb-inner { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--body); }
+        .wl-crumb-back {
+          color:#1d5ba0;
+          font-weight:800;
+          cursor:pointer;
+          display:inline-flex;
+          align-items:center;
+          gap:8px;
+          padding:8px 12px;
+          border-radius:999px;
+          background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(237,244,255,0.98));
+          border:1px solid rgba(191,219,254,0.98);
+          box-shadow:0 10px 18px rgba(29,91,160,0.08);
+          transition:transform .2s ease, box-shadow .2s ease, color .2s ease;
+        }
+        .wl-crumb-back:hover { transform: translateY(-1px); box-shadow:0 16px 24px rgba(29,91,160,0.14); }
 
         .wl-header-bar {
           background:#fff;
@@ -261,8 +280,6 @@ export default function WishlistPage({
 
               <div className="wl-grid">
                 {wishlist.map((item) => {
-                  const inCart = cart.find((c) => c._uid === item._uid);
-                  const qty = inCart ? inCart.quantity : 0;
                   const translatedName = getTranslatedName(item.name);
                   const unitLabel = item.standard || item.unit || item.quantity || "1 unit";
                   const oldVal = parseFloat(String(item.oldPrice || "").replace(/[^0-9.]/g, ""));
@@ -296,21 +313,9 @@ export default function WishlistPage({
                           {item.oldPrice && <span className="wl-card-old">{item.oldPrice}</span>}
                           {discPct && <span className="wl-card-save">{discPct}% off</span>}
                         </div>
-                        {qty > 0 ? (
-                          <div className="wl-qty">
-                            <button className="wl-qty-btn" onClick={() => onDecreaseCart && onDecreaseCart(item._uid)}>
-                              -
-                            </button>
-                            <span className="wl-qty-val">{qty}</span>
-                            <button className="wl-qty-btn" onClick={() => handleMoveToCart(item)}>
-                              +
-                            </button>
-                          </div>
-                        ) : (
-                          <button className="wl-add-btn" onClick={() => handleMoveToCart(item)}>
-                            <i className="fas fa-shopping-cart"></i> {t.home.add} {t.header.cart}
-                          </button>
-                        )}
+                        <button className="wl-add-btn" onClick={() => handleMoveToCart(item)}>
+                          <i className="fas fa-shopping-cart"></i> {t.home.add} {t.header.cart}
+                        </button>
                       </div>
                     </div>
                   );

@@ -363,7 +363,7 @@ export default function CategoryPage({
     const fromFallbackAll = () =>
       prep(
         CATEGORIES_DATA.flatMap((cat) =>
-          mergeCategoryProducts(cat.value).map((product, i) => ({
+          mergeCategoryProducts(cat.value, [], region).map((product, i) => ({
             ...product, _cat: cat.value, _index: i,
             _uid: product._uid || `${cat.value}_${i}`,
           }))
@@ -426,7 +426,7 @@ export default function CategoryPage({
     }
 
     if (!hasFirebaseConfig || !database) {
-      const fallback = prep(mergeCategoryProducts(category));
+      const fallback = prep(mergeCategoryProducts(category, [], region));
       setAllProducts(fallback); setProducts(fallback); setLoading(false);
       previousCategoryRef.current = category;
       previousRegionRef.current = region;
@@ -437,23 +437,24 @@ export default function CategoryPage({
     get(ref(database, "categories/" + category))
       .then((snap) => {
         const data = snap.val();
-        const merged = prep(
-          mergeCategoryProducts(
-            category,
-            data
-              ? Object.values(data).map((prod, i) => ({
-                  ...prod, _cat: category, _index: i, _uid: `${category}_${i}`,
-                }))
-              : []
-          )
-        );
+          const merged = prep(
+            mergeCategoryProducts(
+              category,
+              data
+                ? Object.values(data).map((prod, i) => ({
+                    ...prod, _cat: category, _index: i, _uid: `${category}_${i}`,
+                  }))
+                : [],
+              region
+            )
+          );
         setProducts(merged); setLoading(false);
         previousCategoryRef.current = category;
         previousRegionRef.current = region;
         previousRefreshRef.current = refreshSignal;
       })
       .catch(() => {
-        const fallback = prep(mergeCategoryProducts(category));
+        const fallback = prep(mergeCategoryProducts(category, [], region));
         setProducts(fallback); setLoading(false);
         previousCategoryRef.current = category;
         previousRegionRef.current = region;
@@ -471,8 +472,8 @@ export default function CategoryPage({
     }
     if (!hasFirebaseConfig || !database) {
       setAllProducts(
-        prep(CATEGORIES_DATA.flatMap((cat) =>
-          mergeCategoryProducts(cat.value).map((product, i) => ({
+          prep(CATEGORIES_DATA.flatMap((cat) =>
+            mergeCategoryProducts(cat.value, [], region).map((product, i) => ({
             ...product, _cat: cat.value, _index: i,
             _uid: product._uid || `${cat.value}_${i}`,
           }))
@@ -489,16 +490,16 @@ export default function CategoryPage({
             _uid: product?._uid || `${catKey}_${i}`,
           }))
         );
-        setAllProducts(raw.length ? prep(raw) : prep(CATEGORIES_DATA.flatMap((cat) =>
-          mergeCategoryProducts(cat.value).map((product, i) => ({
+          setAllProducts(raw.length ? prep(raw) : prep(CATEGORIES_DATA.flatMap((cat) =>
+            mergeCategoryProducts(cat.value, [], region).map((product, i) => ({
             ...product, _cat: cat.value, _index: i,
             _uid: product._uid || `${cat.value}_${i}`,
           }))
         )));
       })
       .catch(() => {
-        setAllProducts(prep(CATEGORIES_DATA.flatMap((cat) =>
-          mergeCategoryProducts(cat.value).map((product, i) => ({
+          setAllProducts(prep(CATEGORIES_DATA.flatMap((cat) =>
+            mergeCategoryProducts(cat.value, [], region).map((product, i) => ({
             ...product, _cat: cat.value, _index: i,
             _uid: product._uid || `${cat.value}_${i}`,
           }))

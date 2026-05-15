@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { database, hasFirebaseConfig } from "../firebase";
 import { ref, get } from "firebase/database";
+import { INDIA_ALL_PRODUCTS } from "../data/india_products";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
 
 const ALL_CATS = [
@@ -46,8 +47,8 @@ const toIndexedProduct = (product, catValue, index) => ({
   _uid: product._uid || `${product._cat || catValue}_${index}`,
 });
 
-const buildFallbackIndex = () => ({
-  products: KENYA_ALL_PRODUCTS.map((product, index) =>
+const buildFallbackIndex = (region = "in") => ({
+  products: (region === "ke" ? KENYA_ALL_PRODUCTS : INDIA_ALL_PRODUCTS).map((product, index) =>
     toIndexedProduct(product, product._cat || "general", index)
   ),
   categories: ALL_CATS,
@@ -55,7 +56,7 @@ const buildFallbackIndex = () => ({
 
 // Build the full index once and cache it in module scope.
 // Keep this after helper declarations so production bundles do not hit TDZ errors.
-let cachedIndex = buildFallbackIndex();
+let cachedIndex = buildFallbackIndex("in");
 let indexPromise = null;
 let liveIndexHydrated = false;
 
@@ -96,9 +97,7 @@ async function buildIndex() {
       .filter((result) => result.status === "fulfilled")
       .flatMap((result) => result.value || []);
 
-    const mergedProducts = new Map(
-      buildFallbackIndex().products.map((product) => [product._uid, product])
-    );
+    const mergedProducts = new Map(buildFallbackIndex("in").products.map((product) => [product._uid, product]));
 
     liveProducts.forEach((product) => {
       mergedProducts.set(product._uid, product);
@@ -143,7 +142,7 @@ export function useSearch(region = "in") {
    * - products:   matching product objects   (with _cat, _uid, etc.)
    */
   const search = useCallback((query) => {
-    const activeIndex = isKenya ? buildFallbackIndex() : cachedIndex;
+    const activeIndex = isKenya ? buildFallbackIndex("ke") : cachedIndex;
 
     if (!activeIndex || !query || query.trim().length < 1) {
       return { categories: [], products: [] };

@@ -38,7 +38,11 @@ export default function Layout({
   const pullStateRef = useRef({ active: false, startY: 0, distance: 0 });
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const showMobileGlassDock = ["home", "category", "product", "cart", "wishlist", "account"].includes(currentPage) && !hideMobileGlassDock;
+  const [addressOverlayOpen, setAddressOverlayOpen] = useState(false);
+  const showMobileGlassDock =
+    ["home", "category", "product", "cart", "wishlist", "account"].includes(currentPage) &&
+    !hideMobileGlassDock &&
+    !addressOverlayOpen;
   const mobileDockBadge = (count) => (
     count > 0 ? <span className="prime-mobile-dock-badge">{count > 99 ? "99+" : count}</span> : null
   );
@@ -50,6 +54,16 @@ export default function Layout({
       pullStateRef.current = { active: false, startY: 0, distance: 0 };
     }
   }, [enablePullRefresh]);
+
+  useEffect(() => {
+    const handleAddressOverlay = (event) => {
+      setAddressOverlayOpen(Boolean(event?.detail?.open));
+    };
+    window.addEventListener("prime-address-overlay", handleAddressOverlay);
+    return () => {
+      window.removeEventListener("prime-address-overlay", handleAddressOverlay);
+    };
+  }, []);
 
   const maxPull = 88;
   const triggerPull = 62;
@@ -419,7 +433,7 @@ export default function Layout({
           </div>
         </nav>
       )}
-      {showFooter && <Footer onNavigate={onFooterNavigate} language={language} region={region} wishlistCount={wishlistCount} onWishlistClick={onWishlistClick} />}
+      {showFooter && <Footer onNavigate={onFooterNavigate} language={language} region={region} wishlistCount={wishlistCount} onWishlistClick={onWishlistClick} hasMobileDock={showMobileGlassDock} />}
 
       <Suspense fallback={null}>
         <ChatbotWidget

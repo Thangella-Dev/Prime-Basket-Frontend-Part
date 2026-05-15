@@ -39,20 +39,35 @@ The frontend currently supports:
 - `India` region
 - `Kenya` region
 - `English` language
+- `Hindi` language
+- `Telugu` language
 - `Swahili` language
 
 Important behavior:
 
-- Country selection can auto-switch the default language
-- Users can still manually override the language afterwards
+- Phone-number login now auto-locks the region profile to `India` or `Kenya`
+- India profiles now stay within India-valid languages and India-related products
+- Kenya profiles now stay within Kenya-valid languages and Kenya-related products
+- Desktop locale selection is now presented as one combined country-language control with flag emojis, matching the premium mobile direction more closely
+- Users can still manually switch only within the valid language set for their active country
 - Currency formatting is region-aware in major shopping flows
 
 ## Current Data Sources
 
 The application currently mixes two catalog modes:
 
-- `India` catalog: primarily Firebase Realtime Database driven
+- `India` catalog: primarily Firebase Realtime Database driven, with an India-safe local fallback layer
 - `Kenya` catalog: largely local fallback/static product data
+
+Recent storefront hardening also added:
+
+- region-aware fallback search indexing
+- normalized cart merging by product + unit
+- product-only wishlist display even if the product is already in cart
+- mobile dock suppression while address-entry overlays are open
+- mobile dock suppression during login/auth overlays and mobile category filter/sort sheets
+- home-only chatbot visibility instead of global page-wide launcher presence
+- hero CTA routing from `Explore now` into the related category flow
 
 Other important state is currently stored in the browser through `localStorage`, including:
 
@@ -85,6 +100,9 @@ Other important state is currently stored in the browser through `localStorage`,
 - OTP verification UX now supports one-time-code autofill and smarter paste handling
 - Desktop account logout now uses the same visible confirmation behavior as mobile
 - The sign-in OTP flow now asks before auto-filling generated demo OTP values and presents the choice more clearly on mobile
+- OTP send now dismisses the mobile keyboard for a smoother auth flow
+- `Buy Again` now exists in `My Account` for quick reorders from previous purchases
+- Desktop account logout now confirms correctly and no longer fails silently
 
 ## Current Limitations
 

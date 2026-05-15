@@ -159,6 +159,14 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
     return () => window.removeEventListener("resize", syncViewport);
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    window.dispatchEvent(new CustomEvent("prime-address-overlay", { detail: { open: isOpen } }));
+    return () => {
+      window.dispatchEvent(new CustomEvent("prime-address-overlay", { detail: { open: false } }));
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSave = () => {
