@@ -217,13 +217,13 @@ export default function App() {
     if (!isAuthenticated || !user?.phone) return;
     const inferredRegion = deriveRegionFromPhone(user.phone);
     if (!inferredRegion) return;
-    const inferredLanguage = getDefaultLanguageForRegion(inferredRegion);
 
     if (region !== inferredRegion) {
       setRegion(inferredRegion);
     }
-    if (language !== inferredLanguage) {
-      setLanguage(inferredLanguage);
+    const sanitizedLanguage = sanitizeLanguageForRegion(language, inferredRegion);
+    if (language !== sanitizedLanguage) {
+      setLanguage(sanitizedLanguage);
     }
   }, [isAuthenticated, user?.phone, region, language]);
 

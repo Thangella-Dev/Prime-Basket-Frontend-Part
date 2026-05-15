@@ -135,14 +135,14 @@ export default function Layout({
     <>
       <style>{`
         .page-shell.has-mobile-glass-dock {
-          padding-bottom: 82px;
+          padding-bottom: 96px;
         }
         .prime-mobile-glass-dock {
           position: fixed;
           left: 50%;
-          bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+          bottom: calc(18px + env(safe-area-inset-bottom, 0px));
           transform: translateX(-50%);
-          width: min(90vw, 404px);
+          width: min(92vw, 418px);
           z-index: 99988;
           display: none;
           pointer-events: none;
@@ -151,9 +151,9 @@ export default function Layout({
           pointer-events: auto;
           display: grid;
           grid-template-columns: repeat(5, minmax(0, 1fr));
-          gap: 2px;
-          padding: 6px;
-          border-radius: 22px;
+          gap: 3px;
+          padding: 8px;
+          border-radius: 24px;
           border: 1px solid rgba(255,255,255,0.2);
           background:
             linear-gradient(135deg, rgba(255,255,255,0.36), rgba(255,255,255,0.16)),
@@ -168,33 +168,35 @@ export default function Layout({
         .prime-mobile-dock-item {
           position: relative;
           border: none;
-          border-radius: 14px;
-          min-height: 50px;
-          padding: 6px 3px 5px;
+          border-radius: 16px;
+          min-height: 56px;
+          padding: 7px 4px 6px;
           background: transparent;
           color: #174d8e;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 4px;
+          gap: 5px;
           cursor: pointer;
           font-family: inherit;
-          transition: transform .22s ease, color .22s ease, background .22s ease, box-shadow .22s ease;
+          transition: transform .22s ease, color .22s ease, background .22s ease, box-shadow .22s ease, filter .22s ease;
           overflow: hidden;
+          -webkit-tap-highlight-color: transparent;
         }
         .prime-mobile-dock-item::before {
           content: "";
           position: absolute;
           inset: 0;
-          border-radius: 16px;
+          border-radius: 18px;
           background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04));
           opacity: 0;
           transition: opacity .22s ease;
         }
         .prime-mobile-dock-item:hover,
         .prime-mobile-dock-item:active {
-          transform: translateY(-2px) scale(1.01);
+          transform: translateY(-3px) scale(1.02);
+          filter: saturate(1.05);
         }
         .prime-mobile-dock-item:hover::before,
         .prime-mobile-dock-item:active::before,
@@ -206,21 +208,24 @@ export default function Layout({
           background: linear-gradient(180deg, rgba(255,255,255,0.48), rgba(233,242,255,0.24));
           box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28), 0 10px 20px rgba(10,24,48,0.1);
         }
+        .prime-mobile-dock-item:active {
+          animation: primeDockTap .28s ease;
+        }
         .prime-mobile-dock-item.active .prime-mobile-dock-icon {
           transform: translateY(-1px) scale(1.04);
           box-shadow: 0 8px 16px rgba(12, 39, 85, 0.12);
         }
         .prime-mobile-dock-icon {
           position: relative;
-          width: 27px;
-          height: 27px;
-          border-radius: 9px;
+          width: 30px;
+          height: 30px;
+          border-radius: 10px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           background: rgba(255,255,255,0.22);
           border: 1px solid rgba(255,255,255,0.2);
-          font-size: 12px;
+          font-size: 13px;
           transition: transform .22s ease, background .22s ease, box-shadow .22s ease;
         }
         .prime-mobile-dock-item.active .prime-mobile-dock-icon,
@@ -230,7 +235,7 @@ export default function Layout({
         }
         .prime-mobile-dock-label {
           position: relative;
-          font-size: 8.8px;
+          font-size: 9.4px;
           font-weight: 800;
           line-height: 1;
           letter-spacing: 0.01em;
@@ -291,6 +296,11 @@ export default function Layout({
         @keyframes primeDockRise {
           from { opacity: 0; transform: translate(-50%, 14px) scale(.96); }
           to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+        @keyframes primeDockTap {
+          0% { transform: translateY(-1px) scale(1); }
+          50% { transform: translateY(-4px) scale(0.98); }
+          100% { transform: translateY(-3px) scale(1.02); }
         }
         @media (max-width: 768px) {
           .prime-mobile-glass-dock {
