@@ -3,8 +3,9 @@ import { useState, useEffect, useMemo } from "react";
 import { database, hasFirebaseConfig } from "../firebase";
 import { ref, get } from "firebase/database";
 import { useT } from "../i18n/translations";
+import { INDIA_ALL_PRODUCTS } from "../data/india_products";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
-import { enhanceProduct, formatCurrency, parsePrice } from "../utils/productUtils";
+import { enhanceProduct, formatCurrency, parsePrice, resolveProductImage } from "../utils/productUtils";
 import ProductCard from "../components/ProductCard";
 import { getLocalizedProductName } from "../utils/translationUtils";
 import { SkeletonCard } from "../components/SkeletonLoaders";
@@ -110,7 +111,8 @@ export default function ProductDetailPage({
     setLoadingSimilar(true);
     const relCats = RELATED[product._cat] || ["fruits", "vegetables", "dairyProducts"];
     const fallbackRelated = () => {
-      const allRelated = KENYA_ALL_PRODUCTS
+      const fallbackCatalog = region === "ke" ? KENYA_ALL_PRODUCTS : INDIA_ALL_PRODUCTS;
+      const allRelated = fallbackCatalog
         .filter((p) => relCats.includes(p._cat) && p._uid !== product._uid)
         .slice(0, 10);
       setSimilar(allRelated.map((p) => enhanceProduct(p, region)));
@@ -362,7 +364,7 @@ export default function ProductDetailPage({
               <div className="pdp-thumbs">
                 {[0,1,2].map((i) => (
                   <div key={i} className={`pdp-thumb${activeThumb === i ? " active" : ""}`} onClick={() => setActiveThumb(i)}>
-                    <img src={product.imageUrl} alt="" />
+                    <img src={resolveProductImage(product)} alt="" />
                   </div>
                 ))}
               </div>
@@ -380,7 +382,7 @@ export default function ProductDetailPage({
                 </div>
                 {shareMsg && <div className="pdp-share-toast">{shareMsg}</div>}
                 <div className="pdp-img-zone">
-                  <img src={product.imageUrl} alt={translatedName} className="pdp-bigimg" />
+                  <img src={resolveProductImage(product)} alt={translatedName} className="pdp-bigimg" />
                 </div>
               </div>
             </div>

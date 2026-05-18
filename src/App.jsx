@@ -15,7 +15,7 @@ import HomePage from "./pages/HomePage";
 import { translations } from "./i18n/translations";
 import { useTracking } from "./context/TrackingContext";
 import TrackingPopup from "./components/TrackingPopup";
-import { formatCurrency, parsePrice, resolveProductImage, sanitizeImageUrl } from "./utils/productUtils";
+import { formatCurrency, parsePrice, resolveProductImage } from "./utils/productUtils";
 
 const AccountPage = lazy(() => import("./pages/AccountPage"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
@@ -1171,7 +1171,7 @@ export default function App() {
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 {p.image || p.imageUrl ? (
-                  <img src={sanitizeImageUrl(p.image || p.imageUrl)} alt={name}
+                  <img src={resolveProductImage(p)} alt={name}
                     style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                 ) : (
                   <i className="fas fa-box" style={{ color: "#ccc", fontSize: "22px" }}></i>

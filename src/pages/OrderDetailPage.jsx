@@ -1,6 +1,6 @@
 import { useT } from "../i18n/translations";
 import { formatPhoneForDisplay } from "../utils/phoneValidation";
-import { formatCurrency } from "../utils/productUtils";
+import { formatCurrency, resolveProductImage } from "../utils/productUtils";
 import { getLocalizedProductName } from "../utils/translationUtils";
 
 export default function OrderDetailPage({ order, onGoBack, onGoRate, onOrderAgain, language = "en", region = "in", user }) {
@@ -240,7 +240,7 @@ export default function OrderDetailPage({ order, onGoBack, onGoRate, onOrderAgai
                   const price = parseFloat(String(item.price || "").replace(/[^0-9.]/g, "")) || 0;
                   return (
                     <div key={idx} className="od-item">
-                      <div className="od-item-img"><img src={item.imageUrl} alt={item.name} /></div>
+                      <div className="od-item-img"><img src={resolveProductImage(item)} alt={item.name} /></div>
                       <div style={{ flex: 1 }}>
                         <div className="od-item-name">{getTranslatedName(item.name)}</div>
                         <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600, marginTop: 2 }}>{item.selectedUnit} × {item.quantity}</div>
