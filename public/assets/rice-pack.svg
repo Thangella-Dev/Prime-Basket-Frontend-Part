@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#e4eefc"/>
+    </linearGradient>
+    <linearGradient id="bag" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#fbf0d2"/>
+      <stop offset="100%" stop-color="#e3c68f"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <path d="M156 128h200l28 58v166c0 47-38 84-84 84h-88c-46 0-84-37-84-84V186z" fill="url(#bag)"/>
+  <path d="M156 128h200l-18 40H174z" fill="#caa56b"/>
+  <rect x="190" y="194" width="132" height="116" rx="28" fill="#fffdf7" opacity=".92"/>
+  <ellipse cx="256" cy="347" rx="84" ry="48" fill="#fffaf0"/>
+  <g fill="#f8f0d8">
+    <ellipse cx="214" cy="342" rx="12" ry="5" transform="rotate(-18 214 342)"/>
+    <ellipse cx="244" cy="330" rx="12" ry="5" transform="rotate(12 244 330)"/>
+    <ellipse cx="276" cy="341" rx="12" ry="5" transform="rotate(-10 276 341)"/>
+    <ellipse cx="304" cy="329" rx="12" ry="5" transform="rotate(18 304 329)"/>
+    <ellipse cx="231" cy="360" rx="12" ry="5" transform="rotate(6 231 360)"/>
+    <ellipse cx="280" cy="360" rx="12" ry="5" transform="rotate(-14 280 360)"/>
+  </g>
+  <text x="256" y="244" text-anchor="middle" font-size="42" font-family="Segoe UI, Arial, sans-serif" fill="#8b5e2b" font-weight="700">RICE</text>
+  <text x="256" y="280" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#c49651">PREMIUM GRAINS</text>
+</svg>

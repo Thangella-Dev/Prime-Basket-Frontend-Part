@@ -3,6 +3,7 @@ import { useAuth } from "./context/AuthContext";
 import Layout from "./components/Layout";
 import PhoneAuthModal from "./components/PhoneAuthModal";
 import PremiumPageLoader from "./components/PremiumPageLoader";
+import AppErrorBoundary from "./components/AppErrorBoundary";
 import {
   AccountDashboardSkeleton,
   CartPageSkeleton,
@@ -1140,9 +1141,11 @@ export default function App() {
         onPullRefresh={handlePullRefresh}
         hideMobileGlassDock={hideMobileGlassDock || isLoginModalOpen}
       >
-        <Suspense fallback={renderPageSkeleton()}>
-          {renderPage()}
-        </Suspense>
+        <AppErrorBoundary>
+          <Suspense fallback={renderPageSkeleton()}>
+            {renderPage()}
+          </Suspense>
+        </AppErrorBoundary>
       </Layout>
 
       {/* ── Zepto-style Cart Preview Panel ── */}

@@ -10,7 +10,7 @@ import {
 
 import { useT } from "../i18n/translations";
 
-const AUTO_SLIDE_MS = 2000;
+const AUTO_SLIDE_MS = 3200;
 
 export default function HeroSlider({ language = "en", onCategorySelect }) {
   const t = useT(language);
@@ -46,7 +46,7 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
       {
         title: t.hero[1].title,
         desc: t.hero[1].desc,
-        img: "/assets/fresh&clean.png",
+        img: "/assets/leafy-greens.png",
         alt: "Organic vegetables",
         badge: "🥦 Organic",
         tag: "Farm Fresh",
@@ -73,6 +73,27 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
     ],
     [t]
   );
+  const premiumHeroUi = useMemo(
+    () => ({
+      ...heroUi,
+      eyebrow: language === "ke" ? "Bidhaa bora za kila siku" : "Fresh • Fast • Everyday",
+    }),
+    [heroUi, language]
+  );
+  const premiumSlides = useMemo(
+    () =>
+      slides.map((slide, index) => ({
+        ...slide,
+        badge:
+          [
+            "🍊 Fresh Picks",
+            "🥦 Organic",
+            "🥭 Tropical",
+            "🥛 Daily Fresh",
+          ][index] || slide.badge,
+      })),
+    [slides]
+  );
 
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -90,7 +111,7 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
     y: 0,
   });
 
-  const len = slides.length;
+  const len = premiumSlides.length;
 
   const clearTimer = () => {
     if (timerRef.current) {
@@ -217,7 +238,7 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
     return "hidden";
   };
 
-  const slide = slides[current];
+  const slide = premiumSlides[current];
 
   return (
     <>
@@ -754,7 +775,7 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
 
             <div className="hs-eyebrow">
               <span className="hs-eyebrow-dot"></span>
-              {heroUi.eyebrow}
+              {premiumHeroUi.eyebrow}
             </div>
 
             <div className="hs-badge">
@@ -776,7 +797,7 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
               className="hs-cta"
               onClick={() => slide.targetCategory && onCategorySelect?.(slide.targetCategory)}
             >
-              {heroUi.secondaryCta}
+              {premiumHeroUi.secondaryCta}
               <i className="fas fa-arrow-right"></i>
             </button>
 
@@ -786,7 +807,7 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
 
           <div className="hs-carousel">
 
-            {slides.map((s, i) => {
+            {premiumSlides.map((s, i) => {
               const pos = getPos(i);
 
               return (
@@ -825,7 +846,7 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
 
         <div className="hs-dots">
 
-          {slides.map((_, i) => (
+          {premiumSlides.map((_, i) => (
             <div
               key={i}
               className={`hs-dot ${i === current ? "active" : ""}`}

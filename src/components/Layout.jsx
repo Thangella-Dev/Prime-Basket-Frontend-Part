@@ -149,14 +149,14 @@ export default function Layout({
     <>
       <style>{`
         .page-shell.has-mobile-glass-dock {
-          padding-bottom: 96px;
+          padding-bottom: 112px;
         }
         .prime-mobile-glass-dock {
           position: fixed;
           left: 50%;
-          bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+          bottom: calc(24px + env(safe-area-inset-bottom, 0px));
           transform: translateX(-50%);
-          width: min(92vw, 418px);
+          width: min(92vw, 430px);
           z-index: 99988;
           display: none;
           pointer-events: none;
@@ -165,28 +165,29 @@ export default function Layout({
           pointer-events: auto;
           display: grid;
           grid-template-columns: repeat(5, minmax(0, 1fr));
-          gap: 3px;
-          padding: 8px;
-          border-radius: 24px;
-          border: 1px solid rgba(255,255,255,0.2);
+          gap: 4px;
+          padding: 9px;
+          border-radius: 26px;
+          border: 1px solid rgba(255,255,255,0.24);
           background:
-            linear-gradient(135deg, rgba(255,255,255,0.36), rgba(255,255,255,0.16)),
-            linear-gradient(135deg, rgba(29,91,160,0.54), rgba(68,196,212,0.24));
+            linear-gradient(135deg, rgba(255,255,255,0.48), rgba(255,255,255,0.18)),
+            linear-gradient(135deg, rgba(29,91,160,0.52), rgba(68,196,212,0.18));
           box-shadow:
-            0 16px 34px rgba(10, 24, 48, 0.16),
-            inset 0 1px 0 rgba(255,255,255,0.22);
-          backdrop-filter: blur(20px) saturate(145%);
-          -webkit-backdrop-filter: blur(20px) saturate(145%);
+            0 22px 44px rgba(10, 24, 48, 0.18),
+            inset 0 1px 0 rgba(255,255,255,0.26),
+            inset 0 -1px 0 rgba(123, 160, 213, 0.12);
+          backdrop-filter: blur(24px) saturate(155%);
+          -webkit-backdrop-filter: blur(24px) saturate(155%);
           animation: primeDockRise .38s cubic-bezier(.22,.9,.25,1);
         }
         .prime-mobile-dock-item {
           position: relative;
           border: none;
-          border-radius: 16px;
-          min-height: 56px;
-          padding: 7px 4px 6px;
+          border-radius: 18px;
+          min-height: 60px;
+          padding: 8px 5px 7px;
           background: transparent;
-          color: #174d8e;
+          color: #184d90;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -219,8 +220,8 @@ export default function Layout({
         }
         .prime-mobile-dock-item.active {
           color: #0f4e9d;
-          background: linear-gradient(180deg, rgba(255,255,255,0.48), rgba(233,242,255,0.24));
-          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28), 0 10px 20px rgba(10,24,48,0.1);
+          background: linear-gradient(180deg, rgba(255,255,255,0.62), rgba(233,242,255,0.3));
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.34), 0 12px 24px rgba(10,24,48,0.12);
         }
         .prime-mobile-dock-item:active {
           animation: primeDockTap .28s ease;
@@ -231,14 +232,14 @@ export default function Layout({
         }
         .prime-mobile-dock-icon {
           position: relative;
-          width: 30px;
-          height: 30px;
-          border-radius: 10px;
+          width: 32px;
+          height: 32px;
+          border-radius: 11px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          background: rgba(255,255,255,0.22);
-          border: 1px solid rgba(255,255,255,0.2);
+          background: rgba(255,255,255,0.24);
+          border: 1px solid rgba(255,255,255,0.22);
           font-size: 13px;
           transition: transform .22s ease, background .22s ease, box-shadow .22s ease;
         }
@@ -249,10 +250,10 @@ export default function Layout({
         }
         .prime-mobile-dock-label {
           position: relative;
-          font-size: 9.4px;
+          font-size: 9.8px;
           font-weight: 800;
           line-height: 1;
-          letter-spacing: 0.01em;
+          letter-spacing: 0.015em;
           white-space: nowrap;
         }
         .prime-mobile-dock-badge {
@@ -283,10 +284,10 @@ export default function Layout({
         body[data-theme="dark"] .prime-mobile-glass-dock-shell {
           border-color: rgba(116, 154, 219, 0.14);
           background:
-            linear-gradient(135deg, rgba(15,27,44,0.72), rgba(8,16,30,0.56)),
-            linear-gradient(135deg, rgba(18,56,110,0.62), rgba(27,112,154,0.22));
+            linear-gradient(135deg, rgba(15,27,44,0.8), rgba(8,16,30,0.62)),
+            linear-gradient(135deg, rgba(18,56,110,0.58), rgba(27,112,154,0.2));
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.34),
+            0 24px 46px rgba(0, 0, 0, 0.38),
             inset 0 1px 0 rgba(255,255,255,0.08);
         }
         body[data-theme="dark"] .prime-mobile-dock-item {
