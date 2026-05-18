@@ -187,7 +187,7 @@ export function parsePrice(val) {
   return parseFloat(cleaned) || 0;
 }
 
-export function sanitizeImageUrl(url) {
+function sanitizeImageUrl(url) {
   const raw = String(url || "").trim();
   if (!raw) return "";
   if (/^hhttps:\/\//i.test(raw)) return raw.replace(/^hhttps:\/\//i, "https://");
@@ -196,6 +196,7 @@ export function sanitizeImageUrl(url) {
 }
 
 const CATEGORY_IMAGE_FALLBACKS = {
+  rice: "/assets/redrice.png",
   oil: "/assets/olive-oil.png",
   "wheat-flour": "/assets/grocery-items.png",
   salt: "/assets/grocery-items.png",
@@ -204,51 +205,38 @@ const CATEGORY_IMAGE_FALLBACKS = {
   "turmeric-powder": "/assets/organic-food.png",
   pulses: "/assets/grocery-items.png",
   masala: "/assets/organic-food.png",
-  dairyProducts: "/assets/milk.png",
+  fruits: "/assets/fruits.png",
+  vegetables: "/assets/groceries-and-vegetables.png",
+  dairyProducts: "/assets/dairy-needs.png",
   feminineHygiene: "/assets/fresh&clean.png",
   homeNeeds: "/assets/fresh&clean.png",
-  babyCare: "/assets/puppy.png",
+  babyCare: "/assets/fresh&clean.png",
   instantFood: "/assets/chocolates.png",
   milkPowders: "/assets/milk.png",
   chipsAndNamkeens: "/assets/chocolates.png",
   oralCare: "/assets/fresh&clean.png",
+  biscuitsAndCookies: "/assets/chocolates.png",
+  coolDrinks: "/assets/sweetdrinks.png",
   bodyCare: "/assets/fresh&clean.png",
-  meat: "/assets/fresh-eggs.webp",
-};
-
-const SUSPICIOUS_IMAGE_KEYWORDS_BY_CATEGORY = {
-  oil: ["mushroom", "soft-drink", "fanta", "mirinda", "coke", "sprite", "rice", "atta", "pear", "melon"],
-  "wheat-flour": ["rice", "soft-drink", "mushroom", "chips", "cookie", "biscuit"],
-  salt: ["garlic", "biscuit", "cookie", "orange-cream", "fruit", "pear", "melon"],
-  sugar: ["pear", "fruit", "biscuit", "cookie", "garlic"],
-  "turmeric-powder": ["soup", "ramen", "biscuit", "cookie"],
-  pulses: ["ramen", "snack", "chips", "cookie", "biscuit"],
-  masala: ["ramen", "peanuts", "chips", "cookie", "biscuit"],
-  dairyProducts: ["biscuit", "cookie", "chips", "snack"],
-  feminineHygiene: ["biscuit", "cookie", "snack"],
-  homeNeeds: ["soft-drink", "biscuit", "cookie", "snack"],
-  babyCare: ["corn", "biscuit", "cookie", "snack"],
-  instantFood: ["chips", "crisps"],
-  milkPowders: ["biscuit", "cookie"],
-  chipsAndNamkeens: ["tooth", "oral", "paste"],
-  oralCare: ["chips", "crisps", "snack"],
-  bodyCare: ["melon", "fruit", "pulses", "beans"],
-  meat: ["pine", "coconut"],
+  meat: "/assets/chickenmeatballs.png",
 };
 
 const PRODUCT_IMAGE_RULES = [
-  { match: /(sunflower oil|gold oil|cooking oil|vegetable oil|mustard oil|coconut oil|olive oil|oil)/i, image: "/assets/olive-oil.png" },
+  { match: /(rice|basmati|india gate|daawat)/i, image: "/assets/redrice.png" },
+  { match: /(sunflower oil|gold oil|mustard oil|coconut oil|olive oil|cooking oil|vegetable oil|oil)/i, image: "/assets/olive-oil.png" },
   { match: /(atta|wheat flour|chakki|flour)/i, image: "/assets/grocery-items.png" },
-  { match: /(salt|pink salt|sea salt)/i, image: "/assets/grocery-items.png" },
-  { match: /(sugar|sweetener|monkfruit|jaggery)/i, image: "/assets/grocery-items.png" },
-  { match: /(chilli|chili powder|red chilli|red chili)/i, image: "/assets/organic-food.png" },
+  { match: /(salt)/i, image: "/assets/grocery-items.png" },
+  { match: /(sugar|sweetener)/i, image: "/assets/grocery-items.png" },
+  { match: /(chilli|chili powder)/i, image: "/assets/organic-food.png" },
   { match: /(turmeric|haldi)/i, image: "/assets/organic-food.png" },
   { match: /(dal|grams|peas|beans|rajma|moong|toor|masoor|pulses)/i, image: "/assets/grocery-items.png" },
   { match: /(masala|spice|seasoning|curry powder|garam)/i, image: "/assets/organic-food.png" },
-  { match: /(milk|butter|paneer|cheese|curd|yoghurt|yogurt|ghee|whitener|dairy)/i, image: "/assets/milk.png" },
+  { match: /(apple|mango|banana|lychee|pear|fruit)/i, image: "/assets/fruits.png" },
+  { match: /(tomato|potato|vegetable|broccoli|greens|onion)/i, image: "/assets/groceries-and-vegetables.png" },
+  { match: /(milk|butter|paneer|cheese|curd|yoghurt|yogurt|ghee|whitener|dairy)/i, image: "/assets/dairy-needs.png" },
   { match: /(pads|tampons|feminine|whisper|sofy|wipes)/i, image: "/assets/fresh&clean.png" },
   { match: /(surf excel|vim|dishwash|detergent|cleaner|liquid wash|home needs)/i, image: "/assets/fresh&clean.png" },
-  { match: /(pampers|baby wipes|baby care|diapers)/i, image: "/assets/puppy.png" },
+  { match: /(pampers|baby wipes|baby care|diapers)/i, image: "/assets/fresh&clean.png" },
   { match: /(maggi|yippee|noodles|instant food)/i, image: "/assets/chocolates.png" },
   { match: /(milk powder|amulya|nestle everyday|powder)/i, image: "/assets/milk.png" },
   { match: /(bhujia|mad angles|chips|namkeen|crisps|snacks)/i, image: "/assets/chocolates.png" },
@@ -256,9 +244,6 @@ const PRODUCT_IMAGE_RULES = [
   { match: /(soap|body wash|lotion|shampoo|conditioner|santoor|dove|vaseline|dettol)/i, image: "/assets/fresh&clean.png" },
   { match: /(eggs|egg)/i, image: "/assets/fresh-eggs.webp" },
   { match: /(chicken|curry cut|meat|fish|mutton)/i, image: "/assets/chickenmeatballs.png" },
-  { match: /(apple|mango|banana|lychee|pear|fruit)/i, image: "/assets/fruits.png" },
-  { match: /(tomato|potato|vegetable|broccoli|greens|onion)/i, image: "/assets/groceries-and-vegetables.png" },
-  { match: /(rice|basmati|india gate|daawat)/i, image: "/assets/redrice.png" },
   { match: /(biscuit|cookie|oreo|good day)/i, image: "/assets/chocolates.png" },
   { match: /(cola|coca|sprite|fanta|drink|cool drinks|soft drink)/i, image: "/assets/sweetdrinks.png" },
 ];
@@ -269,13 +254,9 @@ export function resolveProductImage(product) {
   const category = product._cat || "";
   const name = String(product.name || "");
   const ruleBasedImage = PRODUCT_IMAGE_RULES.find((rule) => rule.match.test(name))?.image;
+
   if (!imageUrl) return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || "";
 
-  const lowered = imageUrl.toLowerCase();
-  const suspiciousKeywords = SUSPICIOUS_IMAGE_KEYWORDS_BY_CATEGORY[category] || [];
-  if (suspiciousKeywords.some((keyword) => lowered.includes(keyword))) {
-    return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || imageUrl;
-  }
   return imageUrl || ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || "";
 }
 
@@ -285,16 +266,23 @@ export function resolveProductImage(product) {
 export function enhanceProduct(p, region = "in", isDeal = false) {
   if (!p) return p;
 
-  // If already enhanced or has units, just return
-  if (p.units && p.units.length > 0) return p;
-
-  const sanitizedImageUrl = resolveProductImage(p);
   const cat = p._cat || "";
   const nameLower = (p.name || "").toLowerCase();
-  const imgLower = sanitizedImageUrl.toLowerCase();
+  const imgLower = (p.imageUrl || "").toLowerCase();
   const templateKey = inferTemplateKey(cat, nameLower, imgLower);
 
-  let units = [...(UNIT_TEMPLATES[templateKey] || UNIT_TEMPLATES["weight"])];
+  const templateUnits = [...(UNIT_TEMPLATES[templateKey] || UNIT_TEMPLATES["weight"])];
+  const incomingUnits = Array.isArray(p.units)
+    ? p.units
+        .filter(Boolean)
+        .map((unit) => ({
+          label: unit?.label || unit?.name || "",
+          multiplier: Number(unit?.multiplier) > 0 ? Number(unit.multiplier) : 1,
+        }))
+        .filter((unit) => unit.label)
+    : [];
+
+  let units = incomingUnits.length > 0 ? incomingUnits : templateUnits;
   let baseUnitObj = null;
 
   const detectedLabel = detectExplicitUnit(p);
@@ -304,7 +292,12 @@ export function enhanceProduct(p, region = "in", isDeal = false) {
   }
 
   if (!baseUnitObj) {
-    baseUnitObj = units.find(u => u.multiplier === 1) || units[0];
+    baseUnitObj =
+      units.find((u) => p.baseUnit && u.label.toLowerCase() === String(p.baseUnit).toLowerCase()) ||
+      units.find((u) => p.selectedUnit && u.label.toLowerCase() === String(p.selectedUnit).toLowerCase()) ||
+      units.find((u) => u.multiplier === 1) ||
+      units[0] ||
+      { label: "1 unit", multiplier: 1 };
   }
   
   const currentPrice = parsePrice(p.price);
@@ -395,11 +388,9 @@ export function enhanceProduct(p, region = "in", isDeal = false) {
 
   return {
     ...p,
-    imageUrl: sanitizedImageUrl,
-    image: sanitizedImageUrl || p.image,
     ...specs,
     badge: finalBadge,
-    basePrice: currentPrice,
+    basePrice: parsePrice(p.basePrice ?? currentPrice),
     baseUnit: baseUnitObj.label,
     units: units,
     discountPercent: discountPercent
@@ -410,16 +401,19 @@ export function enhanceProduct(p, region = "in", isDeal = false) {
  * Calculates current price and original price for a specific unit
  */
 export function getProductPrices(p, selectedUnitLabel) {
-  const unit = (p.units || []).find(u => u.label === selectedUnitLabel) || { multiplier: 1 };
-  const price = p.basePrice * unit.multiplier;
-  const originalPrice = price + (price * (p.discountPercent || 0) / 100);
+  const safeProduct = enhanceProduct(p);
+  const unit = (safeProduct?.units || []).find((u) => u.label === selectedUnitLabel) || { multiplier: 1 };
+  const basePrice = parsePrice(safeProduct?.basePrice ?? safeProduct?.price);
+  const price = basePrice * unit.multiplier;
+  const discountPercent = safeProduct?.discountPercent || 0;
+  const originalPrice = price + (price * discountPercent / 100);
   const savings = originalPrice - price;
 
   return {
     price,
     originalPrice,
     savings,
-    discountPercent: p.discountPercent || 0
+    discountPercent
   };
 }
 
@@ -430,4 +424,3 @@ export function formatCurrency(amount, region = "in") {
   const prefix = region === "ke" ? "KES " : "\u20B9";
   return `${prefix}${amount.toFixed(2)}`;
 }
-
