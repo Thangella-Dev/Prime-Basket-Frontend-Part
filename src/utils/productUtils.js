@@ -236,19 +236,48 @@ const SUSPICIOUS_IMAGE_KEYWORDS_BY_CATEGORY = {
   meat: ["pine", "coconut"],
 };
 
+const PRODUCT_IMAGE_RULES = [
+  { match: /(sunflower oil|gold oil|cooking oil|vegetable oil|mustard oil|coconut oil|olive oil|oil)/i, image: "/assets/olive-oil.png" },
+  { match: /(atta|wheat flour|chakki|flour)/i, image: "/assets/grocery-items.png" },
+  { match: /(salt|pink salt|sea salt)/i, image: "/assets/grocery-items.png" },
+  { match: /(sugar|sweetener|monkfruit|jaggery)/i, image: "/assets/grocery-items.png" },
+  { match: /(chilli|chili powder|red chilli|red chili)/i, image: "/assets/organic-food.png" },
+  { match: /(turmeric|haldi)/i, image: "/assets/organic-food.png" },
+  { match: /(dal|grams|peas|beans|rajma|moong|toor|masoor|pulses)/i, image: "/assets/grocery-items.png" },
+  { match: /(masala|spice|seasoning|curry powder|garam)/i, image: "/assets/organic-food.png" },
+  { match: /(milk|butter|paneer|cheese|curd|yoghurt|yogurt|ghee|whitener|dairy)/i, image: "/assets/milk.png" },
+  { match: /(pads|tampons|feminine|whisper|sofy|wipes)/i, image: "/assets/fresh&clean.png" },
+  { match: /(surf excel|vim|dishwash|detergent|cleaner|liquid wash|home needs)/i, image: "/assets/fresh&clean.png" },
+  { match: /(pampers|baby wipes|baby care|diapers)/i, image: "/assets/puppy.png" },
+  { match: /(maggi|yippee|noodles|instant food)/i, image: "/assets/chocolates.png" },
+  { match: /(milk powder|amulya|nestle everyday|powder)/i, image: "/assets/milk.png" },
+  { match: /(bhujia|mad angles|chips|namkeen|crisps|snacks)/i, image: "/assets/chocolates.png" },
+  { match: /(toothpaste|toothbrush|oral-b|colgate|dental|miswak)/i, image: "/assets/fresh&clean.png" },
+  { match: /(soap|body wash|lotion|shampoo|conditioner|santoor|dove|vaseline|dettol)/i, image: "/assets/fresh&clean.png" },
+  { match: /(eggs|egg)/i, image: "/assets/fresh-eggs.webp" },
+  { match: /(chicken|curry cut|meat|fish|mutton)/i, image: "/assets/chickenmeatballs.png" },
+  { match: /(apple|mango|banana|lychee|pear|fruit)/i, image: "/assets/fruits.png" },
+  { match: /(tomato|potato|vegetable|broccoli|greens|onion)/i, image: "/assets/groceries-and-vegetables.png" },
+  { match: /(rice|basmati|india gate|daawat)/i, image: "/assets/redrice.png" },
+  { match: /(biscuit|cookie|oreo|good day)/i, image: "/assets/chocolates.png" },
+  { match: /(cola|coca|sprite|fanta|drink|cool drinks|soft drink)/i, image: "/assets/sweetdrinks.png" },
+];
+
 export function resolveProductImage(product) {
   if (!product || typeof product !== "object") return "";
   const imageUrl = sanitizeImageUrl(product.imageUrl || product.image);
   const category = product._cat || "";
+  const name = String(product.name || "");
+  const ruleBasedImage = PRODUCT_IMAGE_RULES.find((rule) => rule.match.test(name))?.image;
   if (!imageUrl) return CATEGORY_IMAGE_FALLBACKS[category] || "";
 
   const lowered = imageUrl.toLowerCase();
   const suspiciousKeywords = SUSPICIOUS_IMAGE_KEYWORDS_BY_CATEGORY[category] || [];
   if (suspiciousKeywords.some((keyword) => lowered.includes(keyword))) {
-    return CATEGORY_IMAGE_FALLBACKS[category] || imageUrl;
+    return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || imageUrl;
   }
 
-  return imageUrl;
+  return imageUrl || ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || "";
 }
 
 /**
