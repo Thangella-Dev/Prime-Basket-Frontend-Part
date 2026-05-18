@@ -777,7 +777,7 @@ export default function App() {
     localStorage.removeItem("pb_active_tracking");
     // Logout from auth (clears user/tokens)
     logout();
-    handleRegionChange("in");
+    setLanguage((prev) => sanitizeLanguageForRegion(prev, region));
     goHome();
   };
 

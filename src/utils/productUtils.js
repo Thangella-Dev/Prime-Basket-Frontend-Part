@@ -263,21 +263,122 @@ const PRODUCT_IMAGE_RULES = [
   { match: /(cola|coca|sprite|fanta|drink|cool drinks|soft drink)/i, image: "/assets/sweetdrinks.png" },
 ];
 
+const GENERIC_PLACEHOLDER_ASSETS = new Set([
+  "/assets/grocery-items.png",
+  "/assets/organic-food.png",
+  "/assets/fresh&clean.png",
+  "/assets/chocolates.png",
+  "/assets/groceries-and-vegetables.png",
+]);
+
+const CATEGORY_ART_THEMES = {
+  rice: { bgA: "#fff8e1", bgB: "#f5e8b8", accent: "#b67a11", chip: "Rice" },
+  oil: { bgA: "#fff7d6", bgB: "#ffe89a", accent: "#c78a16", chip: "Oil" },
+  "wheat-flour": { bgA: "#fffaf0", bgB: "#f5dfbf", accent: "#b97831", chip: "Atta" },
+  salt: { bgA: "#f7fbff", bgB: "#dceeff", accent: "#4e7aa4", chip: "Salt" },
+  sugar: { bgA: "#fff7fb", bgB: "#f4dff1", accent: "#a35892", chip: "Sugar" },
+  "chilli-powder": { bgA: "#fff1f0", bgB: "#ffc8c0", accent: "#c93d2e", chip: "Chilli" },
+  "turmeric-powder": { bgA: "#fff6db", bgB: "#ffd66e", accent: "#c28b15", chip: "Turmeric" },
+  pulses: { bgA: "#f7f4ff", bgB: "#ddd1ff", accent: "#7250c7", chip: "Dal" },
+  masala: { bgA: "#fff3ec", bgB: "#ffd1b3", accent: "#c56a24", chip: "Masala" },
+  fruits: { bgA: "#fff1f4", bgB: "#ffc6d4", accent: "#cf4f7d", chip: "Fruit" },
+  vegetables: { bgA: "#effbef", bgB: "#c8efca", accent: "#3d8a4c", chip: "Veg" },
+  dairyProducts: { bgA: "#eef7ff", bgB: "#d5e9ff", accent: "#4f79c8", chip: "Dairy" },
+  feminineHygiene: { bgA: "#fff4f8", bgB: "#ffd8ea", accent: "#c0558a", chip: "Care" },
+  homeNeeds: { bgA: "#eef7ff", bgB: "#d6e8ff", accent: "#3d6db5", chip: "Home" },
+  babyCare: { bgA: "#f5f1ff", bgB: "#ddd2ff", accent: "#7a66d6", chip: "Baby" },
+  instantFood: { bgA: "#fff6eb", bgB: "#ffd8a8", accent: "#d17821", chip: "Instant" },
+  milkPowders: { bgA: "#f5f9ff", bgB: "#dce8ff", accent: "#567bc2", chip: "Milk" },
+  chipsAndNamkeens: { bgA: "#fff5ec", bgB: "#ffd7b0", accent: "#d07b1f", chip: "Snacks" },
+  oralCare: { bgA: "#edf9ff", bgB: "#c8efff", accent: "#2b8bb0", chip: "Oral" },
+  biscuitsAndCookies: { bgA: "#fff6ef", bgB: "#f6ddc5", accent: "#b77736", chip: "Cookies" },
+  coolDrinks: { bgA: "#edf8ff", bgB: "#caeaff", accent: "#2d84bb", chip: "Drinks" },
+  bodyCare: { bgA: "#f7f1ff", bgB: "#e2d5ff", accent: "#7e5bc3", chip: "Body" },
+  meat: { bgA: "#fff1ef", bgB: "#ffd0c8", accent: "#cb5b4d", chip: "Fresh" },
+};
+
+function escapeSvgText(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function trimLabel(value, maxLength = 22) {
+  const text = String(value || "").trim();
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, Math.max(0, maxLength - 1)).trim()}…`;
+}
+
+function getSemanticHeadline(product) {
+  const name = String(product?.name || "").trim();
+  const brand = String(product?.brand || "").trim();
+  if (!name) return "Prime Basket";
+  if (brand && name.toLowerCase().startsWith(brand.toLowerCase())) {
+    const withoutBrand = name.slice(brand.length).trim();
+    if (withoutBrand) return trimLabel(withoutBrand, 24);
+  }
+  return trimLabel(name, 24);
+}
+
+function buildSemanticProductImage(product) {
+  const category = product?._cat || "general";
+  const theme = CATEGORY_ART_THEMES[category] || {
+    bgA: "#f4f7fb",
+    bgB: "#dbe7f5",
+    accent: "#406a9a",
+    chip: "Prime Basket",
+  };
+  const brand = trimLabel(product?.brand || "Prime Basket", 18);
+  const headline = getSemanticHeadline(product);
+  const unit = trimLabel(product?.standard || product?.selectedUnit || "", 10);
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${theme.bgA}" />
+          <stop offset="100%" stop-color="${theme.bgB}" />
+        </linearGradient>
+      </defs>
+      <rect width="600" height="600" rx="54" fill="url(#bg)" />
+      <circle cx="488" cy="112" r="74" fill="${theme.accent}" opacity="0.12" />
+      <circle cx="130" cy="458" r="88" fill="${theme.accent}" opacity="0.08" />
+      <rect x="52" y="52" width="496" height="496" rx="42" fill="#ffffff" fill-opacity="0.94" />
+      <rect x="82" y="86" width="164" height="52" rx="26" fill="${theme.accent}" fill-opacity="0.12" />
+      <text x="164" y="119" text-anchor="middle" font-size="26" font-family="Arial, sans-serif" font-weight="700" fill="${theme.accent}">${escapeSvgText(theme.chip)}</text>
+      <text x="82" y="196" font-size="28" font-family="Arial, sans-serif" font-weight="700" fill="#58708d">${escapeSvgText(brand.toUpperCase())}</text>
+      <text x="82" y="286" font-size="54" font-family="Arial, sans-serif" font-weight="700" fill="#17365d">${escapeSvgText(headline)}</text>
+      <rect x="82" y="334" width="260" height="8" rx="4" fill="${theme.accent}" fill-opacity="0.22" />
+      <rect x="82" y="372" width="380" height="18" rx="9" fill="#dbe7f4" />
+      <rect x="82" y="406" width="300" height="18" rx="9" fill="#e7eef7" />
+      <rect x="82" y="462" width="130" height="48" rx="24" fill="${theme.accent}" />
+      <text x="147" y="493" text-anchor="middle" font-size="24" font-family="Arial, sans-serif" font-weight="700" fill="#ffffff">${escapeSvgText(unit || "Ready")}</text>
+    </svg>
+  `;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
 export function resolveProductImage(product) {
   if (!product || typeof product !== "object") return "";
   const imageUrl = sanitizeImageUrl(product.imageUrl || product.image);
   const category = product._cat || "";
   const name = String(product.name || "");
   const ruleBasedImage = PRODUCT_IMAGE_RULES.find((rule) => rule.match.test(name))?.image;
-  if (!imageUrl) return CATEGORY_IMAGE_FALLBACKS[category] || "";
+  if (!imageUrl) return buildSemanticProductImage(product);
 
   const lowered = imageUrl.toLowerCase();
   const suspiciousKeywords = SUSPICIOUS_IMAGE_KEYWORDS_BY_CATEGORY[category] || [];
   if (suspiciousKeywords.some((keyword) => lowered.includes(keyword))) {
-    return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || imageUrl;
+    return ruleBasedImage || buildSemanticProductImage(product);
   }
 
-  return imageUrl || ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || "";
+  if (GENERIC_PLACEHOLDER_ASSETS.has(lowered)) {
+    return buildSemanticProductImage(product);
+  }
+
+  return imageUrl || ruleBasedImage || buildSemanticProductImage(product);
 }
 
 /**
