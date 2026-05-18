@@ -37,6 +37,7 @@ const GenericStaticPage = lazy(() => import("./pages/GenericStaticPage"));
 
 const NAV_STATE_KEY = "pb_nav_state_v2";
 const NAV_SCROLL_KEY = "pb_nav_scroll_v2";
+const GUEST_LOCALE_KEY = "pb_guest_locale_v1";
 
 const getAllowedLanguagesForRegion = (regionValue = "in") =>
   regionValue === "ke" ? ["en", "ke"] : ["en", "hi", "te"];
@@ -738,6 +739,18 @@ export default function App() {
   // ── Auth ──
   const handleLoginSuccess = (data) => {
     const userData = data?.user ?? { id: data?.id, name: data?.name || "User", phone: data?.phone || "", email: data?.email || "", role: data?.role || "CUSTOMER" };
+
+    try {
+      localStorage.setItem(
+        GUEST_LOCALE_KEY,
+        JSON.stringify({
+          region,
+          language,
+        })
+      );
+    } catch {
+      // no-op
+    }
     
     // Auto-detect region from phone number if available
     const inferredRegion = deriveRegionFromPhone(userData.phone);
@@ -777,7 +790,14 @@ export default function App() {
     localStorage.removeItem("pb_active_tracking");
     // Logout from auth (clears user/tokens)
     logout();
-    setLanguage((prev) => sanitizeLanguageForRegion(prev, region));
+    const guestLocale = readStoredJson(GUEST_LOCALE_KEY, null);
+    const nextRegion = guestLocale?.region === "ke" ? "ke" : "in";
+    const nextLanguage = sanitizeLanguageForRegion(
+      guestLocale?.language || getDefaultLanguageForRegion(nextRegion),
+      nextRegion
+    );
+    setRegion(nextRegion);
+    setLanguage(nextLanguage);
     goHome();
   };
 

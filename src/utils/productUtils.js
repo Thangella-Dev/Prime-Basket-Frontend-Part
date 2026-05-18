@@ -248,6 +248,16 @@ const PRODUCT_IMAGE_RULES = [
   { match: /(cola|coca|sprite|fanta|drink|cool drinks|soft drink)/i, image: "/assets/sweetdrinks.png" },
 ];
 
+const GENERIC_PLACEHOLDER_ASSETS = new Set([
+  "/assets/grocery-items.png",
+  "/assets/organic-food.png",
+  "/assets/fresh&clean.png",
+  "/assets/chocolates.png",
+  "/assets/milk.png",
+  "/assets/dairy-needs.png",
+  "/assets/groceries-and-vegetables.png",
+]);
+
 export function resolveProductImage(product) {
   if (!product || typeof product !== "object") return "";
   const imageUrl = sanitizeImageUrl(product.imageUrl || product.image);
@@ -256,6 +266,10 @@ export function resolveProductImage(product) {
   const ruleBasedImage = PRODUCT_IMAGE_RULES.find((rule) => rule.match.test(name))?.image;
 
   if (!imageUrl) return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || "";
+
+  if (GENERIC_PLACEHOLDER_ASSETS.has(imageUrl)) {
+    return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || imageUrl;
+  }
 
   return imageUrl || ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || "";
 }
