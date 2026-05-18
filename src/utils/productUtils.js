@@ -258,6 +258,52 @@ const GENERIC_PLACEHOLDER_ASSETS = new Set([
   "/assets/groceries-and-vegetables.png",
 ]);
 
+const PRODUCE_IMAGE_KEYWORDS = [
+  "vegetable",
+  "vegetables",
+  "tomato",
+  "tomatoes",
+  "potato",
+  "potatoes",
+  "broccoli",
+  "onion",
+  "onions",
+  "spinach",
+  "mushroom",
+  "carrot",
+  "capsicum",
+  "cauliflower",
+  "corn",
+  "banana",
+  "apple",
+  "mango",
+  "pear",
+  "grape",
+  "grapes",
+  "papaya",
+  "pineapple",
+  "orange",
+  "watermelon",
+  "melon",
+  "avocado",
+  "fruit",
+  "fruits",
+  "greens",
+];
+
+const CATEGORIES_THAT_SHOULD_NOT_USE_PRODUCE_ART = new Set([
+  "babyCare",
+  "oralCare",
+  "homeNeeds",
+  "feminineHygiene",
+  "bodyCare",
+  "biscuitsAndCookies",
+  "chipsAndNamkeens",
+  "instantFood",
+  "coolDrinks",
+  "milkPowders",
+]);
+
 export function resolveProductImage(product) {
   if (!product || typeof product !== "object") return "";
   const imageUrl = sanitizeImageUrl(product.imageUrl || product.image);
@@ -268,6 +314,12 @@ export function resolveProductImage(product) {
   if (!imageUrl) return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || "";
 
   if (GENERIC_PLACEHOLDER_ASSETS.has(imageUrl)) {
+    return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || imageUrl;
+  }
+
+  const lowered = imageUrl.toLowerCase();
+  const looksLikeProduceArt = PRODUCE_IMAGE_KEYWORDS.some((keyword) => lowered.includes(keyword));
+  if (looksLikeProduceArt && CATEGORIES_THAT_SHOULD_NOT_USE_PRODUCE_ART.has(category)) {
     return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || imageUrl;
   }
 
