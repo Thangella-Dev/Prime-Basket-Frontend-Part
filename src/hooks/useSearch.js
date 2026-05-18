@@ -4,6 +4,7 @@ import { database, hasFirebaseConfig } from "../firebase";
 import { ref, get } from "firebase/database";
 import { INDIA_ALL_PRODUCTS } from "../data/india_products";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
+import { mergeCategoryProducts } from "../data/catalogFallback";
 
 const ALL_CATS = [
   { value: "rice",               label: "Rice" },
@@ -89,22 +90,19 @@ async function buildIndex() {
       get(ref(database, "categories/" + cat.value)).then((snap) => {
         const val = snap.val();
         if (!val) return [];
-        return Object.values(val).map((p, i) => toIndexedProduct(p, cat.value, i));
+        const liveProducts = Object.values(val).map((p, i) => toIndexedProduct(p, cat.value, i));
+        return mergeCategoryProducts(cat.value, liveProducts, "in").map((product, index) =>
+          toIndexedProduct(product, cat.value, index)
+        );
       })
     )
   ).then((results) => {
-    const liveProducts = results
+    const mergedProducts = results
       .filter((result) => result.status === "fulfilled")
       .flatMap((result) => result.value || []);
 
-    const mergedProducts = new Map(buildFallbackIndex("in").products.map((product) => [product._uid, product]));
-
-    liveProducts.forEach((product) => {
-      mergedProducts.set(product._uid, product);
-    });
-
     cachedIndex = {
-      products: [...mergedProducts.values()],
+      products: mergedProducts,
       categories: ALL_CATS,
     };
     indexPromise = null;

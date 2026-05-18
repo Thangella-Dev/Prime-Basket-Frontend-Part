@@ -5,7 +5,7 @@ import { database, hasFirebaseConfig } from "../firebase";
 import { ref, get } from "firebase/database";
 import { useT } from "../i18n/translations";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
-import { mergeCategoryProducts } from "../data/catalogFallback";
+import { filterProductsForRegion, mergeCategoryProducts } from "../data/catalogFallback";
 import { formatCurrencyDisplay } from "../utils/currency";
 import { getLocalizedProductName, getSearchHintSuggestions } from "../utils/translationUtils";
 import { resolveProductImage } from "../utils/productUtils";
@@ -390,13 +390,20 @@ export default function CategoryPage({
       get(ref(database, "categories"))
         .then((snap) => {
           const data = snap.val() || {};
-          const raw = Object.entries(data).flatMap(([catKey, catProducts]) =>
-            Object.values(catProducts || {}).map((product, i) => ({
+          const mergedByCategory = Object.entries(data).flatMap(([catKey, catProducts]) => {
+            const liveProducts = filterProductsForRegion(
+              Object.values(catProducts || {}).map((product, i) => ({
+                ...product, _cat: catKey, _index: i,
+                _uid: product?._uid || `${catKey}_${i}`,
+              })),
+              region
+            );
+            return mergeCategoryProducts(catKey, liveProducts, region).map((product, i) => ({
               ...product, _cat: catKey, _index: i,
-              _uid: product?._uid || `${catKey}_${i}`,
-            }))
-          );
-          const merged = raw.length ? prep(raw) : fromFallbackAll();
+              _uid: product._uid || `${catKey}_${i}`,
+            }));
+          });
+          const merged = mergedByCategory.length ? prep(mergedByCategory) : fromFallbackAll();
           setAllProducts(merged); setProducts(merged); setLoading(false);
           previousCategoryRef.current = category;
           previousRegionRef.current = region;
@@ -484,13 +491,20 @@ export default function CategoryPage({
     get(ref(database, "categories"))
       .then((snap) => {
         const data = snap.val() || {};
-        const raw = Object.entries(data).flatMap(([catKey, catProducts]) =>
-          Object.values(catProducts || {}).map((product, i) => ({
+        const mergedByCategory = Object.entries(data).flatMap(([catKey, catProducts]) => {
+          const liveProducts = filterProductsForRegion(
+            Object.values(catProducts || {}).map((product, i) => ({
+              ...product, _cat: catKey, _index: i,
+              _uid: product?._uid || `${catKey}_${i}`,
+            })),
+            region
+          );
+          return mergeCategoryProducts(catKey, liveProducts, region).map((product, i) => ({
             ...product, _cat: catKey, _index: i,
-            _uid: product?._uid || `${catKey}_${i}`,
-          }))
-        );
-          setAllProducts(raw.length ? prep(raw) : prep(CATEGORIES_DATA.flatMap((cat) =>
+            _uid: product._uid || `${catKey}_${i}`,
+          }));
+        });
+          setAllProducts(mergedByCategory.length ? prep(mergedByCategory) : prep(CATEGORIES_DATA.flatMap((cat) =>
             mergeCategoryProducts(cat.value, [], region).map((product, i) => ({
             ...product, _cat: cat.value, _index: i,
             _uid: product._uid || `${cat.value}_${i}`,

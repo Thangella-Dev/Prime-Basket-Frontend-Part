@@ -5,6 +5,39 @@ function normalizeCategory(category) {
   return String(category || "").trim().toLowerCase();
 }
 
+function normalizeText(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+const INDIA_PRODUCT_NAMES = new Set(INDIA_ALL_PRODUCTS.map((product) => normalizeText(product.name)));
+const INDIA_BRANDS = new Set(INDIA_ALL_PRODUCTS.map((product) => normalizeText(product.brand)));
+const KENYA_PRODUCT_NAMES = new Set(KENYA_ALL_PRODUCTS.map((product) => normalizeText(product.name)));
+const KENYA_BRANDS = new Set(KENYA_ALL_PRODUCTS.map((product) => normalizeText(product.brand)));
+
+function isLikelyKenyaProduct(product) {
+  if (!product || typeof product !== "object") return false;
+
+  const uid = normalizeText(product._uid);
+  const price = `${product.price || ""} ${product.oldPrice || ""}`.toLowerCase();
+  const regionText = `${product.region || ""} ${product.country || ""} ${product.currency || ""}`.toLowerCase();
+  const name = normalizeText(product.name);
+  const brand = normalizeText(product.brand);
+
+  if (uid.startsWith("ke_")) return true;
+  if (price.includes("kes")) return true;
+  if (regionText.includes("kenya") || regionText.includes(" ke ") || regionText.endsWith(" ke")) return true;
+  if (name && KENYA_PRODUCT_NAMES.has(name) && !INDIA_PRODUCT_NAMES.has(name)) return true;
+  if (brand && KENYA_BRANDS.has(brand) && !INDIA_BRANDS.has(brand)) return true;
+
+  return false;
+}
+
+export function filterProductsForRegion(products = [], region = "in") {
+  const source = Array.isArray(products) ? products : [];
+  if (region === "ke") return source;
+  return source.filter((product) => !isLikelyKenyaProduct(product));
+}
+
 // Generate stable UID based on product properties, not array index
 function generateStableUid(product, category) {
   const cat = normalizeCategory(category || product._cat);
@@ -60,11 +93,12 @@ export function getFallbackCategoryProductsByRegion(category, region = "in") {
 }
 
 export function mergeCategoryProducts(category, liveProducts = [], region = "in") {
+  const safeLiveProducts = filterProductsForRegion(liveProducts, region);
   const merged = new Map(
     getFallbackCategoryProductsByRegion(category, region).map((product) => [product._uid, product])
   );
 
-  liveProducts.forEach((product, index) => {
+  safeLiveProducts.forEach((product, index) => {
     const normalizedProduct = withCatalogMeta(product, category, index);
     merged.set(normalizedProduct._uid, normalizedProduct);
   });

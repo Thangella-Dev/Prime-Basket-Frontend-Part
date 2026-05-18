@@ -5,6 +5,7 @@ import { ref, get } from "firebase/database";
 import { useT } from "../i18n/translations";
 import { INDIA_ALL_PRODUCTS } from "../data/india_products";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
+import { mergeCategoryProducts } from "../data/catalogFallback";
 import { enhanceProduct, formatCurrency, parsePrice, resolveProductImage } from "../utils/productUtils";
 import ProductCard from "../components/ProductCard";
 import { getLocalizedProductName } from "../utils/translationUtils";
@@ -133,10 +134,12 @@ export default function ProductDetailPage({
       relCats.map((cat) =>
         get(ref(database, "categories/" + cat)).then((snap) => {
           const v = snap.val();
-          if (!v) return [];
-          return Object.values(v).slice(0, 4).map((p, i) => ({
+          const liveProducts = v
+            ? Object.values(v).slice(0, 4).map((p, i) => ({
             ...p, _cat: cat, _index: i, _uid: `${cat}_${i}`,
-          }));
+          }))
+            : [];
+          return mergeCategoryProducts(cat, liveProducts, region).slice(0, 4);
         })
       )
     )
