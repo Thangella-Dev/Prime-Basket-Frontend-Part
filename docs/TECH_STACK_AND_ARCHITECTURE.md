@@ -37,7 +37,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 ### App Shell
 
 - `src/App.jsx`
-  Controls top-level state such as page navigation, region, language, theme, cart, wishlist, checkout state, orders, login modal state, locale enforcement by phone-region, and mobile dock visibility rules.
+  Controls top-level state such as page navigation, region, language, theme, cart, wishlist, checkout state, orders, login modal state, locale enforcement by phone-region, mobile dock visibility rules, and shared page-level error-boundary wrapping.
 
 - `src/components/Layout.jsx`
   Wraps the shared page shell, mobile glass bottom dock, pull-to-refresh handling, and shared overlay-aware dock suppression.
@@ -89,7 +89,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
   Chatbot-related product selection and AI prompt preparation.
 
 - `src/utils/productUtils.js`
-  Product normalization and currency formatting utilities.
+  Product normalization, currency formatting, image sanitizing, and category-safe fallback image resolution utilities.
 
 - `src/data/india_products.js`
   India fallback catalog data used when live India catalog access is unavailable.
@@ -122,6 +122,7 @@ This works, but a future production refactor could move more navigation to a cle
 
 - Firebase Realtime Database for live catalog paths
 - local data fallback for region-specific flows in both India and Kenya
+- direct India fallback asset mapping for categories that previously showed misleading placeholder art
 - timeout-backed fallback protection on key homepage catalog surfaces to avoid prolonged skeleton-only states when live fetches stall
 - region-aware search fallback indexing so category/search results stay aligned to the active phone-region profile
 
@@ -160,3 +161,4 @@ What should improve later:
 - Move from demo persistence to real API persistence
 - Consider route-driven navigation for long-term maintainability
 - Introduce testing and stronger data contracts
+- Add a preview/browser automation path outside the current Windows sandbox so runtime QA is not blocked by `spawn EPERM`

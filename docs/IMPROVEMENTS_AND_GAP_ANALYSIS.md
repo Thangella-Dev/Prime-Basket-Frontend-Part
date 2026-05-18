@@ -2,6 +2,12 @@
 
 ## Latest Stability Pass
 
+- Added a premium shared refresh layer for core storefront sections, shell surfaces, and motion consistency
+- Added a page-level error boundary so major render failures degrade gracefully instead of blanking full views
+- Reduced app boot overhead by caching initial locale/session preference reads instead of repeatedly parsing localStorage on first render
+- Hardened shared image fallback rules so misleading local assets such as red-rice and fruit-drink placeholders no longer override safer product/category imagery
+- Rebuilt the India fallback catalog image mapping and corrected mojibake rupee values in fallback pricing
+- Updated search-result product image rendering so resolved fallback imagery is used more consistently
 - Fixed India-region catalog bleed-through by introducing an India-safe fallback dataset and region-aware fallback helpers
 - Made shared search fallback indexing region-aware so India search results no longer surface Kenya-only products
 - Normalized cart merging by product + selected unit to reduce duplicate line items for the same item
@@ -178,6 +184,7 @@ The following improvements were implemented during the recent Prime Basket front
 - Improve router/navigation structure
 - Add analytics and monitoring
 - Normalize catalog source across regions
+- Add a reliable local runtime verification path outside the current Windows sandbox limitation
 
 ### Lower priority but valuable
 

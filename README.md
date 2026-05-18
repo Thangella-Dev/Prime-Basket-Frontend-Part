@@ -59,6 +59,10 @@ Primary production domain: `https://prime-basket.in`
 - `Buy Again` is now available in `My Account` for reordering previous items individually
 - The mobile dock now hides while mobile category filter/sort sheets are open
 - A runtime crash in `App.jsx` caused by reading `page` before navigation-state initialization was fixed
+- A premium shared refresh layer now strengthens section surfaces, motion, home merchandising, and light/dark consistency across core storefront views
+- Shared product imagery is now more deterministic in fallback mode, especially for India catalog categories like rice, pulses, masala, biscuits, oral care, body care, snacks, cool drinks, feminine care, baby care, and home needs
+- India fallback pricing strings were normalized again so rupee values render correctly instead of mojibake text when local data is used
+- A page-level error boundary now protects major lazy-loaded page regions from blank-screen failures
 
 ## Tech Stack
 
@@ -220,7 +224,8 @@ Detailed backend guidance is available in [docs/BACKEND_INTEGRATION_GUIDE.md](./
 See the `docs` folder for detailed project documentation:
 
 - [Manager Mail Update](./docs/Mail_Update.md)
-- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-15.md)
+- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-18.md)
+- [Backend Readme](./docs/BACKEND.md)
 - [Application Overview](./docs/APPLICATION_OVERVIEW.md)
 - [Tech Stack and Architecture](./docs/TECH_STACK_AND_ARCHITECTURE.md)
 - [Backend Integration Guide](./docs/BACKEND_INTEGRATION_GUIDE.md)
@@ -237,5 +242,7 @@ See the `docs` folder for detailed project documentation:
 - Desktop logout confirmation rendering and OTP modal choice-card UI were finalized in the latest pass
 - Region-aware India fallback catalog, search indexing, wishlist/cart merge behavior, and address-modal mobile dock suppression were finalized in the latest pass
 - Locale selector consolidation, Kenya-English switching, home-only chatbot visibility, mobile dock/filter suppression, hero CTA routing, account `Buy Again`, and the latest `App.jsx` runtime crash fix were finalized in the latest pass
+- A professional QA-style frontend audit was completed in the latest pass, including premium shell polish, India fallback image/data cleanup, shared image-resolution hardening, and page-level error-boundary protection
 - The app is suitable as a strong frontend demo/prototype
 - Final device-lab/browser QA and backend completion are still recommended before production use
+- Local preview/browser smoke checks are still limited in this environment by Windows `spawn EPERM`, though production builds remain green

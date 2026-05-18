@@ -103,6 +103,8 @@ Other important state is currently stored in the browser through `localStorage`,
 - OTP send now dismisses the mobile keyboard for a smoother auth flow
 - `Buy Again` now exists in `My Account` for quick reorders from previous purchases
 - Desktop account logout now confirms correctly and no longer fails silently
+- The shared storefront shell now has a more cohesive premium surface system, stronger mobile dock behavior, and page-level error-boundary protection
+- India fallback catalog presentation is now more trustworthy because category-safe imagery is mapped directly in the fallback dataset instead of depending on misleading placeholders
 
 ## Current Limitations
 
@@ -114,6 +116,7 @@ This is still not a fully production-backed commerce system yet. The main limita
 - Payment flow is demo-oriented
 - Sensitive integrations should not stay fully client-side for production
 - Some pages still rely on inline styles and demo data
+- Live browser/device QA is still needed outside this sandbox because local preview startup is blocked here by Windows `spawn EPERM`
 
 ## Overall Quality Assessment
 

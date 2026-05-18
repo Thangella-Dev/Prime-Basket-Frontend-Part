@@ -112,31 +112,38 @@ export default function App() {
   const [bootVisualReady, setBootVisualReady] = useState(false);
   const [refreshSignal, setRefreshSignal] = useState(0);
   const [hideMobileGlassDock, setHideMobileGlassDock] = useState(false);
+  const initialClientPrefsRef = useRef(null);
   const initialNavRef = useRef(null);
+  if (initialClientPrefsRef.current === null) {
+    const storedUser = readStoredJson("user", null);
+    const inferredRegion = deriveRegionFromPhone(storedUser?.phone);
+    initialClientPrefsRef.current = {
+      storedUser,
+      inferredRegion,
+      storedLanguage: localStorage.getItem("pb_lang") || "en",
+      storedRegion: localStorage.getItem("pb_region") || "in",
+      storedTheme: localStorage.getItem("pb_theme"),
+    };
+  }
   if (initialNavRef.current === null) {
     initialNavRef.current = readStoredJson(NAV_STATE_KEY, {});
   }
+  const initialClientPrefs = initialClientPrefsRef.current || {};
   const initialNav = initialNavRef.current || {};
 
   // ── Language & Region ──
   const [language, setLanguage] = useState(() => {
-    const userStored = JSON.parse(localStorage.getItem("user") || "null");
-    const inferredRegion = deriveRegionFromPhone(userStored?.phone);
-    if (inferredRegion) return getDefaultLanguageForRegion(inferredRegion);
-    const storedLanguage = localStorage.getItem("pb_lang") || "en";
-    const storedRegion = localStorage.getItem("pb_region") || "in";
-    return sanitizeLanguageForRegion(storedLanguage, storedRegion);
+    if (initialClientPrefs.inferredRegion) return getDefaultLanguageForRegion(initialClientPrefs.inferredRegion);
+    return sanitizeLanguageForRegion(initialClientPrefs.storedLanguage || "en", initialClientPrefs.storedRegion || "in");
   });
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem("pb_theme");
+    const saved = initialClientPrefs.storedTheme;
     if (saved === "dark" || saved === "light") return saved;
     return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
   });
   const [region, setRegion] = useState(() => {
-    const userStored = JSON.parse(localStorage.getItem("user") || "null");
-    const inferredRegion = deriveRegionFromPhone(userStored?.phone);
-    if (inferredRegion) return inferredRegion;
-    const stored = localStorage.getItem("pb_region");
+    if (initialClientPrefs.inferredRegion) return initialClientPrefs.inferredRegion;
+    const stored = initialClientPrefs.storedRegion;
     if (stored) return stored;
     return (language === "ke" ? "ke" : "in");
   });

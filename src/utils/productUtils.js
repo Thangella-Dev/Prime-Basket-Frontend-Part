@@ -256,6 +256,8 @@ const GENERIC_PLACEHOLDER_ASSETS = new Set([
   "/assets/milk.png",
   "/assets/dairy-needs.png",
   "/assets/groceries-and-vegetables.png",
+  "/assets/redrice.png",
+  "/assets/sweetdrinks.png",
 ]);
 
 const PRODUCE_IMAGE_KEYWORDS = [

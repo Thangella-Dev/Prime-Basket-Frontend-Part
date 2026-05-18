@@ -455,6 +455,7 @@ export default function SearchBox({ onCategorySelect, onOpenProduct, mobile = fa
                   const fi = catResults.length + i;
                   const translatedName = getLocalizedProductName(prod.name, t);
                   const translatedCat  = t.categories?.[prod._catLabel.toLowerCase().replace(/\s/g, "")] || prod._catLabel;
+                  const resolvedProductImage = resolveProductImage(prod);
                   return (
                     <div
                       key={prod._uid}
@@ -463,8 +464,8 @@ export default function SearchBox({ onCategorySelect, onOpenProduct, mobile = fa
                       onMouseEnter={() => setActiveIdx(fi)}
                     >
                       <div className="sb-ico prod">
-                        {prod.imageUrl
-                          ? <img src={resolveProductImage(prod)} alt={translatedName} loading="lazy" />
+                        {resolvedProductImage
+                          ? <img src={resolvedProductImage} alt={translatedName} loading="lazy" />
                           : <i className="fas fa-box" style={{ color: "#c8d4e8", fontSize: 13 }}></i>
                         }
                       </div>
