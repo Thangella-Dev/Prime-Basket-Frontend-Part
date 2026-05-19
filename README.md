@@ -51,15 +51,23 @@ Primary production domain: `https://prime-basket.in`
 - Kenya users can now switch back from `Swahili` to `English` without the app forcing the region default language again
 - The mobile glass bottom dock now uses a cleaner vertical entry animation, slightly larger tap targets, and stronger active-button feedback
 - The chatbot launcher now shows only on the home page and remains lifted clear of the mobile dock
+- The chatbot can now still be opened intentionally from the mobile side menu on any page, while the floating launcher remains home-only
 - The home hero `Explore now` CTA now opens the matching category flow for the active slide, and the manual slideshow arrows were removed
+- Tapping the hero slide cards themselves now also opens the matching category flow
 - Shared section-title divider lines such as the one after `Popular Products` were removed for a cleaner premium heading style
 - Login/auth overlays now suppress the mobile dock, and OTP send now dismisses the mobile keyboard automatically
 - Checkout `Select address to continue` now jumps directly into address entry when no saved address exists
+- Address entry now shows inline real-world validation errors for empty or invalid required fields like house, locality, pincode, receiver name, and phone
 - Wishlist/cart interaction is more isolated so wishlist taps do not accidentally trigger neighboring cart actions
 - `Buy Again` is now available in `My Account` for reordering previous items individually
 - The mobile dock now hides while mobile category filter/sort sheets are open
 - A runtime crash in `App.jsx` caused by reading `page` before navigation-state initialization was fixed
 - A premium shared refresh layer now strengthens section surfaces, motion, home merchandising, and light/dark consistency across core storefront views
+- Wishlist dark-mode surfaces, crumb header, and action buttons were refined for stronger contrast and readability
+- Product-card and detail-page heart/share controls now avoid sticky mobile hover states after deselecting
+- The order follow-up journey now feels more premium with a richer floating tracking card, a delivered-on-home feedback prompt, and a direct `Track Order` CTA on the order-success page
+- Order progression notifications now include the packed stage as well, not only out-for-delivery and delivered
+- Footer layout spacing was tightened by removing an extra phantom grid column and reducing overly wide gaps
 - Shared product imagery is now more deterministic in fallback mode, especially for India catalog categories like rice, pulses, masala, biscuits, oral care, body care, snacks, cool drinks, feminine care, baby care, and home needs
 - India fallback pricing strings were normalized again so rupee values render correctly instead of mojibake text when local data is used
 - A page-level error boundary now protects major lazy-loaded page regions from blank-screen failures
@@ -224,7 +232,7 @@ Detailed backend guidance is available in [docs/BACKEND_INTEGRATION_GUIDE.md](./
 See the `docs` folder for detailed project documentation:
 
 - [Manager Mail Update](./docs/Mail_Update.md)
-- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-18.md)
+- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-19.md)
 - [Backend Readme](./docs/BACKEND.md)
 - [Application Overview](./docs/APPLICATION_OVERVIEW.md)
 - [Tech Stack and Architecture](./docs/TECH_STACK_AND_ARCHITECTURE.md)

@@ -210,6 +210,14 @@ export default function App() {
           tNote.orderDeliveredMsg.replace("{id}", activeOrder.orderId),
           "success"
         );
+      } else if (activeOrder.status === "Packed") {
+        addNotification(
+          language === "ke" ? "Agizo Limefungwa" : "Order Packed",
+          language === "ke"
+            ? `Agizo lako #${activeOrder.orderId} limefungwa na linaandaliwa kusafirishwa.`
+            : `Your order #${activeOrder.orderId} is packed and being prepared for dispatch.`,
+          "info"
+        );
       } else if (activeOrder.status === "Out for Delivery") {
          addNotification(
           tNote.outForDelivery,
@@ -1273,7 +1281,18 @@ export default function App() {
       />
 
       {/* Global Tracking & Rating Widgets */}
-      <TrackingPopup onOpenTracking={() => setPage("order-tracking")} />
+      <TrackingPopup
+        currentPage={page}
+        onOpenTracking={() => setPage("order-tracking")}
+        onOpenRating={(order) => {
+          if (!order) return;
+          setSelectedOrderForDetail(order);
+          setPage("rate-order");
+        }}
+        onOpenOrderHelp={() => {
+          window.dispatchEvent(new CustomEvent("open-chatbot"));
+        }}
+      />
     </>
   );
 }

@@ -120,6 +120,9 @@ export default function OrderSuccessPage({ order, onGoHome, onGoOrders, onGoTrac
             <button className="os-btn-secondary" onClick={onGoHome}>
               <i className="fas fa-home" style={{ marginRight: 6 }}></i> {t.order.continueShopping}
             </button>
+            <button className="os-btn-tracking" onClick={onGoTracking}>
+              <i className="fas fa-route" style={{ marginRight: 6 }}></i> Track Order
+            </button>
             <button className="os-btn-primary" onClick={onGoOrders}>
               <i className="fas fa-box" style={{ marginRight: 6 }}></i> {t.order.myOrders}
             </button>

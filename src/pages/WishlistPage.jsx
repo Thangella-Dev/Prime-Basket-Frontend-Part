@@ -33,6 +33,7 @@ export default function WishlistPage({
           -webkit-backdrop-filter: blur(18px);
         }
         .wl-crumb-inner { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--body); }
+        .wl-crumb-current { color: var(--dark); font-weight: 700; }
         .wl-crumb-back {
           color:#1d5ba0;
           font-weight:800;
@@ -231,6 +232,73 @@ export default function WishlistPage({
         .wl-empty-btn { background:#1d5ba0; color:#fff; border:none; border-radius:8px; padding:13px 30px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:.2s; }
         .wl-empty-btn:hover { background:#174d8a; }
 
+        body[data-theme="dark"] .wl-crumb {
+          background: linear-gradient(180deg, rgba(9,18,31,0.96), rgba(12,24,40,0.96));
+          border-bottom-color: rgba(92, 117, 155, 0.34);
+        }
+        body[data-theme="dark"] .wl-crumb-current,
+        body[data-theme="dark"] .wl-header-bar h2,
+        body[data-theme="dark"] .wl-card-name,
+        body[data-theme="dark"] .wl-empty h3 {
+          color: #eef5ff;
+        }
+        body[data-theme="dark"] .wl-crumb-inner,
+        body[data-theme="dark"] .wl-card-unit,
+        body[data-theme="dark"] .wl-card-stars,
+        body[data-theme="dark"] .wl-card-old,
+        body[data-theme="dark"] .wl-empty p {
+          color: rgba(215, 228, 246, 0.74);
+        }
+        body[data-theme="dark"] .wl-crumb-back,
+        body[data-theme="dark"] .wl-clear-btn,
+        body[data-theme="dark"] .wl-remove-btn {
+          background: linear-gradient(180deg, rgba(18,31,49,0.96), rgba(13,24,40,0.98));
+          border-color: rgba(95, 125, 170, 0.3);
+          box-shadow: 0 14px 28px rgba(0,0,0,0.22);
+        }
+        body[data-theme="dark"] .wl-crumb-back {
+          color: #93c5fd;
+        }
+        body[data-theme="dark"] .wl-header-bar,
+        body[data-theme="dark"] .wl-card,
+        body[data-theme="dark"] .wl-empty {
+          background: linear-gradient(180deg, rgba(11,20,33,0.98), rgba(15,27,43,0.98));
+          border-color: rgba(87,111,148,0.24);
+          box-shadow: 0 20px 42px rgba(0,0,0,0.28);
+        }
+        body[data-theme="dark"] .wl-card-img {
+          background: linear-gradient(180deg, rgba(19,31,49,0.98), rgba(25,39,60,0.98));
+        }
+        body[data-theme="dark"] .wl-card-brand {
+          color: #8fc2ff;
+        }
+        body[data-theme="dark"] .wl-clear-btn {
+          color: #ff9fbf;
+          border-color: rgba(255, 105, 145, 0.46);
+        }
+        body[data-theme="dark"] .wl-clear-btn:hover {
+          background: rgba(230, 57, 70, 0.14);
+        }
+        body[data-theme="dark"] .wl-remove-btn {
+          color: #ff9fbf;
+        }
+        body[data-theme="dark"] .wl-remove-btn:hover {
+          background: #e63946;
+          color: #fff;
+          border-color: #e63946;
+        }
+        body[data-theme="dark"] .wl-count-pill {
+          background: rgba(230,57,70,0.18);
+          color: #ffb4c8;
+        }
+        body[data-theme="dark"] .wl-card-save {
+          background: rgba(22,163,74,0.18);
+          color: #9be7b4;
+        }
+        body[data-theme="dark"] .wl-empty-btn {
+          box-shadow: 0 16px 28px rgba(29,91,160,0.28);
+        }
+
         @media(max-width:640px){
           .wl-header-bar { padding:16px 18px; border-radius:16px; }
           .wl-card { border-radius:18px; padding:10px; min-height:286px; }
@@ -251,7 +319,7 @@ export default function WishlistPage({
               <i className="fas fa-arrow-left" style={{ fontSize: 10 }}></i> {t.cart.breadcrumbHome}
             </span>
             <i className="fas fa-chevron-right" style={{ fontSize: 10 }}></i>
-            <span style={{ color: "var(--dark)", fontWeight: 700 }}>{t.wishlist.title}</span>
+            <span className="wl-crumb-current">{t.wishlist.title}</span>
           </div>
         </div>
 

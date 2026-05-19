@@ -108,6 +108,7 @@ export default function ChatbotWidget({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [panelKey, setPanelKey] = useState(0);
+  const [openedFromShortcut, setOpenedFromShortcut] = useState(false);
 
   const isHome = currentPage === "home";
   const isCheckoutFlow = currentPage === "cart" || currentPage === "payment";
@@ -162,10 +163,10 @@ export default function ChatbotWidget({
   }, [authModalOpen, drawerOpen]);
 
   useEffect(() => {
-    if (!isHome && open) {
+    if (!isHome && open && !openedFromShortcut) {
       setOpen(false);
     }
-  }, [isHome, open]);
+  }, [isHome, open, openedFromShortcut]);
 
   useEffect(() => {
     if (open) {
@@ -181,13 +182,16 @@ export default function ChatbotWidget({
 
   useEffect(() => {
     const handleOpenChatbot = () => {
-      if (authModalOpen || !isHome) return;
-      setOpen(true);
+      if (authModalOpen) return;
+      window.setTimeout(() => {
+        setOpenedFromShortcut(true);
+        setOpen(true);
+      }, 70);
     };
 
     window.addEventListener("open-chatbot", handleOpenChatbot);
     return () => window.removeEventListener("open-chatbot", handleOpenChatbot);
-  }, [authModalOpen, isHome]);
+  }, [authModalOpen]);
 
   const showChatLauncher = useMemo(
     () => (
@@ -451,7 +455,10 @@ export default function ChatbotWidget({
           <button
             type="button"
             className="prime-chat-trigger"
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              setOpenedFromShortcut(false);
+              setOpen(true);
+            }}
             title="PrimeBot Assistant"
             aria-label="Open PrimeBot assistant"
           >
@@ -479,7 +486,10 @@ export default function ChatbotWidget({
             <ChatbotPage
               onGoCart={onGoCart}
               onGoWishlist={onGoWishlist}
-              onClose={() => setOpen(false)}
+              onClose={() => {
+                setOpen(false);
+                setOpenedFromShortcut(false);
+              }}
               cart={cart}
               wishlist={wishlist}
               onAddToCart={onAddToCart}
