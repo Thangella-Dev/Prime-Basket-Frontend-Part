@@ -85,7 +85,7 @@
 /* ─── Close Button ────────────────────────────────────────────────── */
 .modal-close-btn {
   position: absolute;
-  top: 0.75rem;
+  top: 0.45rem;
   right: 0.9rem;
   width: 38px;
   height: 38px;
@@ -97,6 +97,7 @@
   line-height: 1;
   cursor: pointer;
   transition: background 0.2s;
+  z-index: 8;
 }
 
 .modal-close-btn:hover {
@@ -644,7 +645,7 @@
   }
 
   .modal-close-btn {
-    top: 0.55rem;
+    top: 0.25rem;
     right: 0.6rem;
     width: 34px;
     height: 34px;

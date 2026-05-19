@@ -113,6 +113,15 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
 
   const len = premiumSlides.length;
 
+  const handleCategoryRoute = useCallback(
+    (targetCategory) => {
+      if (targetCategory) {
+        onCategorySelect?.(targetCategory);
+      }
+    },
+    [onCategorySelect]
+  );
+
   const clearTimer = () => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -795,7 +804,7 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
             <button
               type="button"
               className="hs-cta"
-              onClick={() => slide.targetCategory && onCategorySelect?.(slide.targetCategory)}
+              onClick={() => handleCategoryRoute(slide.targetCategory)}
             >
               {premiumHeroUi.secondaryCta}
               <i className="fas fa-arrow-right"></i>
@@ -815,9 +824,13 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
                   key={i}
                   className="hs-card"
                   data-pos={pos}
-                  onClick={() => {
-                    if (pos !== "center") {
-                      goTo(i);
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleCategoryRoute(s.targetCategory)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleCategoryRoute(s.targetCategory);
                     }
                   }}
                 >

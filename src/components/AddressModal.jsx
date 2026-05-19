@@ -75,6 +75,7 @@ function pixelToLatLng(centerLatitude, centerLongitude, zoom, pixelX, pixelY, wi
 
 export default function AddressModal({ isOpen, onClose, onSave, initialData, t }) {
   const [formData, setFormData] = useState(defaultForm);
+  const [formErrors, setFormErrors] = useState({});
   const [locationInfo, setLocationInfo] = useState(() => loadSavedLocation());
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState("");
@@ -125,6 +126,7 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
     } else {
       setFormData(defaultForm);
     }
+    setFormErrors({});
   }, [initialData, isOpen]);
 
   useEffect(() => {
@@ -169,15 +171,49 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
 
   if (!isOpen) return null;
 
+  const setFieldValue = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const getFieldError = (field) => formErrors[field] || "";
+
+  const getFieldStyle = (field) => ({
+    width: "100%",
+    padding: "11px 12px",
+    borderRadius: "12px",
+    border: `1.5px solid ${getFieldError(field) ? "#dc2626" : palette.border}`,
+    outline: "none",
+    background: palette.panelBg,
+    color: palette.text,
+    boxShadow: getFieldError(field) ? "0 0 0 3px rgba(220,38,38,0.08)" : "none",
+  });
+
   const handleSave = () => {
-    if (!formData.house.trim() || !formData.area.trim()) {
-      setLocationError("Please enter House No and Area.");
+    const nextErrors = {};
+    const phoneDigits = String(formData.receiverPhone || "").replace(/\D/g, "");
+    const pincodeDigits = String(formData.pincode || "").replace(/\D/g, "");
+
+    if (!formData.house.trim()) nextErrors.house = "Enter house or flat details.";
+    if (!formData.area.trim()) nextErrors.area = "Enter area, street, or locality.";
+    if (!pincodeDigits) nextErrors.pincode = "Enter pincode.";
+    else if (pincodeDigits.length < 5 || pincodeDigits.length > 8) nextErrors.pincode = "Enter a valid pincode.";
+    if (!formData.receiverName.trim()) nextErrors.receiverName = "Enter receiver name.";
+    if (!phoneDigits) nextErrors.receiverPhone = "Enter phone number.";
+    else if (phoneDigits.length < 8 || phoneDigits.length > 15) nextErrors.receiverPhone = "Enter a valid phone number.";
+
+    if (Object.keys(nextErrors).length > 0) {
+      setFormErrors(nextErrors);
+      setLocationError("Please complete the highlighted address details.");
       return;
     }
-    if (!formData.receiverName.trim() || !formData.receiverPhone.trim()) {
-      setLocationError("Please enter Receiver Name and Phone Number.");
-      return;
-    }
+
+    setFormErrors({});
     setLocationError("");
     onSave(formData);
   };
@@ -185,6 +221,13 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
   const handleDetectLocation = async () => {
     setLocationLoading(true);
     setLocationError("");
+    setFormErrors((prev) => {
+      if (!prev.area && !prev.pincode) return prev;
+      const next = { ...prev };
+      delete next.area;
+      delete next.pincode;
+      return next;
+    });
     try {
       const location = await detectCurrentLocation();
       setLocationInfo(location);
@@ -222,6 +265,13 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
     }
 
     const location = await reverseGeocode(latitude, longitude);
+    setFormErrors((prev) => {
+      if (!prev.area && !prev.pincode) return prev;
+      const next = { ...prev };
+      delete next.area;
+      delete next.pincode;
+      return next;
+    });
     setLocationInfo(location);
     setMapSelection((prev) => ({
       ...prev,
@@ -490,9 +540,10 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 type="text"
                 placeholder="Flat 402"
                 value={formData.house}
-                onChange={(e) => setFormData({ ...formData, house: e.target.value })}
-                style={{ width: "100%", padding: "11px 12px", borderRadius: "12px", border: `1.5px solid ${palette.border}`, outline: "none", background: palette.panelBg, color: palette.text }}
+                onChange={(e) => setFieldValue("house", e.target.value)}
+                style={getFieldStyle("house")}
               />
+              {getFieldError("house") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("house")}</div>}
             </div>
 
             <div>
@@ -501,8 +552,8 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 type="text"
                 placeholder="Sunshine Apartments"
                 value={formData.building}
-                onChange={(e) => setFormData({ ...formData, building: e.target.value })}
-                style={{ width: "100%", padding: "11px 12px", borderRadius: "12px", border: `1.5px solid ${palette.border}`, outline: "none", background: palette.panelBg, color: palette.text }}
+                onChange={(e) => setFieldValue("building", e.target.value)}
+                style={getFieldStyle("building")}
               />
             </div>
 
@@ -512,9 +563,10 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 type="text"
                 placeholder="KPHB Phase 1"
                 value={formData.area}
-                onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                style={{ width: "100%", padding: "11px 12px", borderRadius: "12px", border: `1.5px solid ${palette.border}`, outline: "none", background: palette.panelBg, color: palette.text }}
+                onChange={(e) => setFieldValue("area", e.target.value)}
+                style={getFieldStyle("area")}
               />
+              {getFieldError("area") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("area")}</div>}
             </div>
 
             <div>
@@ -523,8 +575,8 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 type="text"
                 placeholder="Near metro / bank"
                 value={formData.landmark}
-                onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
-                style={{ width: "100%", padding: "11px 12px", borderRadius: "12px", border: `1.5px solid ${palette.border}`, outline: "none", background: palette.panelBg, color: palette.text }}
+                onChange={(e) => setFieldValue("landmark", e.target.value)}
+                style={getFieldStyle("landmark")}
               />
             </div>
 
@@ -534,9 +586,12 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 type="text"
                 placeholder="500085"
                 value={formData.pincode}
-                onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
-                style={{ width: "100%", padding: "11px 12px", borderRadius: "12px", border: `1.5px solid ${palette.border}`, outline: "none", background: palette.panelBg, color: palette.text }}
+                inputMode="numeric"
+                maxLength={8}
+                onChange={(e) => setFieldValue("pincode", e.target.value.replace(/\D/g, "").slice(0, 8))}
+                style={getFieldStyle("pincode")}
               />
+              {getFieldError("pincode") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("pincode")}</div>}
             </div>
 
             <div>
@@ -545,9 +600,10 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 type="text"
                 placeholder="Nikhil"
                 value={formData.receiverName}
-                onChange={(e) => setFormData({ ...formData, receiverName: e.target.value })}
-                style={{ width: "100%", padding: "11px 12px", borderRadius: "12px", border: `1.5px solid ${palette.border}`, outline: "none", background: palette.panelBg, color: palette.text }}
+                onChange={(e) => setFieldValue("receiverName", e.target.value)}
+                style={getFieldStyle("receiverName")}
               />
+              {getFieldError("receiverName") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("receiverName")}</div>}
             </div>
 
             <div>
@@ -558,10 +614,13 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                   type="text"
                   placeholder="8519913550"
                   value={formData.receiverPhone}
-                  onChange={(e) => setFormData({ ...formData, receiverPhone: e.target.value })}
-                  style={{ flex: 1, padding: "11px 12px", borderRadius: "12px", border: `1.5px solid ${palette.border}`, outline: "none", background: palette.panelBg, color: palette.text }}
+                  inputMode="tel"
+                  maxLength={15}
+                  onChange={(e) => setFieldValue("receiverPhone", e.target.value.replace(/\D/g, "").slice(0, 15))}
+                  style={{ ...getFieldStyle("receiverPhone"), flex: 1 }}
                 />
               </div>
+              {getFieldError("receiverPhone") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("receiverPhone")}</div>}
             </div>
 
             <div style={{ gridColumn: "1 / -1" }}>

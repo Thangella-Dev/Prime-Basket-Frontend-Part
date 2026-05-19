@@ -423,6 +423,7 @@ function Profile({ user, updateUser, t, language = "en", region = "in" }) {
   const [photo, setPhoto] = useState(null); // Temporary preview
   const [displayPhoto, setDisplayPhoto] = useState(user?.profileImage || null);
   const [name, setName] = useState(user?.name || "");
+  const [nameError, setNameError] = useState("");
   const [email, setEmail] = useState(user?.email || "");
   const [emailError, setEmailError] = useState("");
   const [phone, setPhone] = useState(user?.phone || "");
@@ -441,6 +442,10 @@ function Profile({ user, updateUser, t, language = "en", region = "in" }) {
 
   const handleSave = () => {
     try {
+      if (!name.trim()) {
+        setNameError("Please enter your full name");
+        return;
+      }
       if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         setEmailError("Please enter a valid email address");
         return;
@@ -455,6 +460,7 @@ function Profile({ user, updateUser, t, language = "en", region = "in" }) {
       }
       setDisplayPhoto(photo || displayPhoto);
       setPhoto(null);
+      setNameError("");
       setEmailError("");
       setIsEditing(false);
       setNotice({ type: "success", text: `${t.account.details} saved successfully.` });
@@ -473,6 +479,7 @@ function Profile({ user, updateUser, t, language = "en", region = "in" }) {
     setIsEditing(false);
     setName(user?.name || "");
     setEmail(user?.email || "");
+    setNameError("");
     setEmailError("");
     setPhone(user?.phone || "");
     setPhoto(null);
@@ -534,7 +541,10 @@ function Profile({ user, updateUser, t, language = "en", region = "in" }) {
           <div className="profile-field">
             <label>{t.account.fullName}</label>
             {isEditing ? (
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+              <>
+                <input className={nameError ? "has-error" : ""} type="text" value={name} onChange={(e) => { setName(e.target.value); setNameError(""); }} />
+                {nameError && <div className="profile-error">{nameError}</div>}
+              </>
             ) : (
               <div className="profile-value">{name || "N/A"}</div>
             )}

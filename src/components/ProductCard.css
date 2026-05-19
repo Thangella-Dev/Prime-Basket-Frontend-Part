@@ -75,11 +75,24 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.pcard-v2 .pwish-v2:hover, .pcard-v2 .pwish-v2.active {
+.pcard-v2 .pwish-v2.active {
   background: rgb(255, 59, 129);
   color: #fff;
   border-color: rgb(255, 59, 129);
   transform: scale(1.1);
+}
+
+.pcard-v2 .pwish-v2:active {
+  transform: scale(0.96);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pcard-v2 .pwish-v2:hover {
+    background: rgb(255, 59, 129);
+    color: #fff;
+    border-color: rgb(255, 59, 129);
+    transform: scale(1.1);
+  }
 }
 
 .pcard-v2 .pimg-v2 {
