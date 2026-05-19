@@ -52,6 +52,7 @@ Primary production domain: `https://prime-basket.in`
 - The mobile glass bottom dock now uses a cleaner vertical entry animation, slightly larger tap targets, and stronger active-button feedback
 - The chatbot launcher now shows only on the home page and remains lifted clear of the mobile dock
 - The chatbot can now still be opened intentionally from the mobile side menu on any page, while the floating launcher remains home-only
+- The chatbot launcher now also hides automatically while the delivered-order feedback prompt is visible on home, preventing overlap with that premium order-follow-up card
 - The home hero `Explore now` CTA now opens the matching category flow for the active slide, and the manual slideshow arrows were removed
 - Tapping the hero slide cards themselves now also opens the matching category flow
 - Shared section-title divider lines such as the one after `Popular Products` were removed for a cleaner premium heading style
@@ -75,6 +76,7 @@ Primary production domain: `https://prime-basket.in`
 - Mobile footer spacing is now tighter around the dock/footer handoff so the last section no longer leaves extra empty space on small screens
 - Scroll restoration now runs only on the initial refresh/session restore, which prevents the random auto scroll up/down behavior that could happen while moving through app sections
 - Account help/support popup backdrops now use the app’s blue-tinted premium overlay treatment instead of a flat dark backdrop
+- The shared app shell now shows premium animated online/offline status popups so connectivity changes feel polished and product-native
 - Shared product imagery is now more deterministic in fallback mode, especially for India catalog categories like rice, pulses, masala, biscuits, oral care, body care, snacks, cool drinks, feminine care, baby care, and home needs
 - India fallback pricing strings were normalized again so rupee values render correctly instead of mojibake text when local data is used
 - A page-level error boundary now protects major lazy-loaded page regions from blank-screen failures

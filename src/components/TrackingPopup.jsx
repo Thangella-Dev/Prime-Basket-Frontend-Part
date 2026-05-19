@@ -43,6 +43,14 @@ export default function TrackingPopup({
     return !readDismissedPrompts().includes(completedOrder.orderId) && !hasOrderReview(completedOrder.orderId);
   }, [completedOrder?.orderId, currentPage, dismissTick]);
 
+  React.useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    document.body.classList.toggle("prime-delivery-prompt-open", showDeliveredPrompt);
+    return () => {
+      document.body.classList.remove("prime-delivery-prompt-open");
+    };
+  }, [showDeliveredPrompt]);
+
   if (!isTrackingVisible && !showDeliveredPrompt) return null;
 
   const dismissDeliveredPrompt = () => {

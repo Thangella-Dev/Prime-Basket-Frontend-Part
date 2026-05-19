@@ -109,6 +109,7 @@ export default function ChatbotWidget({
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [panelKey, setPanelKey] = useState(0);
   const [openedFromShortcut, setOpenedFromShortcut] = useState(false);
+  const [deliveryPromptOpen, setDeliveryPromptOpen] = useState(false);
 
   const isHome = currentPage === "home";
   const isCheckoutFlow = currentPage === "cart" || currentPage === "payment";
@@ -119,6 +120,7 @@ export default function ChatbotWidget({
     const syncDrawerState = () => {
       setDrawerOpen(document.body.classList.contains("prime-drawer-open"));
       setAuthModalOpen(document.body.classList.contains("prime-auth-open"));
+      setDeliveryPromptOpen(document.body.classList.contains("prime-delivery-prompt-open"));
     };
 
     syncDrawerState();
@@ -157,10 +159,10 @@ export default function ChatbotWidget({
   }, []);
 
   useEffect(() => {
-    if (drawerOpen || authModalOpen) {
+    if (drawerOpen || authModalOpen || deliveryPromptOpen) {
       setOpen(false);
     }
-  }, [authModalOpen, drawerOpen]);
+  }, [authModalOpen, deliveryPromptOpen, drawerOpen]);
 
   useEffect(() => {
     if (!isHome && open && !openedFromShortcut) {
@@ -198,10 +200,11 @@ export default function ChatbotWidget({
       !open &&
       !drawerOpen &&
       !authModalOpen &&
+      !deliveryPromptOpen &&
       isHome &&
       isHomeAtTop
     ),
-    [authModalOpen, drawerOpen, isHome, isHomeAtTop, open]
+    [authModalOpen, deliveryPromptOpen, drawerOpen, isHome, isHomeAtTop, open]
   );
 
   const showTopButton = useMemo(
@@ -246,6 +249,10 @@ export default function ChatbotWidget({
           }
         }
         body.prime-auth-open .prime-float-stack {
+          opacity: 0;
+          pointer-events: none;
+        }
+        body.prime-delivery-prompt-open .prime-float-stack {
           opacity: 0;
           pointer-events: none;
         }

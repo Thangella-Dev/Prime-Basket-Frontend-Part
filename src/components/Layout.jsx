@@ -39,6 +39,10 @@ export default function Layout({
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [addressOverlayOpen, setAddressOverlayOpen] = useState(false);
+  const [networkBanner, setNetworkBanner] = useState(() => ({
+    visible: false,
+    mode: typeof navigator !== "undefined" && navigator.onLine === false ? "offline" : "online",
+  }));
   const showMobileGlassDock =
     ["home", "category", "product", "cart", "wishlist", "account"].includes(currentPage) &&
     !hideMobileGlassDock &&
@@ -62,6 +66,32 @@ export default function Layout({
     window.addEventListener("prime-address-overlay", handleAddressOverlay);
     return () => {
       window.removeEventListener("prime-address-overlay", handleAddressOverlay);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    let timer = null;
+
+    const showBanner = (mode) => {
+      if (timer) clearTimeout(timer);
+      setNetworkBanner({ visible: true, mode });
+      if (mode === "online") {
+        timer = window.setTimeout(() => {
+          setNetworkBanner((prev) => ({ ...prev, visible: false }));
+        }, 2400);
+      }
+    };
+
+    const handleOnline = () => showBanner("online");
+    const handleOffline = () => showBanner("offline");
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
@@ -327,7 +357,108 @@ export default function Layout({
             padding-bottom: 0;
           }
         }
+        @keyframes primeNetworkDrop {
+          from { opacity: 0; transform: translate(-50%, -16px) scale(0.97); }
+          to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+        @keyframes primeNetworkPulse {
+          0%, 100% { box-shadow: 0 18px 36px rgba(15,23,42,0.14); }
+          50% { box-shadow: 0 24px 42px rgba(15,91,215,0.2); }
+        }
+        .prime-network-banner {
+          position: fixed;
+          top: 84px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: min(92vw, 420px);
+          z-index: 99999;
+          pointer-events: none;
+          animation: primeNetworkDrop .28s ease-out, primeNetworkPulse 2.8s ease-in-out infinite;
+        }
+        .prime-network-card {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 14px 16px;
+          border-radius: 18px;
+          color: #fff;
+          border: 1px solid rgba(255,255,255,0.18);
+          box-shadow: 0 18px 36px rgba(15,23,42,0.14);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          background: linear-gradient(135deg, #0f5bd7, #1f7ae0 52%, #44c4d4 100%);
+        }
+        .prime-network-card.offline {
+          background: linear-gradient(135deg, #163253, #1d5ba0 48%, #3b82f6 100%);
+        }
+        .prime-network-icon {
+          width: 38px;
+          height: 38px;
+          border-radius: 14px;
+          background: rgba(255,255,255,0.16);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          font-size: 15px;
+        }
+        .prime-network-copy {
+          min-width: 0;
+        }
+        .prime-network-title {
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          opacity: 0.84;
+        }
+        .prime-network-text {
+          font-size: 13px;
+          font-weight: 800;
+          line-height: 1.35;
+          margin-top: 2px;
+        }
+        .prime-network-subtext {
+          font-size: 11px;
+          opacity: 0.82;
+          line-height: 1.35;
+          margin-top: 2px;
+        }
+        @media (max-width: 768px) {
+          .prime-network-banner {
+            top: 76px;
+            width: min(94vw, 390px);
+          }
+          .prime-network-card {
+            padding: 12px 14px;
+            border-radius: 16px;
+          }
+        }
       `}</style>
+      {networkBanner.visible && (
+        <div className="prime-network-banner" aria-live="polite" role="status">
+          <div className={`prime-network-card ${networkBanner.mode === "offline" ? "offline" : "online"}`}>
+            <div className="prime-network-icon">
+              <i className={`fas ${networkBanner.mode === "offline" ? "fa-wifi" : "fa-signal"}`}></i>
+            </div>
+            <div className="prime-network-copy">
+              <div className="prime-network-title">
+                {networkBanner.mode === "offline" ? "Connection paused" : "Back online"}
+              </div>
+              <div className="prime-network-text">
+                {networkBanner.mode === "offline"
+                  ? "You are offline. Some live data may pause for a moment."
+                  : "Connection restored. Live updates are active again."}
+              </div>
+              <div className="prime-network-subtext">
+                {networkBanner.mode === "offline"
+                  ? "You can still browse what is already loaded."
+                  : "Prime Basket is synced and ready."}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <Header
         onAccountClick={onAccountClick}
         isLoggedIn={isLoggedIn}
