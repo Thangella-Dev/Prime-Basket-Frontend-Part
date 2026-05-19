@@ -175,7 +175,7 @@ export default function App() {
     setNotifications(prev => {
       const updated = [newNote, ...prev].slice(0, 20);
       localStorage.setItem("pb_notifications", JSON.stringify(updated));
-      showToast(`${title}: ${message}`);
+      showToast(message, { title, type });
       return updated;
     });
   };
@@ -325,13 +325,14 @@ export default function App() {
   }, [hideMobileGlassDock, page]);
 
   const hasMountedNavigationRef = useRef(false);
+  const hasRestoredInitialScrollRef = useRef(false);
   // Scroll to top on in-app navigation, but not on initial boot/refresh restore
   useEffect(() => {
     if (!hasMountedNavigationRef.current) {
       hasMountedNavigationRef.current = true;
       return;
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "auto" });
   }, [page, selectedCategory, selectedProduct]);
 
   const getViewKey = useCallback(
@@ -369,15 +370,19 @@ export default function App() {
     };
 
     const restoreScroll = () => {
+      if (hasRestoredInitialScrollRef.current) return;
       const saved = readStoredJson(NAV_SCROLL_KEY, {}) || {};
       const y = Number(saved[viewKey] || 0);
-      if (y > 0) {
-        window.scrollTo({ top: y, behavior: "auto" });
-      }
+      hasRestoredInitialScrollRef.current = true;
+      if (y > 0) window.scrollTo({ top: y, behavior: "auto" });
     };
 
-    const raf = window.requestAnimationFrame(restoreScroll);
-    const timer = window.setTimeout(restoreScroll, 240);
+    let raf = 0;
+    let timer = 0;
+    if (!hasRestoredInitialScrollRef.current) {
+      raf = window.requestAnimationFrame(restoreScroll);
+      timer = window.setTimeout(restoreScroll, 240);
+    }
     window.addEventListener("scroll", saveScroll, { passive: true });
     return () => {
       window.cancelAnimationFrame(raf);
@@ -728,10 +733,10 @@ export default function App() {
     setWishlist((prev) => {
       const exists = prev.find((item) => item._uid === product._uid);
       if (exists) {
-        showToast((translations[language] || translations.en).toasts.removedFromWishlist);
+        showToast((translations[language] || translations.en).toasts.removedFromWishlist, { type: "info", title: "Wishlist updated" });
         return prev.filter((item) => item._uid !== product._uid);
       }
-      showToast((translations[language] || translations.en).toasts.addedToWishlist);
+      showToast((translations[language] || translations.en).toasts.addedToWishlist, { type: "success", title: "Wishlist updated" });
       const sanitizedProduct = sanitizeStoredProduct(product);
       const { quantity, selectedUnit, ...wishlistProduct } = sanitizedProduct || {};
       return [...prev, wishlistProduct];
@@ -739,16 +744,32 @@ export default function App() {
   };
 
   // ── Legacy toast (wishlist/notification messages) ──
-  const showToast = (message) => {
+  const showToast = (message, options = {}) => {
     const toast = document.getElementById("simple-toast");
     if (!toast) return;
-    toast.textContent = message;
-    toast.style.transition = "all 0.3s ease";
+    const titleNode = toast.querySelector("[data-toast-title]");
+    const bodyNode = toast.querySelector("[data-toast-body]");
+    const iconNode = toast.querySelector("[data-toast-icon]");
+    const type = options.type || "info";
+    const title = options.title || (type === "success" ? "Success" : "Update");
+    const iconByType = {
+      success: "fa-circle-check",
+      error: "fa-circle-exclamation",
+      warning: "fa-triangle-exclamation",
+      info: "fa-bell",
+    };
+
+    toast.dataset.type = type;
+    if (titleNode) titleNode.textContent = title;
+    if (bodyNode) bodyNode.textContent = message;
+    if (iconNode) iconNode.className = `fas ${iconByType[type] || iconByType.info}`;
+
     toast.style.opacity = "1";
-    toast.style.transform = "translateX(-50%) translateY(0)";
-    setTimeout(() => {
+    toast.style.transform = "translateX(-50%) translateY(0) scale(1)";
+    if (toast._hideTimer) clearTimeout(toast._hideTimer);
+    toast._hideTimer = setTimeout(() => {
       toast.style.opacity = "0";
-      toast.style.transform = "translateX(-50%) translateY(-60px)";
+      toast.style.transform = "translateX(-50%) translateY(-14px) scale(0.98)";
     }, 2200);
   };
 
@@ -1263,14 +1284,48 @@ export default function App() {
 
       {/* Simple toast for wishlist/notification messages */}
       <div id="simple-toast" style={{
-        opacity: 0, transform: "translateX(-50%) translateY(-60px)",
-        transition: "all 0.3s ease",
-        position: "fixed", top: "76px", left: "50%",
-        background: "#222", color: "#fff", padding: "9px 18px",
-        borderRadius: "8px", fontWeight: 600, fontSize: "13px",
-        boxShadow: "0 4px 16px rgba(0,0,0,0.28)", zIndex: 99998,
-        whiteSpace: "nowrap", width: "max-content", pointerEvents: "none",
-      }} />
+        opacity: 0,
+        transform: "translateX(-50%) translateY(-14px) scale(0.98)",
+        transition: "opacity 0.26s ease, transform 0.26s ease",
+        position: "fixed",
+        top: "82px",
+        left: "50%",
+        width: "min(92vw, 430px)",
+        padding: "12px 14px",
+        borderRadius: "18px",
+        background: "linear-gradient(145deg, rgba(12,22,40,0.94), rgba(24,43,72,0.94))",
+        color: "#fff",
+        boxShadow: "0 18px 38px rgba(15,23,42,0.26)",
+        border: "1px solid rgba(255,255,255,0.12)",
+        backdropFilter: "blur(18px)",
+        zIndex: 99998,
+        pointerEvents: "none",
+      }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+          <div
+            style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "12px",
+              background: "rgba(255,255,255,0.12)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <i data-toast-icon className="fas fa-bell"></i>
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div data-toast-title style={{ fontSize: "11px", fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", opacity: 0.8 }}>
+              Update
+            </div>
+            <div data-toast-body style={{ fontSize: "13px", fontWeight: 700, lineHeight: 1.4, marginTop: "2px" }}>
+              Notification
+            </div>
+          </div>
+        </div>
+      </div>
 
       <PhoneAuthModal
         isOpen={isLoginModalOpen}

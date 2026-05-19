@@ -58,6 +58,7 @@ Primary production domain: `https://prime-basket.in`
 - Login/auth overlays now suppress the mobile dock, and OTP send now dismisses the mobile keyboard automatically
 - Checkout `Select address to continue` now jumps directly into address entry when no saved address exists
 - Address entry now shows inline real-world validation errors for empty or invalid required fields like house, locality, pincode, receiver name, and phone
+- Address entry now validates more strictly by region, including exact India/Kenya postal-code rules, normalized receiver names, and phone-number format checks with the country prefix kept inline on mobile
 - Wishlist/cart interaction is more isolated so wishlist taps do not accidentally trigger neighboring cart actions
 - `Buy Again` is now available in `My Account` for reordering previous items individually
 - The mobile dock now hides while mobile category filter/sort sheets are open
@@ -68,6 +69,12 @@ Primary production domain: `https://prime-basket.in`
 - The order follow-up journey now feels more premium with a richer floating tracking card, a delivered-on-home feedback prompt, and a direct `Track Order` CTA on the order-success page
 - Order progression notifications now include the packed stage as well, not only out-for-delivery and delivered
 - Footer layout spacing was tightened by removing an extra phantom grid column and reducing overly wide gaps
+- The global in-app toast now uses a softer premium notice style instead of the older plain dark bar treatment
+- The floating order-update tracker is now more compact on mobile so delivery updates stay visible without covering too much page space
+- My Account profile saving now rejects invalid full names and malformed emails instead of only checking empty values
+- Mobile footer spacing is now tighter around the dock/footer handoff so the last section no longer leaves extra empty space on small screens
+- Scroll restoration now runs only on the initial refresh/session restore, which prevents the random auto scroll up/down behavior that could happen while moving through app sections
+- Account help/support popup backdrops now use the app’s blue-tinted premium overlay treatment instead of a flat dark backdrop
 - Shared product imagery is now more deterministic in fallback mode, especially for India catalog categories like rice, pulses, masala, biscuits, oral care, body care, snacks, cool drinks, feminine care, baby care, and home needs
 - India fallback pricing strings were normalized again so rupee values render correctly instead of mojibake text when local data is used
 - A page-level error boundary now protects major lazy-loaded page regions from blank-screen failures

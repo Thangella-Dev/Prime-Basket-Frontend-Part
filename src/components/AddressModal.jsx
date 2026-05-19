@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { detectCurrentLocation, loadSavedLocation, reverseGeocode } from "../utils/locationService";
+import { getPhoneCountry, validateAndNormalizePhone } from "../utils/phoneValidation";
 
 const defaultForm = {
   house: "",
@@ -73,7 +74,23 @@ function pixelToLatLng(centerLatitude, centerLongitude, zoom, pixelX, pixelY, wi
   return worldToLatLng(worldX, worldY, zoom);
 }
 
-export default function AddressModal({ isOpen, onClose, onSave, initialData, t }) {
+const ADDRESS_TEXT_PATTERN = /^[A-Za-z0-9\s,.'/#()-]+$/;
+const NAME_PATTERN = /^[A-Za-z][A-Za-z\s.'-]{1,49}$/;
+
+function normalizeSpace(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function validateAddressText(value, { label, min = 2, max = 80, required = false, pattern = ADDRESS_TEXT_PATTERN }) {
+  const trimmed = normalizeSpace(value);
+  if (!trimmed) return required ? `Enter ${label.toLowerCase()}.` : "";
+  if (trimmed.length < min) return `${label} is too short.`;
+  if (trimmed.length > max) return `${label} is too long.`;
+  if (!pattern.test(trimmed)) return `Enter a valid ${label.toLowerCase()}.`;
+  return "";
+}
+
+export default function AddressModal({ isOpen, onClose, onSave, initialData, t, region = "in" }) {
   const [formData, setFormData] = useState(defaultForm);
   const [formErrors, setFormErrors] = useState({});
   const [locationInfo, setLocationInfo] = useState(() => loadSavedLocation());
@@ -98,6 +115,7 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
   const isDark = theme === "dark";
   const isMobileSheet = viewportWidth <= 560;
   const isCompactLayout = viewportWidth <= 640;
+  const phoneCountry = useMemo(() => getPhoneCountry(region), [region]);
   const palette = isDark
     ? {
         overlay: "rgba(3, 8, 18, 0.72)",
@@ -183,6 +201,54 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
 
   const getFieldError = (field) => formErrors[field] || "";
 
+  const validateField = (field, rawValue = formData[field]) => {
+    const value = typeof rawValue === "string" ? rawValue : String(rawValue || "");
+    const phoneDigits = value.replace(/\D/g, "");
+    const pincodeDigits = value.replace(/\D/g, "");
+
+    switch (field) {
+      case "house":
+        return validateAddressText(value, { label: "house or flat details", required: true, min: 2, max: 60 });
+      case "building":
+        return validateAddressText(value, { label: "building", min: 2, max: 60 });
+      case "area":
+        return validateAddressText(value, { label: "area, street, or locality", required: true, min: 3, max: 90 });
+      case "landmark":
+        return validateAddressText(value, { label: "landmark", min: 3, max: 80 });
+      case "pincode":
+        if (!pincodeDigits) return "Enter pincode.";
+        if (region === "ke") return /^\d{5}$/.test(pincodeDigits) ? "" : "Enter a valid 5-digit postal code.";
+        return /^\d{6}$/.test(pincodeDigits) ? "" : "Enter a valid 6-digit pincode.";
+      case "receiverName": {
+        const trimmed = normalizeSpace(value);
+        if (!trimmed) return "Enter receiver name.";
+        if (!NAME_PATTERN.test(trimmed)) return "Enter a valid receiver name.";
+        return "";
+      }
+      case "receiverPhone": {
+        if (!phoneDigits) return "Enter phone number.";
+        const validation = validateAndNormalizePhone(region, phoneDigits);
+        return validation.isValid ? "" : validation.error || "Enter a valid phone number.";
+      }
+      default:
+        return "";
+    }
+  };
+
+  const handleFieldBlur = (field) => {
+    const error = validateField(field);
+    setFormErrors((prev) => {
+      if (!error) {
+        if (!prev[field]) return prev;
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      }
+      if (prev[field] === error) return prev;
+      return { ...prev, [field]: error };
+    });
+  };
+
   const getFieldStyle = (field) => ({
     width: "100%",
     padding: "11px 12px",
@@ -196,16 +262,13 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
 
   const handleSave = () => {
     const nextErrors = {};
-    const phoneDigits = String(formData.receiverPhone || "").replace(/\D/g, "");
-    const pincodeDigits = String(formData.pincode || "").replace(/\D/g, "");
+    const fieldsToCheck = ["house", "building", "area", "landmark", "pincode", "receiverName", "receiverPhone"];
+    const phoneValidation = validateAndNormalizePhone(region, String(formData.receiverPhone || "").replace(/\D/g, ""));
 
-    if (!formData.house.trim()) nextErrors.house = "Enter house or flat details.";
-    if (!formData.area.trim()) nextErrors.area = "Enter area, street, or locality.";
-    if (!pincodeDigits) nextErrors.pincode = "Enter pincode.";
-    else if (pincodeDigits.length < 5 || pincodeDigits.length > 8) nextErrors.pincode = "Enter a valid pincode.";
-    if (!formData.receiverName.trim()) nextErrors.receiverName = "Enter receiver name.";
-    if (!phoneDigits) nextErrors.receiverPhone = "Enter phone number.";
-    else if (phoneDigits.length < 8 || phoneDigits.length > 15) nextErrors.receiverPhone = "Enter a valid phone number.";
+    fieldsToCheck.forEach((field) => {
+      const error = validateField(field);
+      if (error) nextErrors[field] = error;
+    });
 
     if (Object.keys(nextErrors).length > 0) {
       setFormErrors(nextErrors);
@@ -215,7 +278,16 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
 
     setFormErrors({});
     setLocationError("");
-    onSave(formData);
+    onSave({
+      ...formData,
+      house: normalizeSpace(formData.house),
+      building: normalizeSpace(formData.building),
+      area: normalizeSpace(formData.area),
+      landmark: normalizeSpace(formData.landmark),
+      pincode: String(formData.pincode || "").replace(/\D/g, ""),
+      receiverName: normalizeSpace(formData.receiverName),
+      receiverPhone: phoneValidation.normalized || String(formData.receiverPhone || "").replace(/\D/g, ""),
+    });
   };
 
   const handleDetectLocation = async () => {
@@ -541,6 +613,7 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 placeholder="Flat 402"
                 value={formData.house}
                 onChange={(e) => setFieldValue("house", e.target.value)}
+                onBlur={() => handleFieldBlur("house")}
                 style={getFieldStyle("house")}
               />
               {getFieldError("house") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("house")}</div>}
@@ -553,8 +626,10 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 placeholder="Sunshine Apartments"
                 value={formData.building}
                 onChange={(e) => setFieldValue("building", e.target.value)}
+                onBlur={() => handleFieldBlur("building")}
                 style={getFieldStyle("building")}
               />
+              {getFieldError("building") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("building")}</div>}
             </div>
 
             <div style={{ gridColumn: "1 / -1" }}>
@@ -564,6 +639,7 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 placeholder="KPHB Phase 1"
                 value={formData.area}
                 onChange={(e) => setFieldValue("area", e.target.value)}
+                onBlur={() => handleFieldBlur("area")}
                 style={getFieldStyle("area")}
               />
               {getFieldError("area") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("area")}</div>}
@@ -576,8 +652,10 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 placeholder="Near metro / bank"
                 value={formData.landmark}
                 onChange={(e) => setFieldValue("landmark", e.target.value)}
+                onBlur={() => handleFieldBlur("landmark")}
                 style={getFieldStyle("landmark")}
               />
+              {getFieldError("landmark") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("landmark")}</div>}
             </div>
 
             <div>
@@ -587,8 +665,9 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 placeholder="500085"
                 value={formData.pincode}
                 inputMode="numeric"
-                maxLength={8}
-                onChange={(e) => setFieldValue("pincode", e.target.value.replace(/\D/g, "").slice(0, 8))}
+                maxLength={region === "ke" ? 5 : 6}
+                onChange={(e) => setFieldValue("pincode", e.target.value.replace(/\D/g, "").slice(0, region === "ke" ? 5 : 6))}
+                onBlur={() => handleFieldBlur("pincode")}
                 style={getFieldStyle("pincode")}
               />
               {getFieldError("pincode") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("pincode")}</div>}
@@ -601,6 +680,7 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
                 placeholder="Nikhil"
                 value={formData.receiverName}
                 onChange={(e) => setFieldValue("receiverName", e.target.value)}
+                onBlur={() => handleFieldBlur("receiverName")}
                 style={getFieldStyle("receiverName")}
               />
               {getFieldError("receiverName") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("receiverName")}</div>}
@@ -608,16 +688,17 @@ export default function AddressModal({ isOpen, onClose, onSave, initialData, t }
 
             <div>
               <label style={{ fontSize: "0.68rem", fontWeight: 800, color: palette.subtext, marginBottom: "6px", display: "block" }}>PHONE</label>
-              <div className="address-phone-row" style={{ display: "flex", gap: "10px", flexDirection: isCompactLayout ? "column" : "row" }}>
-                <div style={{ padding: "11px 12px", background: palette.panelBg, border: `1.5px solid ${palette.border}`, borderRadius: "12px", color: palette.subtext, fontWeight: 700 }}>+91</div>
+              <div className="address-phone-row" style={{ display: "flex", gap: "10px", alignItems: "stretch", flexDirection: "row" }}>
+                <div style={{ minWidth: isCompactLayout ? "76px" : "84px", padding: "11px 12px", display: "flex", alignItems: "center", justifyContent: "center", background: palette.panelBg, border: `1.5px solid ${palette.border}`, borderRadius: "12px", color: palette.subtext, fontWeight: 700, whiteSpace: "nowrap" }}>{phoneCountry.dial}</div>
                 <input
                   type="text"
-                  placeholder="8519913550"
+                  placeholder={phoneCountry.code === "IN" ? "8519913550" : "712345678"}
                   value={formData.receiverPhone}
                   inputMode="tel"
-                  maxLength={15}
-                  onChange={(e) => setFieldValue("receiverPhone", e.target.value.replace(/\D/g, "").slice(0, 15))}
-                  style={{ ...getFieldStyle("receiverPhone"), flex: 1 }}
+                  maxLength={phoneCountry.code === "IN" ? 10 : 10}
+                  onChange={(e) => setFieldValue("receiverPhone", e.target.value.replace(/\D/g, "").slice(0, phoneCountry.code === "IN" ? 10 : 10))}
+                  onBlur={() => handleFieldBlur("receiverPhone")}
+                  style={{ ...getFieldStyle("receiverPhone"), flex: 1, minWidth: 0 }}
                 />
               </div>
               {getFieldError("receiverPhone") && <div style={{ marginTop: "6px", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700 }}>{getFieldError("receiverPhone")}</div>}

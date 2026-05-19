@@ -442,22 +442,31 @@ function Profile({ user, updateUser, t, language = "en", region = "in" }) {
 
   const handleSave = () => {
     try {
-      if (!name.trim()) {
-        setNameError("Please enter your full name");
+      const cleanedName = String(name || "").replace(/\s+/g, " ").trim();
+      const cleanedEmail = String(email || "").trim();
+
+      if (!cleanedName) {
+        setNameError("Please enter your full name.");
         return;
       }
-      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setEmailError("Please enter a valid email address");
+      if (cleanedName.length < 2 || cleanedName.length > 50 || !/^[A-Za-z][A-Za-z\s.'-]+$/.test(cleanedName)) {
+        setNameError("Enter a valid full name.");
+        return;
+      }
+      if (cleanedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedEmail)) {
+        setEmailError("Please enter a valid email address.");
         return;
       }
       
       const saved = JSON.parse(localStorage.getItem("user") || "{}");
-      const updated = { ...saved, name, email, phone, profileImage: photo || displayPhoto };
+      const updated = { ...saved, name: cleanedName, email: cleanedEmail, phone, profileImage: photo || displayPhoto };
       if (updateUser) {
         updateUser(updated);
       } else {
         localStorage.setItem("user", JSON.stringify(updated));
       }
+      setName(cleanedName);
+      setEmail(cleanedEmail);
       setDisplayPhoto(photo || displayPhoto);
       setPhoto(null);
       setNameError("");
@@ -2443,12 +2452,13 @@ function HelpSection({ t, language }) {
       <style>{`
         .help-modal-overlay {
           position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.5); z-index: 1000;
+          background: linear-gradient(180deg, rgba(15, 46, 90, 0.52), rgba(8, 20, 41, 0.62)); z-index: 1000;
+          backdrop-filter: blur(10px);
           display: flex; align-items: center; justify-content: center;
         }
         .help-modal {
-          background: white; border-radius: 16px; width: 90%; max-width: 500px;
-          overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+          background: linear-gradient(180deg, #ffffff, #f7fbff); border-radius: 20px; width: 90%; max-width: 500px;
+          overflow: hidden; box-shadow: 0 24px 54px rgba(15,23,42,0.18); border: 1px solid rgba(191, 219, 254, 0.66);
         }
         .help-modal-header {
           padding: 20px; border-bottom: 1px solid #eee;

@@ -229,8 +229,8 @@ export default function TrackingPopup({
         @media (max-width: 768px) {
           .prime-tracking-shell {
             left: 12px !important;
-            right: 12px !important;
-            width: auto !important;
+            right: auto !important;
+            width: min(284px, calc(100vw - 24px)) !important;
             bottom: calc(112px + env(safe-area-inset-bottom, 0px)) !important;
           }
         }
@@ -240,9 +240,9 @@ export default function TrackingPopup({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "12px",
-          padding: "14px 16px",
-          borderRadius: "22px",
+          gap: "10px",
+          padding: "12px 14px",
+          borderRadius: "20px",
           background: "linear-gradient(135deg, #0f5bd7, #1f7ae0 46%, #44c4d4 100%)",
           color: "#fff",
           border: "1px solid rgba(255,255,255,0.18)",
@@ -251,9 +251,9 @@ export default function TrackingPopup({
       >
         <div
           style={{
-            width: "42px",
-            height: "42px",
-            borderRadius: "16px",
+            width: "38px",
+            height: "38px",
+            borderRadius: "14px",
             background: "rgba(255,255,255,0.16)",
             display: "flex",
             alignItems: "center",
@@ -261,20 +261,32 @@ export default function TrackingPopup({
             flexShrink: 0,
           }}
         >
-          <i className="fas fa-truck" style={{ fontSize: "17px" }}></i>
+          <i className="fas fa-truck" style={{ fontSize: "15px" }}></i>
         </div>
         <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", opacity: 0.78 }}>
+          <div style={{ fontSize: "9px", fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", opacity: 0.82 }}>
             Order update
           </div>
-          <div style={{ fontSize: "14px", fontWeight: 800, marginTop: "2px" }}>
+          <div style={{ fontSize: "13px", fontWeight: 800, marginTop: "1px", lineHeight: 1.2 }}>
             {activeOrder.status}
           </div>
-          <div style={{ fontSize: "12px", opacity: 0.86, marginTop: "2px" }}>
-            Tap to track order #{activeOrder.orderId}
+          <div style={{ fontSize: "11px", opacity: 0.86, marginTop: "2px", lineHeight: 1.35 }}>
+            Track order #{activeOrder.orderId}
           </div>
         </div>
-        <i className="fas fa-chevron-right" style={{ fontSize: "12px", opacity: 0.78 }}></i>
+        <div
+          style={{
+            padding: "7px 10px",
+            borderRadius: "12px",
+            background: "rgba(255,255,255,0.18)",
+            fontSize: "10px",
+            fontWeight: 800,
+            letterSpacing: "0.03em",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Track
+        </div>
       </div>
     </div>
   );

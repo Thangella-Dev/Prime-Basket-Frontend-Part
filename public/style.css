@@ -2996,26 +2996,33 @@ body[data-theme="dark"] .browse-btn .chevron {
 @media (max-width: 1100px) { .footer-top { grid-template-columns: minmax(220px, 1.06fr) repeat(3, minmax(0, 1fr)); gap: 20px 14px; } .app-col { grid-column: 1 / -1; } }
 @media (max-width: 860px) { .footer-top { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 18px; } .footer-brand { grid-column: 1 / -1; } }
 @media (max-width: 600px) {
-  .footer.footer-with-mobile-dock { padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px)); }
-  .footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 28px 16px 24px; gap: 20px 14px; }
+  .footer.footer-with-mobile-dock { padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
+  .footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 24px 16px 18px; gap: 16px 12px; }
   .footer-brand { grid-column: 1 / -1; }
   .app-col { grid-column: 1 / -1; }
-  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 16px; padding: 16px; }
-  .phone-group { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .footer-col h4 { margin-bottom: 14px; }
+  .footer-col ul { gap: 9px; }
+  .brand-desc { margin-bottom: 14px; }
+  .contact-list { gap: 8px; }
+  .app-buttons { margin-bottom: 16px; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; padding: 14px 16px; }
+  .phone-group { flex-direction: column; align-items: flex-start; gap: 10px; }
   .social-group { align-items: flex-start; }
   .social-discount { text-align: left; }
 }
 
 @media (max-width: 480px) {
-  .footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; }
+  .footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 22px 14px 16px; gap: 14px 10px; }
   .footer-brand,
   .app-col { grid-column: 1 / -1; }
   .footer-col { text-align: left; }
   .footer-col ul { align-items: flex-start; }
   .brand-logo { justify-content: flex-start; }
   .brand-logo-image-footer { width: min(100%, 220px); }
+  .contact-list li { font-size: 0.8rem; }
   .contact-list li { justify-content: flex-start; }
   .app-buttons { justify-content: flex-start; }
+  .app-btn { padding: 10px 14px; border-radius: 14px; min-width: 0; }
   .payment-icons { justify-content: flex-start; }
   .phone-item {
     width: 100%;
@@ -3030,14 +3037,17 @@ body[data-theme="dark"] .browse-btn .chevron {
   .social-group { align-items: flex-start; width: 100%; }
   .social-discount { text-align: left; width: 100%; }
   .social-row { justify-content: flex-start; width: 100%; }
+  .footer-bottom { gap: 10px; padding: 12px 14px; }
 }
 
 /* ── TOAST ── */
 #toast {
   position: fixed; bottom: 24px; right: 24px;
-  background: #1d5ba0; color: #fff; padding: 13px 22px;
-  border-radius: 10px; font-weight: 700; font-size: 13px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  background: linear-gradient(135deg, #0f5bd7, #2f78dd 52%, #49bfd4 100%);
+  color: #fff; padding: 13px 22px;
+  border-radius: 14px; font-weight: 700; font-size: 13px;
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 18px 34px rgba(15,91,215,.22);
   transform: translateY(100px); opacity: 0; transition: .3s; z-index: 9999;
 }
 

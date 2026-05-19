@@ -1575,6 +1575,7 @@ export default function CartPage({
                     onSave={handleModalSave}
                     t={t}
                     language={language}
+                    region={region}
                   />
 
                   {addresses.length < 5 ? (
