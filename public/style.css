@@ -1150,12 +1150,16 @@ body.prime-drawer-open .hamburger * {
 
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
 .brand-link {
+  appearance: none;
+  border: 0;
+  background: transparent;
   position: relative;
   padding: 6px 8px;
   margin-left: -8px;
   border-radius: 18px;
   overflow: hidden;
   transition: transform 0.18s ease, background 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
+  cursor: pointer;
 }
 .brand-link::after {
   content: "";
@@ -4669,7 +4673,7 @@ body[data-theme="dark"] .footer-divider {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  width: min(340px, calc(100vw - 18px));
+  width: min(316px, calc(100vw - 18px));
   max-width: calc(100vw - 18px);
   background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(248,251,255,0.62));
   border-radius: 22px;
@@ -4687,8 +4691,8 @@ body[data-theme="dark"] .footer-divider {
     top: 72px !important;
     right: 8px !important;
     left: auto !important;
-    width: min(calc(100vw - 16px), 360px) !important;
-    max-height: 65vh !important;
+    width: min(calc(100vw - 16px), 334px) !important;
+    max-height: min(62vh, 470px) !important;
     margin: 0 !important;
     transform: none !important;
   }
@@ -4698,8 +4702,8 @@ body[data-theme="dark"] .footer-divider {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
-  padding: 18px;
+  gap: 10px;
+  padding: 14px 14px 12px;
   background: linear-gradient(180deg, #f8fbff 0%, #f3f7fd 100%);
   border-bottom: 1px solid #edf2fb;
   flex-wrap: wrap;
@@ -4723,7 +4727,7 @@ body[data-theme="dark"] .footer-divider {
 
 .notes-head h4 {
   margin: 0;
-  font-size: 0.96rem;
+  font-size: 0.9rem;
   font-weight: 800;
   color: var(--navy);
 }
@@ -4731,11 +4735,21 @@ body[data-theme="dark"] .footer-divider {
 .notes-head p {
   margin: 4px 0 0;
   color: var(--body);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
 }
 
 .notes-head > div:first-child {
   min-width: 0;
+}
+
+.notes-actions-wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: nowrap;
+  max-width: 100%;
 }
 
 .notes-mark-read {
@@ -4743,8 +4757,8 @@ body[data-theme="dark"] .footer-divider {
   background: rgba(15,91,215,0.08);
   color: var(--green);
   border-radius: 999px;
-  padding: 6px 10px;
-  font-size: 0.68rem;
+  padding: 6px 9px;
+  font-size: 0.65rem;
   font-weight: 800;
   cursor: pointer;
   line-height: 1.2;
@@ -4755,11 +4769,32 @@ body[data-theme="dark"] .footer-divider {
   align-items: center;
   justify-content: flex-end;
   gap: 6px;
-  flex-wrap: nowrap;
-  white-space: nowrap;
+  flex-wrap: wrap;
   max-width: 100%;
+  flex-shrink: 1;
+  width: min(100%, 168px);
+}
+
+.notes-close-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(148,163,184,0.24);
+  background: rgba(255,255,255,0.82);
+  color: #64748b;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   flex-shrink: 0;
-  width: auto;
+  box-shadow: 0 10px 20px rgba(15,23,42,0.08);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.notes-close-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.96);
+  box-shadow: 0 14px 24px rgba(15,23,42,0.12);
 }
 
 .notes-clear {
@@ -4767,19 +4802,46 @@ body[data-theme="dark"] .footer-divider {
   color: #dc2626;
 }
 
+@media (max-width: 1180px) {
+  .notes-head {
+    align-items: flex-start;
+  }
+
+  .notes-actions-wrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .notes-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
 @media (max-width: 600px) {
   .notes-head {
     flex-wrap: wrap;
   }
 
-  .notes-actions {
+  .notes-actions-wrap {
     width: 100%;
-    justify-content: flex-end;
+    align-items: stretch;
+    justify-content: space-between;
+  }
+
+  .notes-actions {
+    width: calc(100% - 40px);
+    justify-content: stretch;
+  }
+
+  .notes-mark-read {
+    flex: 1 1 138px;
+    text-align: center;
   }
 }
 
 .notes-list {
-  max-height: 390px;
+  max-height: 332px;
   overflow-y: auto;
 }
 
@@ -4816,7 +4878,7 @@ body[data-theme="dark"] .footer-divider {
 .note-item {
   display: flex;
   gap: 12px;
-  padding: 16px 18px;
+  padding: 12px 14px;
   border-bottom: 1px solid #edf2fb;
   background: #fff;
 }
@@ -6821,15 +6883,15 @@ body {
 .deals-section,
 .cat-section,
 .curated-section {
-  padding-top: 6px;
+  padding-top: 2px;
 }
 
 .sec-header,
 .deals-header {
   align-items: flex-end;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 26px;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
 .sec-title,
@@ -6842,8 +6904,8 @@ body {
 .deals-subtitle {
   max-width: 58ch;
   color: #6a7d96;
-  font-size: 0.96rem;
-  line-height: 1.7;
+  font-size: 0.92rem;
+  line-height: 1.62;
 }
 
 .section-title-icon {
@@ -6873,12 +6935,12 @@ body {
 
 .products-layout {
   grid-template-columns: minmax(0, 1.62fr) minmax(280px, 0.7fr);
-  gap: 26px;
+  gap: 22px;
 }
 
 .products-grid,
 .deals-grid {
-  gap: 22px;
+  gap: 16px;
 }
 
 .products-layout .sidebar .cat-box,
@@ -6894,7 +6956,7 @@ body {
 .products-layout .sidebar .cat-box {
   position: sticky;
   top: 132px;
-  padding: 24px 22px;
+  padding: 20px 20px;
   background:
     linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,248,255,0.95));
   overflow: auto;
@@ -6921,13 +6983,13 @@ body {
 }
 
 .deals-section {
-  margin-top: 18px;
+  margin-top: 12px;
   padding: 10px clamp(14px, 4vw, 26px) 0;
 }
 
 .deals-header,
 .category-intro-card {
-  padding: 22px 24px;
+  padding: 18px 20px;
   border-radius: 28px;
   background:
     radial-gradient(circle at top right, rgba(68, 196, 212, 0.12), transparent 28%),
@@ -6957,7 +7019,7 @@ body {
 }
 
 .banners {
-  gap: 22px;
+  gap: 18px;
 }
 
 .bcard {
@@ -6970,14 +7032,14 @@ body {
 }
 
 .cat-grid {
-  gap: 18px;
+  gap: 14px;
 }
 
 .catbox {
   background:
     linear-gradient(180deg, rgba(255,255,255,0.98), rgba(243,248,255,0.97));
   border-radius: 24px;
-  padding: 22px 18px;
+  padding: 18px 16px;
   transition:
     transform 0.26s var(--pb-ease-premium),
     box-shadow 0.26s var(--pb-ease-premium),
@@ -6995,14 +7057,14 @@ body {
 }
 
 .mcol-card {
-  padding: 22px 18px;
+  padding: 18px 16px;
   border-radius: 28px;
   background:
     linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,248,255,0.96));
 }
 
 .colhead {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .rail-control-btn {
@@ -7092,8 +7154,8 @@ body[data-theme="dark"] .bbtn {
   .sec-header,
   .deals-header {
     align-items: stretch;
-    gap: 14px;
-    margin-bottom: 18px;
+    gap: 12px;
+    margin-bottom: 15px;
   }
 
   .section-title-icon {

@@ -2177,50 +2177,50 @@ body[data-theme="dark"] .faq-title {
 .account-container.account-desktop-layout {
   --account-scroll-offset: 120px;
   display: grid;
-  grid-template-columns: minmax(220px, 250px) minmax(0, 1fr);
+  grid-template-columns: minmax(198px, 220px) minmax(0, 1fr);
   align-items: start;
-  gap: 22px;
+  gap: 14px;
+  padding: 12px 0 20px;
 }
 
 .account-desktop-home {
-  min-height: 40px;
-  padding: 0 14px;
+  min-height: 36px;
+  padding: 0 12px;
 }
 
 .account-sidebar-subtitle {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   color: #64748b;
-  font-size: 0.88rem;
-  line-height: 1.55;
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .account-desktop-panel {
-  display: grid;
-  gap: 18px;
+  display: block;
 }
 
 .account-desktop-panel-head {
-  padding: 24px 24px 0;
+  padding: 18px 18px 0;
 }
 
 .account-desktop-panel-head h2 {
-  margin: 12px 0 0;
-  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
-  line-height: 1.08;
+  margin: 10px 0 0;
+  font-size: clamp(1.22rem, 1.8vw, 1.62rem);
+  line-height: 1.06;
   letter-spacing: -0.04em;
   color: #10213c;
 }
 
 .account-desktop-panel-head p {
-  margin: 10px 0 0;
-  max-width: 700px;
+  margin: 8px 0 0;
+  max-width: 620px;
   color: #64748b;
-  font-size: 0.95rem;
-  line-height: 1.65;
+  font-size: 0.87rem;
+  line-height: 1.55;
 }
 
 .account-container.account-desktop-layout .account-detail-content {
-  padding: 0 24px 24px;
+  padding: 0;
 }
 
 .account-container.account-desktop-layout .account-detail-content > div,
@@ -2240,7 +2240,7 @@ body[data-theme="dark"] .faq-title {
 .account-menu-stage,
 .account-detail-stage {
   display: grid;
-  gap: 20px;
+  gap: 16px;
   animation: slideUpFade 0.32s ease both;
 }
 
@@ -2255,7 +2255,167 @@ body[data-theme="dark"] .faq-title {
 }
 
 .account-menu-hero {
-  padding: 26px 28px;
+  padding: 20px 22px;
+}
+
+.account-container.account-desktop-layout .account-sidebar {
+  padding: 14px;
+  border-radius: 20px;
+  max-height: calc(100vh - var(--account-scroll-offset) - 12px);
+}
+
+.account-container.account-desktop-layout .account-sidebar-header {
+  margin-bottom: 12px;
+}
+
+.account-container.account-desktop-layout .account-sidebar h2 {
+  font-size: 1.05rem;
+}
+
+.account-container.account-desktop-layout .account-menu {
+  gap: 6px;
+  padding-right: 4px;
+  padding-bottom: 6px;
+}
+
+.account-container.account-desktop-layout .account-item {
+  min-height: 46px;
+  gap: 9px;
+  padding: 7px 8px;
+  border-radius: 12px;
+}
+
+.account-container.account-desktop-layout .account-item i {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  font-size: 0.76rem;
+}
+
+.account-container.account-desktop-layout .account-item span {
+  font-size: 0.76rem;
+}
+
+.account-container.account-desktop-layout .account-content > div,
+.account-container.account-desktop-layout .profile-container,
+.account-container.account-desktop-layout .orders-card,
+.account-container.account-desktop-layout .address-card,
+.account-container.account-desktop-layout .giftcards-card,
+.account-container.account-desktop-layout .recent-card,
+.account-container.account-desktop-layout .notifications-card,
+.account-container.account-desktop-layout .payments-card,
+.account-container.account-desktop-layout .help-card,
+.account-container.account-desktop-layout .refunds-card {
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.06);
+}
+
+.account-container.account-desktop-layout .account-content {
+  position: relative;
+  top: auto;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+.account-container.account-desktop-layout .account-desktop-panel {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+  padding: 0;
+}
+
+.account-container.account-desktop-layout .account-desktop-panel::before {
+  display: none;
+}
+
+.account-container.account-desktop-layout .account-panel-head {
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+}
+
+.account-container.account-desktop-layout .account-panel-head h2,
+.account-container.account-desktop-layout .orders-card h2,
+.account-container.account-desktop-layout .address-card h2,
+.account-container.account-desktop-layout .notifications-card h2,
+.account-container.account-desktop-layout .payments-card h2,
+.account-container.account-desktop-layout .help-card h2,
+.account-container.account-desktop-layout .refunds-card h2 {
+  font-size: 1.22rem;
+}
+
+.account-container.account-desktop-layout .account-panel-action {
+  padding: 8px 13px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+}
+
+.account-container.account-desktop-layout .profile-container {
+  padding: 14px 16px;
+}
+
+.account-container.account-desktop-layout .profile-layout {
+  grid-template-columns: minmax(148px, 180px) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.account-container.account-desktop-layout .profile-photo {
+  width: 104px;
+  height: 104px;
+}
+
+.account-container.account-desktop-layout .account-menu-hero,
+.account-container.account-desktop-layout .account-detail-bar {
+  border-radius: 22px;
+}
+
+.account-container.account-desktop-layout .account-menu-hero {
+  padding: 18px 20px;
+}
+
+.account-container.account-desktop-layout .account-menu-eyebrow {
+  min-height: 26px;
+  padding: 0 10px;
+  font-size: 0.68rem;
+}
+
+.account-container.account-desktop-layout .account-menu-hero h2 {
+  font-size: clamp(1.3rem, 1.7vw, 1.7rem);
+}
+
+.account-container.account-desktop-layout .account-menu-hero p,
+.account-container.account-desktop-layout .account-detail-bar p {
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.account-container.account-desktop-layout .account-menu-grid {
+  gap: 10px;
+}
+
+.account-container.account-desktop-layout .account-menu-card {
+  min-height: 80px;
+  padding: 12px 13px;
+  border-radius: 16px;
+}
+
+.account-container.account-desktop-layout .account-menu-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+
+.account-container.account-desktop-layout .account-menu-card-copy strong {
+  font-size: 0.9rem;
+}
+
+.account-container.account-desktop-layout .account-menu-card-copy span,
+.account-container.account-desktop-layout .account-menu-card-arrow {
+  font-size: 0.74rem;
 }
 
 .account-menu-hero::before,
@@ -2421,6 +2581,55 @@ body[data-theme="dark"] .faq-title {
   gap: 14px;
   align-items: start;
   padding: 18px 22px;
+}
+
+.account-container.account-desktop-layout .account-panel-head {
+  margin-bottom: 12px;
+}
+
+.account-container.account-desktop-layout .account-panel-head h2,
+.account-container.account-desktop-layout .orders-card h2,
+.account-container.account-desktop-layout .address-card h2,
+.account-container.account-desktop-layout .notifications-card h2,
+.account-container.account-desktop-layout .payments-card h2,
+.account-container.account-desktop-layout .help-card h2,
+.account-container.account-desktop-layout .refunds-card h2 {
+  font-size: 1.12rem;
+}
+
+.account-container.account-desktop-layout .profile-layout {
+  grid-template-columns: minmax(132px, 164px) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.account-container.account-desktop-layout .profile-fields,
+.account-container.account-desktop-layout .profile-form {
+  gap: 10px;
+}
+
+.account-container.account-desktop-layout .profile-form label {
+  margin-bottom: 4px;
+  font-size: 0.76rem;
+}
+
+.account-container.account-desktop-layout .profile-form input,
+.account-container.account-desktop-layout .profile-value {
+  min-height: 42px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+
+.account-container.account-desktop-layout .save-btn,
+.account-container.account-desktop-layout .address-form button,
+.account-container.account-desktop-layout .help-options button,
+.account-container.account-desktop-layout .remove-btn,
+.account-container.account-desktop-layout .manual-btn,
+.account-container.account-desktop-layout .location-btn,
+.account-container.account-desktop-layout .logout-btn {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  font-size: 0.84rem;
 }
 
 .account-detail-actions,

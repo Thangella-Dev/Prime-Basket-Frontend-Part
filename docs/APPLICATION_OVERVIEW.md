@@ -64,10 +64,14 @@ Recent storefront hardening also added:
 - region-aware fallback search indexing
 - normalized cart merging by product + unit
 - product-only wishlist display even if the product is already in cart
+- context-aware cart feedback so remove actions no longer show cart-success CTAs
 - mobile dock suppression while address-entry overlays are open
 - mobile dock suppression during login/auth overlays and mobile category filter/sort sheets
+- mobile dock suppression during refund tracking and return-request contexts
 - home-only chatbot visibility instead of global page-wide launcher presence
 - hero CTA routing from `Explore now` into the related category flow
+- browse-category dropdown auto-dismissal on outside interaction while preserving internal dropdown scrolling
+- staged refund and return tracking with requested, review, pickup, refund-processing, and completed phases
 
 Other important state is currently stored in the browser through `localStorage`, including:
 

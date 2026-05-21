@@ -1,5 +1,5 @@
 // src/pages/AccountPage.jsx
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import "./Account.css";
 import { useAuth } from "../context/AuthContext";
@@ -19,18 +19,103 @@ export const ADDRESSES_KEY = "pb_saved_addresses";
 const REFUND_REQUESTS_KEY = "refund_requests";
 const WALLET_KEY = "wallet";
 
-const REFUND_STATUSES = ["Requested", "Processing", "Completed"];
-const RETURN_STATUSES = ["Requested", "Pickup Scheduled", "Picked", "Verified", "Refund Initiated", "Completed"];
+const REFUND_STATUSES = ["Refund Requested", "Under Review", "Approved", "Refund Processing", "Refunded"];
+const RETURN_STATUSES = ["Return Requested", "Under Review", "Approved", "Pickup Scheduled", "Picked Up", "Refund Processing", "Refunded"];
 const RETURN_REASONS = [
-  { label: "Item not received", type: "refund" },
-  { label: "Damaged / Wrong item", type: "return" },
-  { label: "Quality issue", type: "return" },
-  { label: "Don't need anymore", type: "return" },
+  { value: "damaged-product", label: "Damaged product", type: "return" },
+  { value: "wrong-item", label: "Wrong item", type: "return" },
+  { value: "size-issue", label: "Size issue", type: "return" },
+  { value: "defective", label: "Defective", type: "return" },
+  { value: "missing-parts", label: "Missing parts", type: "return" },
+  { value: "quality-issue", label: "Quality issue", type: "return" },
+  { value: "other", label: "Other", type: "refund" },
 ];
+const MAX_RETURN_PROOF_FILES = 4;
+const MAX_IMAGE_FILE_SIZE = 8 * 1024 * 1024;
+const MAX_VIDEO_FILE_SIZE = 20 * 1024 * 1024;
+
+const legacyRefundStatusMap = {
+  Requested: "Under Review",
+  Processing: "Refund Processing",
+  Completed: "Refunded",
+  Picked: "Picked Up",
+  Verified: "Refund Processing",
+  "Refund Initiated": "Refund Processing",
+  "Refund Processed": "Refund Processing",
+};
+
+const isImageMimeType = (type = "") => type.startsWith("image/");
+const isVideoMimeType = (type = "") => type.startsWith("video/");
+
+function buildProofSnapshot(fileLike = {}) {
+  return {
+    id: fileLike.id || `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    name: fileLike.name || "attachment",
+    type: fileLike.type || "",
+    size: Number(fileLike.size || 0),
+    kind: isVideoMimeType(fileLike.type) ? "video" : "image",
+    preview: fileLike.preview || "",
+  };
+}
+
+function estimateRefundDate(timestamp, flowType = "return") {
+  const baseDate = new Date(timestamp || Date.now());
+  baseDate.setDate(baseDate.getDate() + (flowType === "return" ? 5 : 3));
+  return baseDate.toISOString();
+}
+
+function buildInitialRequestHistory(request) {
+  const initialStatus = request?.flowType === "return" ? "Return Requested" : "Refund Requested";
+  return [
+    {
+      status: initialStatus,
+      at: request?.submittedAt || request?.timestamp || new Date().toISOString(),
+      note:
+        request?.flowType === "return"
+          ? "Return request submitted successfully."
+          : "Refund request submitted successfully.",
+    },
+  ];
+}
+
+function normalizeRefundRequest(request) {
+  if (!request || typeof request !== "object") return null;
+  const normalizedFlowType =
+    request.flowType || request.type || (request.reason === "Item not received" ? "refund" : "return");
+  const normalizedStatus =
+    legacyRefundStatusMap[request.status] ||
+    request.status ||
+    (normalizedFlowType === "return" ? "Return Requested" : "Refund Requested");
+  const normalizedTimestamp = request.submittedAt || request.timestamp || new Date().toISOString();
+  const normalizedHistory = Array.isArray(request.history) && request.history.length > 0
+    ? request.history.map((entry) => ({
+        status:
+          legacyRefundStatusMap[entry?.status] ||
+          entry?.status ||
+          (normalizedFlowType === "return" ? "Return Requested" : "Refund Requested"),
+        at: entry?.at || normalizedTimestamp,
+        note: entry?.note || "",
+      }))
+    : buildInitialRequestHistory({ submittedAt: normalizedTimestamp });
+
+  return {
+    ...request,
+    flowType: normalizedFlowType,
+    type: normalizedFlowType,
+    status: normalizedStatus,
+    submittedAt: normalizedTimestamp,
+    expectedRefundDate: request.expectedRefundDate || estimateRefundDate(normalizedTimestamp, normalizedFlowType),
+    detailText: request.detailText || "",
+    proofFiles: Array.isArray(request.proofFiles) ? request.proofFiles.map(buildProofSnapshot) : [],
+    history: normalizedHistory,
+  };
+}
 
 function loadRefundRequests() {
   try {
-    return JSON.parse(localStorage.getItem(REFUND_REQUESTS_KEY) || "[]");
+    return JSON.parse(localStorage.getItem(REFUND_REQUESTS_KEY) || "[]")
+      .map(normalizeRefundRequest)
+      .filter(Boolean);
   } catch {
     return [];
   }
@@ -63,14 +148,24 @@ function statusSteps(type) {
 }
 
 function statusLabel(type, status) {
-  if (type === "return" && status === "Requested") return "Return Requested";
-  if (type === "refund" && status === "Requested") return "Refund Requested";
+  if (status === "Return Requested") return "Return Requested";
+  if (status === "Refund Requested") return "Refund Requested";
+  if (status === "Under Review") return type === "return" ? "Return Under Review" : "Refund Under Review";
+  if (status === "Refund Processing") return "Refund Processing";
+  if (status === "Refunded") return "Refunded";
   return status;
 }
 
 function statusClass(status) {
-  if (status === "Completed") return "done";
-  if (status === "Processing" || status === "Refund Initiated" || status === "Verified") return "processing";
+  if (status === "Refunded") return "done";
+  if (
+    status === "Approved" ||
+    status === "Pickup Scheduled" ||
+    status === "Picked Up" ||
+    status === "Refund Processing"
+  ) {
+    return "processing";
+  }
   return "pending";
 }
 
@@ -160,7 +255,7 @@ function ConfirmDialog({
   );
 }
 
-function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSectionChange, orders: propOrders = [], notifications = [], onClearNotifications, language = "en", region = "in", onOrderSummary, onRateOrder, onOrderAgain, onBuyAgainItem, onDeleteOrder }) {
+function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSectionChange, orders: propOrders = [], notifications = [], onClearNotifications, language = "en", region = "in", onOrderSummary, onRateOrder, onOrderAgain, onBuyAgainItem, onDeleteOrder, onNotification, onRefundOverlayChange }) {
   const t = useT(language);
   const { logout, user, updateUser } = useAuth();
   const currSym = region === "ke" ? "KES " : "\u20b9";
@@ -249,7 +344,7 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
   const renderSectionContent = () => (
     <>
       {section === "profile" && <Profile user={user} updateUser={updateUser} t={t} language={language} region={region} />}
-      {section === "orders" && <OrdersSection orders={propOrders} t={t} currSym={currSym} onOrderSummary={onOrderSummary} onRateOrder={onRateOrder} onOrderAgain={onOrderAgain} onDeleteOrder={onDeleteOrder} language={language} />}
+      {section === "orders" && <OrdersSection orders={propOrders} t={t} currSym={currSym} onOrderSummary={onOrderSummary} onRateOrder={onRateOrder} onOrderAgain={onOrderAgain} onDeleteOrder={onDeleteOrder} language={language} onNotification={onNotification} onRefundOverlayChange={onRefundOverlayChange} />}
       {section === "buyAgain" && <BuyAgainSection orders={propOrders} t={t} currSym={currSym} language={language} onBuyAgainItem={onBuyAgainItem} />}
       {section === "addresses" && <AddressSection t={t} language={language} region={region} />}
       {section === "refunds" && <RefundsDemoSection t={t} currSym={currSym} region={region} language={language} />}
@@ -303,11 +398,6 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
 
           <main className="account-content">
             <div className="account-desktop-panel">
-              <div className="account-desktop-panel-head">
-                <div className="account-menu-eyebrow">{t.account.title}</div>
-                <h2>{sectionMeta[section]?.title || t.account.title}</h2>
-                <p>{sectionMeta[section]?.subtitle || "Manage your account section details."}</p>
-              </div>
               <div className="account-detail-content">
                 {renderSectionContent()}
               </div>
@@ -683,7 +773,7 @@ function BuyAgainSection({ orders = [], t, currSym = "\u20b9", language = "en", 
   );
 }
 
-function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onRateOrder, onOrderAgain, onDeleteOrder }) {
+function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onRateOrder, onOrderAgain, onDeleteOrder, onNotification, onRefundOverlayChange }) {
   const [loading, setLoading] = useState(true);
 
   const [activeMenuOrderId, setActiveMenuOrderId] = useState(null);
@@ -691,18 +781,15 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
   const [returnModal, setReturnModal] = useState(null);
   const [returnStep, setReturnStep] = useState(1);
   const [returnReason, setReturnReason] = useState("");
+  const [returnDetailText, setReturnDetailText] = useState("");
   const [refundMethod, setRefundMethod] = useState("");
+  const [proofFiles, setProofFiles] = useState([]);
+  const [proofError, setProofError] = useState("");
   const [submittingRequest, setSubmittingRequest] = useState(false);
   const [demoToast, setDemoToast] = useState("");
-  const [now, setNow] = useState(Date.now());
   const [orderFilter, setOrderFilter] = useState("Delivered"); // Default filter
   const [orderToDelete, setOrderToDelete] = useState(null);
-
-  // Refreshes the UI state for time-dependent logic
-  useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), 30000);
-    return () => clearInterval(interval);
-  }, []);
+  const videoPreviewUrlsRef = useRef(new Set());
 
   const [markedOrders, setMarkedOrders] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pb_marked_orders") || "[]"); } catch { return []; }
@@ -725,9 +812,32 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
     };
   }, []);
 
-  const updateRequestStatus = (id, status) => {
+  useEffect(() => () => {
+    videoPreviewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    videoPreviewUrlsRef.current.clear();
+  }, []);
+
+  useEffect(() => {
+    onRefundOverlayChange?.(Boolean(returnModal));
+    return () => {
+      onRefundOverlayChange?.(false);
+    };
+  }, [onRefundOverlayChange, returnModal]);
+
+  const updateRequestStatus = (id, status, note = "") => {
     setRefundRequests(prev => {
-      const updated = prev.map(req => req.id === id ? { ...req, status } : req);
+      const updated = prev.map((req) => {
+        if (req.id !== id) return req;
+        const nextHistory = Array.isArray(req.history) ? [...req.history] : [];
+        if (nextHistory[nextHistory.length - 1]?.status !== status) {
+          nextHistory.push({
+            status,
+            at: new Date().toISOString(),
+            note,
+          });
+        }
+        return { ...req, status, history: nextHistory };
+      });
       saveRefundRequests(updated);
       window.dispatchEvent(new Event("refund-requests-updated"));
       return updated;
@@ -755,37 +865,75 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
     };
     saveWallet(updatedWallet);
     window.dispatchEvent(new Event("wallet-updated"));
-    setDemoToast("Refund processed successfully. Wallet updated.");
+    setDemoToast("Refund completed successfully. Wallet updated.");
     setTimeout(() => setDemoToast(""), 2600);
   };
 
+  const notifyReturnStatus = (request, status) => {
+    if (!onNotification || !request) return;
+    const messageByStatus = {
+      "Return Requested": ["Return requested", `Your return request for order #${request.orderId} has been submitted.`],
+      "Refund Requested": ["Refund requested", `Your refund request for order #${request.orderId} has been submitted.`],
+      "Under Review": ["Under review", `Your request for order #${request.orderId} is under review.`],
+      Approved: ["Request approved", `Your request for order #${request.orderId} has been approved.`],
+      "Pickup Scheduled": ["Pickup scheduled", `Pickup has been scheduled for order #${request.orderId}.`],
+      "Picked Up": ["Return picked up", `The return item for order #${request.orderId} has been picked up.`],
+      "Refund Processing": ["Refund processing", `Your refund for order #${request.orderId} is being processed.`],
+      Refunded: ["Refund completed", `Your refund for order #${request.orderId} has been completed.`],
+    };
+    const payload = messageByStatus[status];
+    if (!payload) return;
+    onNotification(
+      payload[0],
+      payload[1],
+      status === "Refunded" || status === "Approved" ? "success" : status.includes("Pickup") ? "delivery" : "info"
+    );
+  };
+
   const runDemoFlow = (request) => {
-    const flow = request.type === "return"
+    const flow = request.flowType === "return"
       ? [
-          ["Pickup Scheduled", 3000],
-          ["Picked", 7000],
-          ["Verified", 11000],
-          ["Refund Initiated", 15000],
-          ["Completed", 19000],
+          ["Under Review", 2500, "Your return request entered the review queue."],
+          ["Approved", 3500, "Our review team approved the request after checking the submitted proof."],
+          ["Pickup Scheduled", 8500, "Pickup partner assigned and slot confirmed."],
+          ["Picked Up", 13500, "The item has been collected by the delivery partner."],
+          ["Refund Processing", 18500, "Warehouse verification finished and the refund is processing."],
+          ["Refunded", 24000, "Refund sent to your selected refund method."],
         ]
       : [
-          ["Processing", 3000],
-          ["Completed", request.refundMethod === "Wallet" ? 7000 : 10000],
+          ["Under Review", 2500, "Your refund request entered the review queue."],
+          ["Approved", 3500, "The refund request was approved after review."],
+          ["Refund Processing", 9000, "The refund is being processed."],
+          ["Refunded", request.refundMethod === "Wallet" ? 13000 : 16000, "Refund sent to your selected refund method."],
         ];
 
-    flow.forEach(([status, delay]) => {
+    flow.forEach(([status, delay, note]) => {
       setTimeout(() => {
-        updateRequestStatus(request.id, status);
-        if (status === "Completed") completeWalletCredit(request);
+        updateRequestStatus(request.id, status, note);
+        notifyReturnStatus(request, status);
+        if (status === "Refunded") completeWalletCredit(request);
       }, delay);
     });
   };
 
+  const clearTransientProofFiles = () => {
+    proofFiles.forEach((file) => {
+      if (file.kind === "video" && file.preview) {
+        URL.revokeObjectURL(file.preview);
+        videoPreviewUrlsRef.current.delete(file.preview);
+      }
+    });
+  };
+
   const resetReturnModal = () => {
+    clearTransientProofFiles();
     setReturnModal(null);
     setReturnStep(1);
     setReturnReason("");
+    setReturnDetailText("");
     setRefundMethod("");
+    setProofFiles([]);
+    setProofError("");
     setSubmittingRequest(false);
   };
 
@@ -806,11 +954,96 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
     });
     setReturnStep(1);
     setReturnReason("");
+    setReturnDetailText("");
     setRefundMethod("");
+    setProofFiles([]);
+    setProofError("");
   };
 
-  const selectedReasonMeta = RETURN_REASONS.find(reason => reason.label === returnReason);
+  const selectedReasonMeta = RETURN_REASONS.find(reason => reason.value === returnReason);
   const selectedFlowType = selectedReasonMeta?.type || returnModal?.selectedType || "refund";
+
+  const setProofFileState = (id, updater) => {
+    setProofFiles((prev) => prev.map((entry) => (entry.id === id ? { ...entry, ...updater(entry) } : entry)));
+  };
+
+  const simulateUploadProgress = (id, finalUpdater) =>
+    new Promise((resolve) => {
+      let progress = 0;
+      const interval = window.setInterval(() => {
+        progress += 20;
+        setProofFileState(id, () => ({ progress: Math.min(progress, 90) }));
+        if (progress >= 90) {
+          window.clearInterval(interval);
+          setProofFileState(id, () => ({ ...finalUpdater, progress: 100, status: "ready" }));
+          resolve();
+        }
+      }, 90);
+    });
+
+  const handleProofSelection = async (event) => {
+    const files = Array.from(event.target.files || []);
+    event.target.value = "";
+    if (!files.length) return;
+    if (proofFiles.length + files.length > MAX_RETURN_PROOF_FILES) {
+      setProofError(`You can upload up to ${MAX_RETURN_PROOF_FILES} proof files.`);
+      return;
+    }
+    setProofError("");
+
+    for (const file of files) {
+      const isImage = isImageMimeType(file.type);
+      const isVideo = isVideoMimeType(file.type);
+      const maxSize = isVideo ? MAX_VIDEO_FILE_SIZE : MAX_IMAGE_FILE_SIZE;
+      if (!isImage && !isVideo) {
+        setProofError("Only images and videos are allowed.");
+        continue;
+      }
+      if (file.size > maxSize) {
+        setProofError(`${file.name} exceeds the allowed upload size.`);
+        continue;
+      }
+
+      const id = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+      setProofFiles((prev) => [...prev, {
+        id,
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        kind: isVideo ? "video" : "image",
+        progress: 0,
+        status: "uploading",
+        preview: "",
+      }]);
+
+      if (isVideo) {
+        const preview = URL.createObjectURL(file);
+        videoPreviewUrlsRef.current.add(preview);
+        await simulateUploadProgress(id, { preview });
+        continue;
+      }
+
+      const preview = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      }).catch(() => "");
+
+      await simulateUploadProgress(id, { preview });
+    }
+  };
+
+  const removeProofFile = (id) => {
+    setProofFiles((prev) => {
+      const file = prev.find((entry) => entry.id === id);
+      if (file?.kind === "video" && file.preview) {
+        URL.revokeObjectURL(file.preview);
+        videoPreviewUrlsRef.current.delete(file.preview);
+      }
+      return prev.filter((entry) => entry.id !== id);
+    });
+  };
 
   const submitDemoRequest = () => {
     if (!returnModal || !returnReason || !refundMethod) return;
@@ -825,14 +1058,20 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
       orderId: returnModal.order.orderId,
       orderItemId: returnModal.orderItemId,
       productName: getTranslatedName(returnModal.item?.name) || "Order item",
-      productImage: returnModal.item?.imageUrl || "",
-      reason: returnReason,
+      productImage: resolveProductImage(returnModal.item),
+      reason: selectedReasonMeta?.label || returnReason,
+      reasonKey: returnReason,
       type: selectedFlowType,
-      status: "Requested",
+      flowType: selectedFlowType,
+      status: selectedFlowType === "return" ? "Return Requested" : "Refund Requested",
       refundMethod,
       amount: returnModal.amount,
-      timestamp: new Date().toISOString(),
+      detailText: returnDetailText.trim(),
+      proofFiles: proofFiles.map(buildProofSnapshot),
+      submittedAt: new Date().toISOString(),
+      expectedRefundDate: estimateRefundDate(Date.now(), selectedFlowType),
     };
+    request.history = buildInitialRequestHistory(request);
 
     setTimeout(() => {
       setRefundRequests(prev => {
@@ -843,6 +1082,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
       });
       setSubmittingRequest(false);
       setReturnStep(3);
+      notifyReturnStatus(request, request.status);
       runDemoFlow(request);
     }, 700);
   };
@@ -939,6 +1179,50 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
         .ret-progress-dot { width:18px; height:18px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center; color:white; font-size:9px; }
         .ret-progress-row.active { color:#1d5ba0; }
         .ret-progress-row.active .ret-progress-dot { background:#1d5ba0; }
+        .ret-textarea {
+          width:100%; min-height:108px; resize:vertical; padding:14px 15px; margin-top:12px;
+          border-radius:14px; border:1.5px solid #dbe5f1; background:#fff; color:#253d4e; font:inherit; font-size:13px;
+        }
+        .ret-textarea:focus { outline:none; border-color:#1d5ba0; box-shadow:0 0 0 4px rgba(29,91,160,.08); }
+        .ret-proof-upload {
+          margin-top:16px; border:1.5px dashed #bfdbfe; border-radius:16px; padding:16px;
+          background:linear-gradient(180deg,#f8fbff,#f1f7ff);
+        }
+        .ret-proof-upload input { display:none; }
+        .ret-proof-trigger {
+          display:flex; align-items:center; justify-content:center; gap:10px; min-height:48px; width:100%;
+          border:none; border-radius:14px; background:linear-gradient(135deg,#1d5ba0,#2b74c8); color:#fff;
+          font-weight:800; cursor:pointer; box-shadow:0 14px 26px rgba(29,91,160,.18);
+        }
+        .ret-proof-help { margin-top:10px; font-size:12px; color:#64748b; line-height:1.6; }
+        .ret-proof-error { margin-top:10px; color:#dc2626; font-size:12px; font-weight:700; }
+        .ret-proof-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; margin-top:14px; }
+        .ret-proof-card {
+          position:relative; overflow:hidden; border-radius:16px; border:1px solid #dbe5f1; background:#fff; padding:10px;
+          box-shadow:0 10px 18px rgba(15,23,42,.06);
+        }
+        .ret-proof-preview {
+          aspect-ratio:1 / 1; border-radius:12px; background:#f8fafc; display:flex; align-items:center; justify-content:center; overflow:hidden;
+        }
+        .ret-proof-preview img, .ret-proof-preview video { width:100%; height:100%; object-fit:cover; }
+        .ret-proof-preview i { font-size:24px; color:#6b86aa; }
+        .ret-proof-name { margin-top:8px; font-size:11px; font-weight:800; color:#253d4e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .ret-proof-meta { margin-top:4px; font-size:10px; color:#64748b; display:flex; justify-content:space-between; gap:6px; }
+        .ret-proof-progress { width:100%; height:6px; margin-top:8px; border-radius:999px; background:#e5edf7; overflow:hidden; }
+        .ret-proof-progress > span { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#1d5ba0,#44c4d4); }
+        .ret-proof-remove {
+          position:absolute; top:8px; right:8px; width:28px; height:28px; border:none; border-radius:999px;
+          background:rgba(15,23,42,.72); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;
+        }
+        .ret-status-chip {
+          display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; font-size:12px; font-weight:800;
+          background:#e8f0fb; color:#1d5ba0; margin-bottom:12px;
+        }
+        .ret-status-chip.processing { background:#fef3c7; color:#b45309; }
+        .ret-status-chip.done { background:#dcfce7; color:#15803d; }
+        .ret-estimate {
+          margin-top:14px; padding:12px 14px; border-radius:14px; background:#f8fbff; border:1px solid #dbeafe; color:#1e3a5f; font-size:12px; font-weight:700;
+        }
         .ord-line-items { padding: 0 22px 14px; display:flex; flex-direction:column; gap:10px; }
         .ord-line-item {
           border:1px solid #edf2f7; border-radius:12px; padding:12px;
@@ -1036,16 +1320,65 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
               </div>
               {returnStep === 1 && (
                 <>
-                  <div className="ret-step-title">Step 1: Why are you returning this?</div>
-                  <p style={{ color: '#64748b', fontSize: 13, marginBottom: 20 }}>Please select the most accurate reason.</p>
+                  <div className="ret-step-title">Step 1: Select return reason</div>
+                  <p style={{ color: '#64748b', fontSize: 13, marginBottom: 20 }}>Choose the closest reason, then add optional notes and proof.</p>
                   {RETURN_REASONS.map(reason => (
-                    <div key={reason.label} className={`ret-reason-opt ${returnReason === reason.label ? 'selected' : ''}`} onClick={() => setReturnReason(reason.label)}>
+                    <div key={reason.value} className={`ret-reason-opt ${returnReason === reason.value ? 'selected' : ''}`} onClick={() => setReturnReason(reason.value)}>
                       <strong>{reason.label}</strong>
                       <div style={{ fontSize: 12, opacity: .72, marginTop: 3 }}>
                         {reason.type === "refund" ? "Refund only, no pickup" : "Return pickup and refund"}
                       </div>
                     </div>
                   ))}
+                  <textarea
+                    className="ret-textarea"
+                    placeholder="Add more details to help the review team understand the issue..."
+                    value={returnDetailText}
+                    onChange={(event) => setReturnDetailText(event.target.value)}
+                  />
+                  <div className="ret-proof-upload">
+                    <label className="ret-proof-trigger" htmlFor="ret-proof-files">
+                      <i className="fas fa-cloud-arrow-up"></i>
+                      Upload photos or videos
+                    </label>
+                    <input
+                      id="ret-proof-files"
+                      type="file"
+                      accept="image/*,video/*"
+                      multiple
+                      onChange={handleProofSelection}
+                    />
+                    <div className="ret-proof-help">
+                      Add up to {MAX_RETURN_PROOF_FILES} files. Images up to 8 MB, videos up to 20 MB.
+                    </div>
+                    {proofError && <div className="ret-proof-error">{proofError}</div>}
+                    {proofFiles.length > 0 && (
+                      <div className="ret-proof-grid">
+                        {proofFiles.map((file) => (
+                          <div key={file.id} className="ret-proof-card">
+                            <button type="button" className="ret-proof-remove" onClick={() => removeProofFile(file.id)} aria-label="Remove proof file">
+                              <i className="fas fa-times"></i>
+                            </button>
+                            <div className="ret-proof-preview">
+                              {file.kind === "image" && file.preview ? (
+                                <img src={file.preview} alt={file.name} />
+                              ) : file.kind === "video" && file.preview ? (
+                                <video src={file.preview} muted playsInline />
+                              ) : (
+                                <i className={`fas ${file.kind === "video" ? "fa-video" : "fa-image"}`}></i>
+                              )}
+                            </div>
+                            <div className="ret-proof-name">{file.name}</div>
+                            <div className="ret-proof-meta">
+                              <span>{file.kind === "video" ? "Video" : "Image"}</span>
+                              <span>{Math.max(1, Math.round(file.size / 1024 / 1024))} MB</span>
+                            </div>
+                            <div className="ret-proof-progress"><span style={{ width: `${file.progress}%` }}></span></div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <button 
                     disabled={!returnReason}
                     style={{ width: '100%', padding: 14, borderRadius: 10, background: returnReason ? '#1d5ba0' : '#cbd5e1', color: 'white', border: 'none', fontWeight: 700, marginTop: 10 }} 
@@ -1058,22 +1391,22 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
 
               {returnStep === 2 && (
                 <>
-                  <div className="ret-step-title">Step 2: Choose Refund Method</div>
-                  <p style={{ color: '#64748b', fontSize: 13, marginBottom: 20 }}>Where would you like to receive your refund?</p>
+                  <div className="ret-step-title">Step 2: Choose refund method</div>
+                  <p style={{ color: '#64748b', fontSize: 13, marginBottom: 20 }}>Choose where the approved refund should be sent after review.</p>
                   <div className={`ret-reason-opt ${refundMethod === "Original Payment" ? "selected" : ""}`} onClick={() => setRefundMethod("Original Payment")}>
                     <strong>Original Payment Mode</strong>
-                    <div style={{ fontSize: 12, opacity: 0.8 }}>Demo delay: 2-3 seconds</div>
+                    <div style={{ fontSize: 12, opacity: 0.8 }}>Expected in 3-5 business days after approval</div>
                   </div>
                   <div className={`ret-reason-opt ${refundMethod === "Wallet" ? "selected" : ""}`} onClick={() => setRefundMethod("Wallet")}>
                     <strong>Prime-Basket Wallet</strong>
-                    <div style={{ fontSize: 12, opacity: 0.8 }}>Instant refund (Recommended)</div>
+                    <div style={{ fontSize: 12, opacity: 0.8 }}>Fastest option after refund processing</div>
                   </div>
                   <button
                     disabled={!refundMethod || submittingRequest}
                     style={{ width: '100%', padding: 14, borderRadius: 10, background: refundMethod ? '#1d5ba0' : '#cbd5e1', color: 'white', border: 'none', fontWeight: 700, marginTop: 10 }}
                     onClick={submitDemoRequest}
                   >
-                    {submittingRequest ? "Creating request..." : "Confirm Request"}
+                    {submittingRequest ? "Submitting request..." : "Submit Request"}
                   </button>
                   <button style={{ width: '100%', padding: 14, borderRadius: 10, background: '#f1f5f9', border: 'none', fontWeight: 700, marginTop: 10 }} onClick={() => setReturnStep(1)}>Back</button>
                 </>
@@ -1081,14 +1414,19 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
 
               {returnStep === 3 && (
                 <div style={{ padding: '8px 0' }}>
-                  <div className="ret-step-title">Step 3: Processing...</div>
+                  <div className={`ret-status-chip ${statusClass(selectedFlowType === "return" ? "Return Requested" : "Refund Requested")}`}>
+                    <i className="fas fa-shield-check"></i>
+                    {statusLabel(selectedFlowType, selectedFlowType === "return" ? "Return Requested" : "Refund Requested")}
+                  </div>
+                  <div className="ret-step-title">Step 3: Request submitted</div>
                   <p style={{ color: '#64748b', fontSize: 14, marginBottom: 12 }}>
-                    {selectedFlowType === "return" ? "Pickup and refund flow started." : "Refund flow started."}
+                    {selectedFlowType === "return" ? "Your return request has been logged and will move into review before pickup is scheduled." : "Your refund request has been logged and will move into review before processing starts."}
                   </p>
                   <div style={{ color: "#253d4e", fontSize: 13, lineHeight: 1.7 }}>
-                    <div><strong>Reason:</strong> {returnReason}</div>
+                    <div><strong>Reason:</strong> {selectedReasonMeta?.label || returnReason}</div>
                     <div><strong>Refund Method:</strong> {refundMethod}</div>
-                    <div><strong>Estimated time:</strong> Processing...</div>
+                    <div><strong>Proof Files:</strong> {proofFiles.length || 0}</div>
+                    {returnDetailText.trim() && <div><strong>Details:</strong> {returnDetailText.trim()}</div>}
                   </div>
                   <div className="ret-progress">
                     {statusSteps(selectedFlowType).map((step, i) => (
@@ -1097,6 +1435,9 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
                         {statusLabel(selectedFlowType, step)}
                       </div>
                     ))}
+                  </div>
+                  <div className="ret-estimate">
+                    Expected refund completion by {new Date(estimateRefundDate(Date.now(), selectedFlowType)).toLocaleDateString()}.
                   </div>
                   <button style={{ width: '100%', padding: 14, borderRadius: 10, background: '#1d5ba0', color: 'white', border: 'none', fontWeight: 700 }} onClick={resetReturnModal}>
                     View in My Refunds
@@ -1232,8 +1573,8 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
                           {request && (
                             <div style={{ marginTop: 8 }}>
                               <span className={`ord-refund-badge ${statusClass(request.status)}`}>
-                                <i className={`fas ${request.status === "Completed" ? "fa-check-circle" : "fa-clock"}`}></i>
-                                {statusLabel(request.type, request.status)}
+                                <i className={`fas ${request.status === "Refunded" ? "fa-check-circle" : request.status === "Approved" ? "fa-thumbs-up" : "fa-clock"}`}></i>
+                                {statusLabel(request.flowType || request.type, request.status)}
                               </span>
                             </div>
                           )}
@@ -1740,20 +2081,25 @@ function RefundsDemoSection({ t, currSym, region }) {
   return (
     <div className="refunds-card">
       <style>{`
-        .rfd-demo-item { border:1px solid #ececec; border-radius:12px; padding:16px; margin-bottom:12px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:start; }
+        .rfd-demo-item { border:1px solid #ececec; border-radius:20px; padding:18px; margin-bottom:14px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:start; }
         .rfd-demo-product { display:flex; gap:12px; min-width:0; }
-        .rfd-demo-img { width:52px; height:52px; border-radius:10px; border:1px solid #edf2f7; background:#fafafa; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
+        .rfd-demo-img { width:56px; height:56px; border-radius:14px; border:1px solid #edf2f7; background:#fafafa; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
         .rfd-demo-img img { max-width:100%; max-height:100%; object-fit:contain; }
-        .rfd-status { padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700; }
+        .rfd-status { padding:7px 12px; border-radius:999px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:7px; }
         .rfd-completed { background:#dcfce7; color:#16a34a; }
         .rfd-processing { background:#fef9c3; color:#ca8a04; }
         .rfd-pending { background:#e8f0fb; color:#1d5ba0; }
-        .rfd-timeline { grid-column:1 / -1; display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; margin-top:4px; }
-        .rfd-step { display:flex; align-items:center; gap:6px; color:#94a3b8; font-size:11px; font-weight:800; }
-        .rfd-step-dot { width:18px; height:18px; border-radius:50%; background:#e2e8f0; color:white; display:flex; align-items:center; justify-content:center; font-size:9px; flex-shrink:0; }
+        .rfd-timeline { grid-column:1 / -1; display:grid; gap:10px; margin-top:6px; }
+        .rfd-step { display:grid; grid-template-columns:22px minmax(0,1fr); align-items:start; gap:10px; color:#94a3b8; font-size:11px; font-weight:800; }
+        .rfd-step-copy { display:grid; gap:3px; }
+        .rfd-step-time { font-size:10px; font-weight:700; color:#94a3b8; }
+        .rfd-step-dot { width:22px; height:22px; border-radius:50%; background:#e2e8f0; color:white; display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; margin-top:1px; }
         .rfd-step.done,.rfd-step.active { color:#1d5ba0; }
         .rfd-step.done .rfd-step-dot { background:#16a34a; }
         .rfd-step.active .rfd-step-dot { background:#1d5ba0; animation:pulse 1.2s infinite; }
+        .rfd-meta-row { grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+        .rfd-meta-pill { padding:7px 10px; border-radius:999px; background:#f8fbff; border:1px solid #dbeafe; color:#335276; font-size:11px; font-weight:800; }
+        .rfd-extra-copy { grid-column:1 / -1; font-size:12px; color:#64748b; line-height:1.6; }
         @media(max-width:700px){ .rfd-demo-item{ grid-template-columns:1fr; } }
       `}</style>
       <h2 style={{ display: "flex", alignItems: "center", gap: "10px", color: "#17324d" }}>
@@ -1769,8 +2115,8 @@ function RefundsDemoSection({ t, currSym, region }) {
           />
         ) : (
           refunds.map((rfd) => {
-            const steps = statusSteps(rfd.type);
-            const activeIndex = rfd.status === "Completed" ? steps.length : steps.indexOf(rfd.status);
+            const steps = statusSteps(rfd.flowType || rfd.type);
+            const activeIndex = rfd.status === "Refunded" ? steps.length : steps.indexOf(rfd.status);
             return (
               <div key={rfd.id} className="rfd-demo-item">
                 <div className="rfd-demo-product">
@@ -1780,20 +2126,35 @@ function RefundsDemoSection({ t, currSym, region }) {
                   <div style={{ minWidth: 0 }}>
                     <strong style={{ color: "#253d4e" }}>{rfd.productName || "Order item"}</strong>
                     <p style={{ fontSize: "13px", color: "#7e7e7e", margin: "4px 0" }}>#{rfd.id} - Order #{rfd.orderId}</p>
-                    <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>{rfd.type === "return" ? "Return + Refund" : "Refund Only"} - {rfd.refundMethod} - {rfd.reason}</p>
+                    <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>{(rfd.flowType || rfd.type) === "return" ? "Return + Refund" : "Refund Only"} · {rfd.refundMethod} · {rfd.reason}</p>
                   </div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: "16px", fontWeight: 800, color: "#1d5ba0", marginBottom: "4px" }}>{currSym}{Number(rfd.amount || 0).toFixed(2)}</div>
-                  <span className={`rfd-status ${rfd.status === "Completed" ? "rfd-completed" : rfd.status === "Requested" ? "rfd-pending" : "rfd-processing"}`}>{statusLabel(rfd.type, rfd.status)}</span>
+                  <span className={`rfd-status ${rfd.status === "Refunded" ? "rfd-completed" : rfd.status === "Return Requested" || rfd.status === "Refund Requested" || rfd.status === "Under Review" ? "rfd-pending" : "rfd-processing"}`}>
+                    <i className={`fas ${rfd.status === "Refunded" ? "fa-circle-check" : rfd.status === "Approved" ? "fa-thumbs-up" : rfd.status === "Pickup Scheduled" ? "fa-truck" : "fa-hourglass-half"}`}></i>
+                    {statusLabel(rfd.flowType || rfd.type, rfd.status)}
+                  </span>
                 </div>
+                <div className="rfd-meta-row">
+                  <span className="rfd-meta-pill">Submitted {new Date(rfd.submittedAt || rfd.timestamp).toLocaleDateString()}</span>
+                  <span className="rfd-meta-pill">Expected by {new Date(rfd.expectedRefundDate || estimateRefundDate(rfd.submittedAt || rfd.timestamp, rfd.flowType || rfd.type)).toLocaleDateString()}</span>
+                  <span className="rfd-meta-pill">{(rfd.proofFiles || []).length} proof file{(rfd.proofFiles || []).length === 1 ? "" : "s"}</span>
+                </div>
+                {rfd.detailText && <div className="rfd-extra-copy">{rfd.detailText}</div>}
                 <div className="rfd-timeline">
-                  {steps.map((step, index) => (
-                    <div key={step} className={`rfd-step ${index < activeIndex ? "done" : index === activeIndex ? "active" : ""}`}>
-                      <span className="rfd-step-dot">{index < activeIndex ? <i className="fas fa-check"></i> : index + 1}</span>
-                      {statusLabel(rfd.type, step)}
-                    </div>
-                  ))}
+                  {steps.map((step, index) => {
+                    const historyEntry = (rfd.history || []).find((entry) => entry.status === step);
+                    return (
+                      <div key={step} className={`rfd-step ${index < activeIndex ? "done" : index === activeIndex ? "active" : ""}`}>
+                        <span className="rfd-step-dot">{index < activeIndex ? <i className="fas fa-check"></i> : index + 1}</span>
+                        <div className="rfd-step-copy">
+                          <span>{statusLabel(rfd.flowType || rfd.type, step)}</span>
+                          <span className="rfd-step-time">{historyEntry?.at ? new Date(historyEntry.at).toLocaleString() : "Pending"}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );

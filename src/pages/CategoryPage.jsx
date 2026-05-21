@@ -9,6 +9,7 @@ import { filterProductsForRegion, mergeCategoryProducts } from "../data/catalogF
 import { formatCurrencyDisplay } from "../utils/currency";
 import { getLocalizedProductName, getSearchHintSuggestions } from "../utils/translationUtils";
 import { resolveProductImage } from "../utils/productUtils";
+import { safeSessionGet, safeSessionRemove, safeSessionSet } from "../utils/safeStorage";
 import ProductCard from "../components/ProductCard";
 import {
   CategorySkeletonLoader,
@@ -43,6 +44,8 @@ const CATEGORIES_DATA = [
 ];
 
 const BADGE_CLS = ["bg-hot", "bg-sale", "bg-new", "bg-best"];
+const CATEGORY_VIEW_CACHE_PREFIX = "pb_category_view_v1";
+const CATEGORY_VIEW_TTL_MS = 1000 * 60 * 20;
 
 const getSortOptions = (t) => [
   { value: "default", label: t.filters.sortBy.default },
@@ -189,6 +192,8 @@ export default function CategoryPage({
   region = "in",
   refreshSignal = 0,
   onMobileOverlayChange,
+  navigationMode = "push",
+  visitToken = 0,
 }) {
   const t = useT(language);
   const isKenya = region === "ke";
@@ -228,6 +233,9 @@ export default function CategoryPage({
   const previousCategoryRef = useRef(category);
   const previousRegionRef = useRef(region);
   const previousRefreshRef = useRef(refreshSignal);
+  const restoredFromCacheRef = useRef(false);
+  const restoredScrollYRef = useRef(0);
+  const lastFreshVisitResetRef = useRef("");
   const searchSuggestions = useMemo(() => getSearchHintSuggestions(language), [language]);
 
   // ── Theme (palette) ────────────────────────────────────────────────────────
@@ -278,6 +286,10 @@ export default function CategoryPage({
       label: t.categories?.[cat.key] || cat.value,
     })),
   ];
+  const categoryStateCacheKey = useMemo(
+    () => `${CATEGORY_VIEW_CACHE_PREFIX}:${region}:${category || "unknown"}`,
+    [category, region]
+  );
 
   // ── Scroll reset ───────────────────────────────────────────────────────────
   const scrollToTop = useCallback(() => {
@@ -287,7 +299,10 @@ export default function CategoryPage({
     }
   }, []);
 
-  useLayoutEffect(() => { scrollToTop(); }, [category]);
+  useLayoutEffect(() => {
+    if (navigationMode === "restore") return;
+    scrollToTop();
+  }, [category, navigationMode, scrollToTop]);
 
   // ── Theme observer ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -341,22 +356,68 @@ export default function CategoryPage({
     return () => onMobileOverlayChange?.(false);
   }, [filterOpen, isMobileViewport, mobileSortOpen, onMobileOverlayChange]);
 
+  useEffect(() => {
+    restoredFromCacheRef.current = false;
+    restoredScrollYRef.current = 0;
+    if (!category || navigationMode !== "restore") return;
+
+    const cached = safeSessionGet(categoryStateCacheKey);
+    if (!cached) return;
+
+    try {
+      const parsed = JSON.parse(cached);
+      if (!parsed || Date.now() - Number(parsed.savedAt || 0) > CATEGORY_VIEW_TTL_MS) {
+        safeSessionRemove(categoryStateCacheKey);
+        return;
+      }
+
+      if (Array.isArray(parsed.products)) setProducts(parsed.products);
+      if (Array.isArray(parsed.allProducts)) setAllProducts(parsed.allProducts);
+      if (Array.isArray(parsed.selectedBrands)) setSelectedBrands(parsed.selectedBrands);
+      if (Array.isArray(parsed.priceRange)) setPriceRange(parsed.priceRange);
+      if (Array.isArray(parsed.discountRange)) setDiscountRange(parsed.discountRange);
+      setBrandSearch(parsed.brandSearch || "");
+      setSearchQuery(parsed.searchQuery || "");
+      setSortBy(parsed.sortBy || "default");
+      restoredScrollYRef.current = Number(parsed.scrollY || 0);
+      restoredFromCacheRef.current = true;
+      setLoading(false);
+
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: restoredScrollYRef.current, behavior: "auto" });
+      });
+    } catch {
+      safeSessionRemove(categoryStateCacheKey);
+    }
+  }, [category, categoryStateCacheKey, navigationMode]);
+
   // ── Load products ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!category) return;
     const categoryChanged = previousCategoryRef.current !== category;
     const regionChanged = previousRegionRef.current !== region;
     const pullRefreshTriggered = previousRefreshRef.current !== refreshSignal;
+    if (restoredFromCacheRef.current && !pullRefreshTriggered && !categoryChanged && !regionChanged) {
+      previousCategoryRef.current = category;
+      previousRegionRef.current = region;
+      previousRefreshRef.current = refreshSignal;
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: restoredScrollYRef.current, behavior: "auto" });
+      });
+      return;
+    }
     const keepContentVisible = pullRefreshTriggered && !categoryChanged && !regionChanged && products.length > 0;
 
     setLoading(!keepContentVisible);
     if (!keepContentVisible) {
       setProducts([]);
     }
-    setSelectedBrands([]);
-    setBrandSearch("");
-    setSearchQuery("");
-    setSortBy("default");
+    if (categoryChanged || regionChanged) {
+      setSelectedBrands([]);
+      setBrandSearch("");
+      setSearchQuery("");
+      setSortBy("default");
+    }
 
     const prep = (arr) => arr.map((p) => prepareCategoryProduct(p, region));
 
@@ -534,8 +595,37 @@ export default function CategoryPage({
   }, [products]);
 
   // Sync ranges when products change
-  useEffect(() => { setPriceRange(priceBounds); }, [priceBounds[0], priceBounds[1]]);
-  useEffect(() => { setDiscountRange(discountBounds); }, [discountBounds[0], discountBounds[1]]);
+  useEffect(() => {
+    setPriceRange((prev) => clampRange(prev, priceBounds[0], priceBounds[1]));
+  }, [priceBounds[0], priceBounds[1]]);
+  useEffect(() => {
+    setDiscountRange((prev) => clampRange(prev, discountBounds[0], discountBounds[1]));
+  }, [discountBounds[0], discountBounds[1]]);
+
+  useEffect(() => {
+    if (!category || navigationMode === "restore" || loading) return;
+    const resetKey = `${category}:${visitToken}:${products.length}:${priceBounds[1]}:${discountBounds[1]}`;
+    if (lastFreshVisitResetRef.current === resetKey) return;
+    lastFreshVisitResetRef.current = resetKey;
+    setSearchQuery("");
+    setSelectedBrands([]);
+    setBrandSearch("");
+    setPriceRange(priceBounds);
+    setDiscountRange(discountBounds);
+    setSortBy("default");
+    if (categoryStateCacheKey) {
+      safeSessionRemove(categoryStateCacheKey);
+    }
+  }, [
+    category,
+    categoryStateCacheKey,
+    discountBounds,
+    loading,
+    navigationMode,
+    priceBounds,
+    products.length,
+    visitToken,
+  ]);
 
   // ── Brand list ─────────────────────────────────────────────────────────────
   const brandSource = useMemo(() =>
@@ -685,6 +775,79 @@ export default function CategoryPage({
       else if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(window.location.href);
     } catch { /* ignore */ }
   }, [activeLabel]);
+
+  useEffect(() => {
+    if (!category || loading) return;
+    safeSessionSet(
+      categoryStateCacheKey,
+      JSON.stringify({
+        savedAt: Date.now(),
+        products,
+        allProducts,
+        selectedBrands,
+        brandSearch,
+        searchQuery,
+        priceRange: effectivePriceRange,
+        discountRange: effectiveDiscountRange,
+        sortBy,
+        scrollY: typeof window !== "undefined" ? window.scrollY || 0 : 0,
+      })
+    );
+  }, [
+    allProducts,
+    brandSearch,
+    category,
+    categoryStateCacheKey,
+    effectiveDiscountRange,
+    effectivePriceRange,
+    loading,
+    products,
+    searchQuery,
+    selectedBrands,
+    sortBy,
+  ]);
+
+  useEffect(() => {
+    if (!category || loading || typeof window === "undefined") return undefined;
+    let frame = 0;
+    const saveScroll = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        safeSessionSet(
+          categoryStateCacheKey,
+          JSON.stringify({
+            savedAt: Date.now(),
+            products,
+            allProducts,
+            selectedBrands,
+            brandSearch,
+            searchQuery,
+            priceRange: effectivePriceRange,
+            discountRange: effectiveDiscountRange,
+            sortBy,
+            scrollY: window.scrollY || 0,
+          })
+        );
+      });
+    };
+    window.addEventListener("scroll", saveScroll, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", saveScroll);
+    };
+  }, [
+    allProducts,
+    brandSearch,
+    category,
+    categoryStateCacheKey,
+    effectiveDiscountRange,
+    effectivePriceRange,
+    loading,
+    products,
+    searchQuery,
+    selectedBrands,
+    sortBy,
+  ]);
 
   // ── Sort label ─────────────────────────────────────────────────────────────
   const sortLabel = sortBy === "default"

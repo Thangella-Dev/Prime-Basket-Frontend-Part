@@ -28,6 +28,8 @@ const ALL_CATS = [
 ];
 
 const DEAL_CATS = ["fruits", "vegetables", "dairyProducts", "biscuitsAndCookies", "instantFood", "coolDrinks"];
+const HOME_VIEW_CACHE_PREFIX = "pb_home_view_v1";
+const HOME_VIEW_TTL_MS = 1000 * 60 * 20;
 
 const MULTICOL_CATS = {
   topSelling: "rice",
@@ -148,6 +150,7 @@ export default function HomePage({
   language = "en",
   region = "in",
   refreshSignal = 0,
+  navigationMode = "push",
 }) {
   const t = useT(language);
   const isKenya = region === "ke";
@@ -163,6 +166,9 @@ export default function HomePage({
   const railViewportRefs = useRef({});
   const railGestureState = useRef({});
   const hasLoadedHomeRef = useRef(false);
+  const restoredHomeCacheRef = useRef(false);
+  const restoredHomeScrollYRef = useRef(0);
+  const homeStateCacheKey = `${HOME_VIEW_CACHE_PREFIX}:${region}`;
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -228,8 +234,46 @@ export default function HomePage({
   const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
   useEffect(() => {
+    restoredHomeCacheRef.current = false;
+    restoredHomeScrollYRef.current = 0;
+    if (navigationMode !== "restore") return;
+
+    const cached = safeSessionGet(homeStateCacheKey);
+    if (!cached) return;
+
+    try {
+      const parsed = JSON.parse(cached);
+      if (!parsed || Date.now() - Number(parsed.savedAt || 0) > HOME_VIEW_TTL_MS) {
+        safeSessionRemove(homeStateCacheKey);
+        return;
+      }
+
+      if (Array.isArray(parsed.popular15)) setPopular15(parsed.popular15);
+      if (Array.isArray(parsed.deals)) setDeals(parsed.deals);
+      if (parsed.multiCols) setMultiCols(parsed.multiCols);
+      restoredHomeScrollYRef.current = Number(parsed.scrollY || 0);
+      restoredHomeCacheRef.current = true;
+      hasLoadedHomeRef.current = true;
+      setLoading(false);
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: restoredHomeScrollYRef.current, behavior: "auto" });
+      });
+    } catch {
+      safeSessionRemove(homeStateCacheKey);
+    }
+  }, [homeStateCacheKey, navigationMode]);
+
+  useEffect(() => {
     let cancelled = false;
     const keepContentVisible = hasLoadedHomeRef.current && refreshSignal > 0;
+    if (restoredHomeCacheRef.current && refreshSignal === 0) {
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: restoredHomeScrollYRef.current, behavior: "auto" });
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
 
     if (isKenya) {
       if (!cancelled) {
@@ -313,7 +357,46 @@ export default function HomePage({
     return () => {
       cancelled = true;
     };
-  }, [isKenya, language, refreshSignal, region]);
+  }, [homeStateCacheKey, isKenya, language, refreshSignal, region]);
+
+  useEffect(() => {
+    if (loading) return;
+    safeSessionSet(
+      homeStateCacheKey,
+      JSON.stringify({
+        savedAt: Date.now(),
+        popular15,
+        deals,
+        multiCols,
+        scrollY: typeof window !== "undefined" ? window.scrollY || 0 : 0,
+      })
+    );
+  }, [deals, homeStateCacheKey, loading, multiCols, popular15]);
+
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return undefined;
+    let frame = 0;
+    const saveScroll = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        safeSessionSet(
+          homeStateCacheKey,
+          JSON.stringify({
+            savedAt: Date.now(),
+            popular15,
+            deals,
+            multiCols,
+            scrollY: window.scrollY || 0,
+          })
+        );
+      });
+    };
+    window.addEventListener("scroll", saveScroll, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", saveScroll);
+    };
+  }, [deals, homeStateCacheKey, loading, multiCols, popular15]);
 
   const curatedSections = [
     { key: "topSelling", title: t.home.topSelling, items: (multiCols.topSelling || []).filter(Boolean) },

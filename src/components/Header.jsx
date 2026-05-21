@@ -8,7 +8,7 @@ import { MoonStar, SunMedium } from "lucide-react";
 
 export default function Header({
   onAccountClick, isLoggedIn, user,
-  onCategorySelect, onLogoClick,
+  onCategorySelect, onLogoClick, onLogoDoubleClick,
   onBack, currentPage = "home",
   cartCount = 0, wishlistCount = 0,
   onCartClick, onWishlistClick,
@@ -125,6 +125,7 @@ export default function Header({
   const mobileLanguageRef = useRef(null);
   const desktopLocaleRef = useRef(null);
   const brandTimerRef = useRef(null);
+  const lastBrandClickRef = useRef(0);
   const locationNoticeTimerRef = useRef(null);
   const lastScrollYRef = useRef(0);
   const scrollAnchorRef = useRef(0);
@@ -204,7 +205,7 @@ export default function Header({
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
+    const handlePointerOutside = (e) => {
       const clickedInsideDesktopBrowse = browseRef.current?.contains(e.target);
       const clickedInsideMobileBrowse = mobileBrowseRef.current?.contains(e.target);
       const clickedInsideDesktopNotes = notesRef.current?.contains(e.target);
@@ -215,9 +216,77 @@ export default function Header({
       if (mobileLanguageRef.current && !mobileLanguageRef.current.contains(e.target)) setMobileLanguageOpen(false);
       if (!clickedInsideDesktopLocale) setDesktopLocaleOpen(false);
     };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    document.addEventListener("pointerdown", handlePointerOutside);
+    return () => document.removeEventListener("pointerdown", handlePointerOutside);
   }, []);
+
+  useEffect(() => {
+    setNotesOpen(false);
+    setDropdownOpen(false);
+  }, [currentPage]);
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setNotesOpen(false);
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, []);
+
+  useEffect(() => {
+    if (!dropdownOpen) return undefined;
+    const isInsideBrowse = (target) =>
+      browseRef.current?.contains(target) || mobileBrowseRef.current?.contains(target);
+    const closeBrowse = () => setDropdownOpen(false);
+    const closeBrowseOnOutsideScroll = (event) => {
+      if (isInsideBrowse(event.target)) return;
+      setDropdownOpen(false);
+    };
+    const closeBrowseOnWindowScroll = () => {
+      const activeElement = document.activeElement;
+      if (activeElement && isInsideBrowse(activeElement)) return;
+      setDropdownOpen(false);
+    };
+    document.addEventListener("wheel", closeBrowseOnOutsideScroll, { passive: true, capture: true });
+    document.addEventListener("touchmove", closeBrowseOnOutsideScroll, { passive: true, capture: true });
+    window.addEventListener("scroll", closeBrowseOnWindowScroll, { passive: true });
+    window.addEventListener("resize", closeBrowse);
+    return () => {
+      document.removeEventListener("wheel", closeBrowseOnOutsideScroll, { capture: true });
+      document.removeEventListener("touchmove", closeBrowseOnOutsideScroll, { capture: true });
+      window.removeEventListener("scroll", closeBrowseOnWindowScroll);
+      window.removeEventListener("resize", closeBrowse);
+    };
+  }, [dropdownOpen]);
+
+  useEffect(() => {
+    if (!notesOpen) return undefined;
+    const isInsideNotes = (target) =>
+      notesRef.current?.contains(target) || mobileNotesRef.current?.contains(target);
+    const closeNotes = () => setNotesOpen(false);
+    const closeNotesOnOutsideScroll = (event) => {
+      if (isInsideNotes(event.target)) return;
+      setNotesOpen(false);
+    };
+    const closeNotesOnWindowScroll = () => {
+      const activeElement = document.activeElement;
+      if (isInsideNotes(activeElement)) return;
+      setNotesOpen(false);
+    };
+    document.addEventListener("wheel", closeNotesOnOutsideScroll, { passive: true, capture: true });
+    document.addEventListener("touchmove", closeNotesOnOutsideScroll, { passive: true, capture: true });
+    window.addEventListener("scroll", closeNotesOnWindowScroll, { passive: true });
+    window.addEventListener("resize", closeNotes);
+    return () => {
+      document.removeEventListener("wheel", closeNotesOnOutsideScroll, { capture: true });
+      document.removeEventListener("touchmove", closeNotesOnOutsideScroll, { capture: true });
+      window.removeEventListener("scroll", closeNotesOnWindowScroll);
+      window.removeEventListener("resize", closeNotes);
+    };
+  }, [notesOpen]);
 
   useEffect(() => {
     const isLocked = drawerOpen || searchOpen;
@@ -284,10 +353,34 @@ export default function Header({
 
   const handleBrandClick = (e) => {
     e.preventDefault();
+    closeAllPanels();
+    if (currentPage === "home") {
+      if (brandTimerRef.current) clearTimeout(brandTimerRef.current);
+      setBrandTap(true);
+      brandTimerRef.current = setTimeout(() => setBrandTap(false), 420);
+      return;
+    }
+    const now = Date.now();
+    if (now - lastBrandClickRef.current < 450) {
+      return;
+    }
+    lastBrandClickRef.current = now;
     if (brandTimerRef.current) clearTimeout(brandTimerRef.current);
     setBrandTap(true);
     brandTimerRef.current = setTimeout(() => setBrandTap(false), 420);
+    onLogoClick?.();
+  };
+
+  const handleBrandDoubleClick = (e) => {
+    e.preventDefault();
     closeAllPanels();
+    if (brandTimerRef.current) clearTimeout(brandTimerRef.current);
+    setBrandTap(true);
+    brandTimerRef.current = setTimeout(() => setBrandTap(false), 420);
+    if (currentPage === "home") {
+      onLogoDoubleClick?.();
+      return;
+    }
     onLogoClick?.();
   };
 
@@ -575,13 +668,18 @@ export default function Header({
       <header id="navbar" className={`${scrolled ? "scrolled" : ""}${chromeHidden ? " chrome-hidden" : ""}${drawerOpen ? " drawer-open" : ""}${isCategoryPage ? " page-category" : ""}${showMobileLocationBar ? " has-mobile-location-bar" : ""}`}>
         <div className="nav-inner">
         <div className="nav-left" style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-          <a href="#" className={`logo brand-link${brandTap ? " brand-link-active" : ""}`} onClick={handleBrandClick}>
+          <button
+            type="button"
+            className={`logo brand-link${brandTap ? " brand-link-active" : ""}`}
+            onClick={handleBrandClick}
+            onDoubleClick={handleBrandDoubleClick}
+          >
             <img
               src="/assets/prime-basket-brand.png"
               alt="Prime Basket"
               className="brand-logo-image brand-logo-image-header"
             />
-          </a>
+          </button>
         </div>
 
         <div className="nav-center" style={{ gap: "30px", justifyContent: "center" }}></div>
@@ -684,16 +782,21 @@ export default function Header({
                       <h4>Notifications</h4>
                       <p>{unreadCount > 0 ? `${unreadCount} unread updates` : "Everything is up to date"}</p>
                     </div>
-                    {notifications.length > 0 && (
-                      <div className="notes-actions">
-                        <button type="button" className="notes-mark-read" onClick={markAllRead}>
-                          Mark all read
-                        </button>
-                        <button type="button" className="notes-mark-read notes-clear" onClick={clearNotifications}>
-                          Clear notifications
-                        </button>
-                      </div>
-                    )}
+                    <div className="notes-actions-wrap">
+                      {notifications.length > 0 && (
+                        <div className="notes-actions">
+                          <button type="button" className="notes-mark-read" onClick={markAllRead}>
+                            Mark all read
+                          </button>
+                          <button type="button" className="notes-mark-read notes-clear" onClick={clearNotifications}>
+                            Clear notifications
+                          </button>
+                        </div>
+                      )}
+                      <button type="button" className="notes-close-btn" onClick={() => setNotesOpen(false)} aria-label="Close notifications">
+                        <i className="fas fa-times"></i>
+                      </button>
+                    </div>
                   </div>
 
                   <div className="notes-list">
@@ -850,16 +953,21 @@ export default function Header({
                     <h4>Notifications</h4>
                     <p>{unreadCount > 0 ? `${unreadCount} unread updates` : "Everything is up to date"}</p>
                   </div>
-                  {notifications.length > 0 && (
-                    <div className="notes-actions">
-                      <button type="button" className="notes-mark-read" onClick={markAllRead}>
-                        Mark all read
-                      </button>
-                      <button type="button" className="notes-mark-read notes-clear" onClick={clearNotifications}>
-                        Clear notifications
-                      </button>
-                    </div>
-                  )}
+                  <div className="notes-actions-wrap">
+                    {notifications.length > 0 && (
+                      <div className="notes-actions">
+                        <button type="button" className="notes-mark-read" onClick={markAllRead}>
+                          Mark all read
+                        </button>
+                        <button type="button" className="notes-mark-read notes-clear" onClick={clearNotifications}>
+                          Clear notifications
+                        </button>
+                      </div>
+                    )}
+                    <button type="button" className="notes-close-btn" onClick={() => setNotesOpen(false)} aria-label="Close notifications">
+                      <i className="fas fa-times"></i>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="notes-list">

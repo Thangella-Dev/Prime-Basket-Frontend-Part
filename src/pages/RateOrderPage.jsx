@@ -22,16 +22,20 @@ export default function RateOrderPage({ order, onGoBack, onSubmit, language = "e
   const t = useT(language);
   const currSym = region === "ke" ? "KES " : "\u20b9";
 
-  const [deliveryRating, setDeliveryRating] = useState(0);
-  const [deliveryHover, setDeliveryHover] = useState(0);
-  const [qualityRating, setQualityRating] = useState(0);
-  const [qualityHover, setQualityHover] = useState(0);
+  const [ratings, setRatings] = useState({ delivery: 0, quality: 0 });
+  const [hoverRatings, setHoverRatings] = useState({ delivery: 0, quality: 0 });
   const [selectedIssues, setSelectedIssues] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [reviewText, setReviewText] = useState("");
   const [photos, setPhotos] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [validationError, setValidationError] = useState("");
+
+  const deliveryRating = ratings.delivery;
+  const qualityRating = ratings.quality;
+  const deliveryHover = hoverRatings.delivery;
+  const qualityHover = hoverRatings.quality;
+  const hasAnyRating = deliveryRating > 0 || qualityRating > 0;
 
   const averageRating = (deliveryRating + qualityRating) / 2;
   const ratingLevel = averageRating >= 4 ? "good" : averageRating >= 2.5 ? "medium" : averageRating > 0 ? "bad" : "none";
@@ -83,7 +87,7 @@ export default function RateOrderPage({ order, onGoBack, onSubmit, language = "e
   };
 
   const handleSubmit = () => {
-    if (deliveryRating === 0 && qualityRating === 0) {
+    if (!hasAnyRating) {
       setValidationError("Please provide at least one rating.");
       return;
     }
@@ -92,8 +96,8 @@ export default function RateOrderPage({ order, onGoBack, onSubmit, language = "e
     if (onSubmit) {
       onSubmit({
         orderId: order?.orderId,
-        deliveryRating,
-        qualityRating,
+        deliveryRating: ratings.delivery,
+        qualityRating: ratings.quality,
         issues: selectedIssues,
         tags: selectedTags,
         reviewText,
@@ -317,11 +321,11 @@ export default function RateOrderPage({ order, onGoBack, onSubmit, language = "e
                 rating={deliveryRating}
                 hover={deliveryHover}
                 onRate={(value) => {
-                  setDeliveryRating(value);
+                  setRatings((prev) => ({ ...prev, delivery: value }));
                   if (validationError) setValidationError("");
                 }}
-                onHover={setDeliveryHover}
-                onLeave={() => setDeliveryHover(0)}
+                onHover={(value) => setHoverRatings((prev) => ({ ...prev, delivery: value }))}
+                onLeave={() => setHoverRatings((prev) => ({ ...prev, delivery: 0 }))}
               />
               <StarRow
                 label="Product Quality"
@@ -329,11 +333,11 @@ export default function RateOrderPage({ order, onGoBack, onSubmit, language = "e
                 rating={qualityRating}
                 hover={qualityHover}
                 onRate={(value) => {
-                  setQualityRating(value);
+                  setRatings((prev) => ({ ...prev, quality: value }));
                   if (validationError) setValidationError("");
                 }}
-                onHover={setQualityHover}
-                onLeave={() => setQualityHover(0)}
+                onHover={(value) => setHoverRatings((prev) => ({ ...prev, quality: value }))}
+                onLeave={() => setHoverRatings((prev) => ({ ...prev, quality: 0 }))}
               />
             </div>
           </div>

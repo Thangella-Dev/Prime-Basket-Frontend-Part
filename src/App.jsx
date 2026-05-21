@@ -39,6 +39,8 @@ const GenericStaticPage = lazy(() => import("./pages/GenericStaticPage"));
 const NAV_STATE_KEY = "pb_nav_state_v2";
 const NAV_SCROLL_KEY = "pb_nav_scroll_v2";
 const GUEST_LOCALE_KEY = "pb_guest_locale_v1";
+const NAV_MODE_RESTORE = "restore";
+const NAV_MODE_PUSH = "push";
 
 const getAllowedLanguagesForRegion = (regionValue = "in") =>
   regionValue === "ke" ? ["en", "ke"] : ["en", "hi", "te"];
@@ -106,12 +108,78 @@ const normalizeUnitKey = (value) =>
     .toLowerCase()
     .replace(/\s+/g, " ");
 
+const buildWishlistSnapshot = (product) => {
+  const sanitizedProduct = sanitizeStoredProduct(product);
+  const {
+    quantity,
+    selectedUnit,
+    wishlistOrigin,
+    wishlistRestoreEligible,
+    wishlistOriginSnapshot,
+    ...wishlistProduct
+  } = sanitizedProduct || {};
+  return wishlistProduct;
+};
+
+const dedupeWishlistCollection = (items = []) => {
+  const byUid = new Map();
+  items.forEach((item) => {
+    const snapshot = buildWishlistSnapshot(item);
+    if (snapshot?._uid && !byUid.has(snapshot._uid)) {
+      byUid.set(snapshot._uid, snapshot);
+    }
+  });
+  return [...byUid.values()];
+};
+
+const dedupeCartCollection = (items = []) => {
+  const byKey = new Map();
+  items.forEach((item) => {
+    const sanitizedItem = sanitizeStoredProduct(item);
+    const normalizedUnit = normalizeUnitKey(
+      sanitizedItem?.selectedUnit ||
+      sanitizedItem?.baseUnit ||
+      sanitizedItem?.standard ||
+      sanitizedItem?.unit ||
+      sanitizedItem?.quantityLabel ||
+      "default"
+    );
+    const key = `${sanitizedItem?._uid || sanitizedItem?.id || sanitizedItem?.name || "item"}::${normalizedUnit}`;
+    const nextQuantity = Number(sanitizedItem?.quantity) > 0 ? Number(sanitizedItem.quantity) : 1;
+
+    if (!byKey.has(key)) {
+      byKey.set(key, {
+        ...sanitizedItem,
+        selectedUnit: normalizedUnit,
+        quantity: nextQuantity,
+      });
+      return;
+    }
+
+    const existing = byKey.get(key);
+    byKey.set(key, {
+      ...existing,
+      quantity: (existing.quantity || 0) + nextQuantity,
+      wishlistOrigin: Boolean(existing.wishlistOrigin || sanitizedItem?.wishlistOrigin),
+      wishlistRestoreEligible:
+        existing.wishlistRestoreEligible !== false &&
+        sanitizedItem?.wishlistRestoreEligible !== false,
+      wishlistOriginSnapshot:
+        existing.wishlistOriginSnapshot || sanitizedItem?.wishlistOriginSnapshot || null,
+    });
+  });
+  return [...byKey.values()];
+};
+
 export default function App() {
   const { isAuthenticated, user, login, logout } = useAuth();
   const { startTracking, activeOrder, completedOrder, setCompletedOrder } = useTracking();
   const [bootVisualReady, setBootVisualReady] = useState(false);
   const [refreshSignal, setRefreshSignal] = useState(0);
   const [hideMobileGlassDock, setHideMobileGlassDock] = useState(false);
+  const [refundOverlayOpen, setRefundOverlayOpen] = useState(false);
+  const [categoryVisitToken, setCategoryVisitToken] = useState(0);
+  const [navigationMode, setNavigationMode] = useState(NAV_MODE_PUSH);
   const initialClientPrefsRef = useRef(null);
   const initialNavRef = useRef(null);
   if (initialClientPrefsRef.current === null) {
@@ -156,7 +224,7 @@ export default function App() {
     const safeRegion = nextRegion === "ke" ? "ke" : "in";
     setRegion(safeRegion);
     setLanguage(getDefaultLanguageForRegion(safeRegion));
-  }, []);
+  }, [language]);
 
   // ── Notifications ──
   const [notifications, setNotifications] = useState(() => {
@@ -170,7 +238,8 @@ export default function App() {
       message,
       type,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      read: false
+      read: false,
+      createdAt: Date.now(),
     };
     setNotifications(prev => {
       const updated = [newNote, ...prev].slice(0, 20);
@@ -179,6 +248,23 @@ export default function App() {
       return updated;
     });
   };
+
+  useEffect(() => {
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const cleaned = notifications.filter((note) => {
+      const createdAt = Number(note?.createdAt || 0);
+      if (!createdAt) return true;
+      const isOlderThanDay = now - createdAt > DAY_MS;
+      const keepImportantUnread =
+        !note?.read && (note?.type === "delivery" || note?.type === "success");
+      return !isOlderThanDay || keepImportantUnread;
+    });
+    if (cleaned.length !== notifications.length) {
+      setNotifications(cleaned);
+      localStorage.setItem("pb_notifications", JSON.stringify(cleaned));
+    }
+  }, [notifications]);
 
   const markAllRead = () => {
     const updated = notifications.map(n => ({ ...n, read: true }));
@@ -287,25 +373,25 @@ export default function App() {
   // ── Cart & Wishlist ──
   const [cart, setCart] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("pb_cart") || "[]").map(sanitizeStoredProduct);
+      return dedupeCartCollection(JSON.parse(localStorage.getItem("pb_cart") || "[]"));
     } catch {
       return [];
     }
   });
   const [wishlist, setWishlist] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("pb_wishlist") || "[]").map(sanitizeStoredProduct);
+      return dedupeWishlistCollection(JSON.parse(localStorage.getItem("pb_wishlist") || "[]"));
     } catch {
       return [];
     }
   });
 
   useEffect(() => {
-    localStorage.setItem("pb_cart", JSON.stringify(cart));
+    localStorage.setItem("pb_cart", JSON.stringify(dedupeCartCollection(cart)));
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem("pb_wishlist", JSON.stringify(wishlist));
+    localStorage.setItem("pb_wishlist", JSON.stringify(dedupeWishlistCollection(wishlist)));
   }, [wishlist]);
 
   // ── Cart Toast Panel ──
@@ -326,10 +412,15 @@ export default function App() {
 
   const hasMountedNavigationRef = useRef(false);
   const hasRestoredInitialScrollRef = useRef(false);
+  const skipNextScrollResetRef = useRef(false);
   // Scroll to top on in-app navigation, but not on initial boot/refresh restore
   useEffect(() => {
     if (!hasMountedNavigationRef.current) {
       hasMountedNavigationRef.current = true;
+      return;
+    }
+    if (skipNextScrollResetRef.current) {
+      skipNextScrollResetRef.current = false;
       return;
     }
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -413,6 +504,8 @@ export default function App() {
   // ── History API Support ──
   useEffect(() => {
     const handlePopState = (event) => {
+      skipNextScrollResetRef.current = true;
+      setNavigationMode(NAV_MODE_RESTORE);
       if (event.state) {
         const { page: p, cat: c, prod: pr, accSec } = event.state;
         setPage(p || "home");
@@ -502,20 +595,52 @@ export default function App() {
 
   // ── Navigation helpers ──
   const goHome = () => {
+    if (page === "home" && !selectedCategory && !selectedProduct) {
+      return;
+    }
+    skipNextScrollResetRef.current = true;
+    setNavigationMode(NAV_MODE_RESTORE);
     setPage("home");
     setSelectedCategory(null);
     setSelectedProduct(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  const refreshHomeFromLogo = useCallback(() => {
+    setNavigationMode(NAV_MODE_PUSH);
+    setPage("home");
+    setSelectedCategory(null);
+    setSelectedProduct(null);
+    setRefreshSignal((prev) => prev + 1);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, []);
   const goCategory = (cat) => {
+    setNavigationMode(NAV_MODE_PUSH);
     window.scrollTo({ top: 0, behavior: "auto" });
+    setCategoryVisitToken((prev) => prev + 1);
     setSelectedCategory(cat);
     setSelectedProduct(null);
     setPage("category");
   };
-  const openProduct = (product) => { setSelectedProduct(product); setPage("product"); };
+  const openProduct = (product) => {
+    setNavigationMode(NAV_MODE_PUSH);
+    setSelectedProduct(product);
+    setPage("product");
+  };
   const goCart = () => setPage("cart");
   const goWishlist = () => setPage("wishlist");
+
+  const goBackFromProduct = () => {
+    if (typeof window !== "undefined" && window.history.length > 1 && window.history.state) {
+      window.history.back();
+      return;
+    }
+    if (selectedCategory) {
+      goCategory(selectedCategory);
+      return;
+    }
+    goHome();
+  };
 
   const goCheckout = (data) => {
     if (!isAuthenticated) {
@@ -646,7 +771,7 @@ export default function App() {
   };
 
   // ── Cart Toast Panel ──
-  const showCartToast = useCallback((product, updatedCart) => {
+  const showCartToast = useCallback((product, updatedCart, action = "added") => {
     if (cartToastTimer.current) clearTimeout(cartToastTimer.current);
     const normalizedProduct = normalizeCartProduct(product);
     const item = updatedCart.find((i) => i._uid === normalizedProduct._uid && resolveCartUnit(i) === normalizedProduct.selectedUnit);
@@ -654,7 +779,7 @@ export default function App() {
       setCartToast(null);
       return;
     }
-    setCartToast(buildCartToastPayload(normalizedProduct, item.quantity, "added"));
+    setCartToast(buildCartToastPayload(normalizedProduct, item.quantity, action));
     cartToastTimer.current = setTimeout(() => setCartToast(null), 3000);
   }, [normalizeCartProduct, resolveCartUnit]);
 
@@ -666,6 +791,20 @@ export default function App() {
     cartToastTimer.current = setTimeout(() => setCartToast(null), 2200);
   }, [normalizeCartProduct]);
 
+  const restoreWishlistProductFromCart = useCallback((cartItem, options = {}) => {
+    const { silent = false } = options;
+    if (!cartItem?.wishlistOrigin || cartItem?.wishlistRestoreEligible === false) return;
+    const snapshot = buildWishlistSnapshot(cartItem.wishlistOriginSnapshot || cartItem);
+    if (!snapshot?._uid) return;
+    setWishlist((prev) => {
+      if (prev.some((item) => item._uid === snapshot._uid)) return prev;
+      return dedupeWishlistCollection([...prev, snapshot]);
+    });
+    if (!silent) {
+      showToast("Moved back to wishlist", { type: "info", title: "Wishlist updated" });
+    }
+  }, []);
+
   // ── Cart helpers ──
   const addToCart = (product) => {
     setCart((prev) => {
@@ -675,7 +814,16 @@ export default function App() {
       if (existing) {
         updated = prev.map((item) =>
           item._uid === normalizedProduct._uid && resolveCartUnit(item) === normalizedProduct.selectedUnit
-            ? { ...item, quantity: item.quantity + 1 }
+            ? {
+                ...item,
+                quantity: item.quantity + 1,
+                wishlistOrigin: Boolean(item.wishlistOrigin || normalizedProduct.wishlistOrigin),
+                wishlistRestoreEligible:
+                  item.wishlistRestoreEligible !== false &&
+                  normalizedProduct.wishlistRestoreEligible !== false,
+                wishlistOriginSnapshot:
+                  item.wishlistOriginSnapshot || normalizedProduct.wishlistOriginSnapshot || null,
+              }
             : item
         );
       } else {
@@ -689,6 +837,7 @@ export default function App() {
   const decreaseQuantity = (product) => {
     const uid = typeof product === "string" ? product : product._uid;
     const unit = typeof product === "object" ? resolveCartUnit(product) : null;
+    let removedItem = null;
     
     setCart((prev) => {
       const index = prev.findIndex((item) => item._uid === uid && (!unit || resolveCartUnit(item) === unit));
@@ -700,6 +849,7 @@ export default function App() {
         }
         return updated;
       }
+      removedItem = prev.find((item) => item._uid === uid && (!unit || resolveCartUnit(item) === unit)) || null;
       const updated = prev.filter((item) => !(item._uid === uid && (!unit || resolveCartUnit(item) === unit)));
       if (typeof product === "object") {
         showCartRemovedToast(product);
@@ -708,11 +858,15 @@ export default function App() {
       }
       return updated;
     });
+    if (removedItem) {
+      restoreWishlistProductFromCart(removedItem);
+    }
   };
 
-  const removeFromCart = (uid, unit) =>
+  const removeFromCart = (uid, unit) => {
+    let removedItem = null;
     setCart((prev) => {
-      const removedItem = prev.find((i) => i._uid === uid && (!unit || resolveCartUnit(i) === unit));
+      removedItem = prev.find((i) => i._uid === uid && (!unit || resolveCartUnit(i) === unit)) || null;
       if (removedItem) {
         showCartRemovedToast(removedItem);
       } else {
@@ -720,26 +874,105 @@ export default function App() {
       }
       return prev.filter((i) => !(i._uid === uid && (!unit || resolveCartUnit(i) === unit)));
     });
+    if (removedItem) {
+      restoreWishlistProductFromCart(removedItem);
+    }
+  };
 
   const updateCartQty = (uid, unit, qty) => {
     if (qty <= 0) removeFromCart(uid, unit);
     else setCart((prev) => prev.map((i) => (i._uid === uid && (!unit || resolveCartUnit(i) === unit)) ? { ...i, quantity: qty } : i));
   };
 
-  const clearCart = () => { setCart([]); localStorage.removeItem("pb_cart"); };
+  const clearCart = () => {
+    cart.forEach((item) => restoreWishlistProductFromCart(item, { silent: true }));
+    setCart([]);
+    localStorage.removeItem("pb_cart");
+  };
 
   // ── Wishlist helpers ──
+  const removeWishlistItem = useCallback((product, options = {}) => {
+    const { silent = false, blockRestore = true } = options;
+    if (!product?._uid) return;
+    const uid = product._uid;
+
+    setWishlist((prev) => prev.filter((item) => item._uid !== uid));
+
+    if (blockRestore) {
+      setCart((prev) =>
+        prev.map((item) =>
+          item._uid === uid ? { ...item, wishlistRestoreEligible: false } : item
+        )
+      );
+    }
+
+    if (!silent) {
+      showToast((translations[language] || translations.en).toasts.removedFromWishlist, {
+        type: "info",
+        title: "Wishlist updated",
+      });
+    }
+  }, [language]);
+
+  const moveWishlistItemToCart = useCallback((product) => {
+    if (!product) return;
+    const wishlistSnapshot = buildWishlistSnapshot(product);
+    const cartProduct = {
+      ...product,
+      wishlistOrigin: true,
+      wishlistRestoreEligible: true,
+      wishlistOriginSnapshot: wishlistSnapshot,
+    };
+
+    removeWishlistItem(product, { silent: true, blockRestore: false });
+    setCart((prev) => {
+      const normalizedProduct = normalizeCartProduct(cartProduct);
+      const existing = prev.find((item) => item._uid === normalizedProduct._uid && resolveCartUnit(item) === normalizedProduct.selectedUnit);
+      const updated = existing
+        ? prev.map((item) =>
+            item._uid === normalizedProduct._uid && resolveCartUnit(item) === normalizedProduct.selectedUnit
+              ? {
+                  ...item,
+                  quantity: item.quantity + 1,
+                  wishlistOrigin: true,
+                  wishlistRestoreEligible: true,
+                  wishlistOriginSnapshot:
+                    item.wishlistOriginSnapshot || normalizedProduct.wishlistOriginSnapshot || null,
+                }
+              : item
+          )
+        : [...prev, normalizedProduct];
+
+      showCartToast(normalizedProduct, updated, "moved");
+      return updated;
+    });
+  }, [normalizeCartProduct, removeWishlistItem, resolveCartUnit, showCartToast]);
+
+  const clearWishlist = useCallback(() => {
+    const wishlistIds = new Set(wishlist.map((item) => item._uid));
+    setWishlist([]);
+    setCart((prev) =>
+      prev.map((item) =>
+        wishlistIds.has(item._uid) ? { ...item, wishlistRestoreEligible: false } : item
+      )
+    );
+    showToast("Wishlist cleared", { type: "info", title: "Wishlist updated" });
+  }, [wishlist]);
+
   const toggleWishlist = (product) => {
     setWishlist((prev) => {
       const exists = prev.find((item) => item._uid === product._uid);
       if (exists) {
+        setCart((cartPrev) =>
+          cartPrev.map((item) =>
+            item._uid === product._uid ? { ...item, wishlistRestoreEligible: false } : item
+          )
+        );
         showToast((translations[language] || translations.en).toasts.removedFromWishlist, { type: "info", title: "Wishlist updated" });
         return prev.filter((item) => item._uid !== product._uid);
       }
       showToast((translations[language] || translations.en).toasts.addedToWishlist, { type: "success", title: "Wishlist updated" });
-      const sanitizedProduct = sanitizeStoredProduct(product);
-      const { quantity, selectedUnit, ...wishlistProduct } = sanitizedProduct || {};
-      return [...prev, wishlistProduct];
+      return dedupeWishlistCollection([...prev, buildWishlistSnapshot(product)]);
     });
   };
 
@@ -750,6 +983,7 @@ export default function App() {
     const titleNode = toast.querySelector("[data-toast-title]");
     const bodyNode = toast.querySelector("[data-toast-body]");
     const iconNode = toast.querySelector("[data-toast-icon]");
+    const iconWrapNode = toast.querySelector("[data-toast-icon-wrap]");
     const type = options.type || "info";
     const title = options.title || (type === "success" ? "Success" : "Update");
     const iconByType = {
@@ -758,11 +992,42 @@ export default function App() {
       warning: "fa-triangle-exclamation",
       info: "fa-bell",
     };
+    const paletteByType = {
+      success: {
+        background: "linear-gradient(135deg, rgba(10,90,76,0.92), rgba(22,163,74,0.82), rgba(84,214,146,0.78))",
+        border: "1px solid rgba(134,239,172,0.34)",
+        shadow: "0 18px 38px rgba(22,163,74,0.2)",
+        iconBg: "rgba(220,252,231,0.18)",
+      },
+      error: {
+        background: "linear-gradient(135deg, rgba(127,29,29,0.92), rgba(220,38,38,0.86), rgba(248,113,113,0.78))",
+        border: "1px solid rgba(254,202,202,0.34)",
+        shadow: "0 18px 38px rgba(220,38,38,0.22)",
+        iconBg: "rgba(254,226,226,0.18)",
+      },
+      warning: {
+        background: "linear-gradient(135deg, rgba(120,53,15,0.92), rgba(234,88,12,0.86), rgba(251,191,36,0.72))",
+        border: "1px solid rgba(253,230,138,0.34)",
+        shadow: "0 18px 38px rgba(234,88,12,0.2)",
+        iconBg: "rgba(255,247,237,0.18)",
+      },
+      info: {
+        background: "linear-gradient(135deg, rgba(14,47,104,0.92), rgba(29,91,160,0.88), rgba(73,191,212,0.76))",
+        border: "1px solid rgba(191,219,254,0.34)",
+        shadow: "0 18px 38px rgba(29,91,160,0.22)",
+        iconBg: "rgba(239,246,255,0.18)",
+      },
+    };
+    const palette = paletteByType[type] || paletteByType.info;
 
     toast.dataset.type = type;
     if (titleNode) titleNode.textContent = title;
     if (bodyNode) bodyNode.textContent = message;
     if (iconNode) iconNode.className = `fas ${iconByType[type] || iconByType.info}`;
+    toast.style.background = palette.background;
+    toast.style.border = palette.border;
+    toast.style.boxShadow = palette.shadow;
+    if (iconWrapNode) iconWrapNode.style.background = palette.iconBg;
 
     toast.style.opacity = "1";
     toast.style.transform = "translateX(-50%) translateY(0) scale(1)";
@@ -920,6 +1185,8 @@ export default function App() {
           onOrderAgain={handleOrderAgain}
           onBuyAgainItem={addToCart}
           onDeleteOrder={deleteOrder}
+          onNotification={addNotification}
+          onRefundOverlayChange={setRefundOverlayOpen}
         />
       );
     }
@@ -947,6 +1214,8 @@ export default function App() {
           wishlist={wishlist}
           cart={cart}
           toggleWishlist={toggleWishlist}
+          onMoveToCart={moveWishlistItemToCart}
+          onClearWishlist={clearWishlist}
           onAddCart={addToCart}
           onDecreaseCart={decreaseQuantity}
           onOpenProduct={openProduct}
@@ -1071,6 +1340,8 @@ export default function App() {
           region={region}
           refreshSignal={refreshSignal}
           onMobileOverlayChange={setHideMobileGlassDock}
+          navigationMode={navigationMode}
+          visitToken={categoryVisitToken}
         />
       );
     }
@@ -1078,7 +1349,7 @@ export default function App() {
       return (
         <ProductDetailPage
           product={selectedProduct}
-          onBack={goHome}
+          onBack={goBackFromProduct}
           onAddCart={addToCart}
           onDecreaseCart={decreaseQuantity}
           cart={cart}
@@ -1104,6 +1375,7 @@ export default function App() {
           language={language}
           region={region}
           refreshSignal={refreshSignal}
+          navigationMode={navigationMode}
         />
       );
     }
@@ -1121,6 +1393,7 @@ export default function App() {
         language={language}
         region={region}
         refreshSignal={refreshSignal}
+        navigationMode={navigationMode}
       />
     );
   };
@@ -1153,6 +1426,7 @@ export default function App() {
         user={user}
         onCategorySelect={goCategory}
         onLogoClick={goHome}
+        onLogoDoubleClick={refreshHomeFromLogo}
         language={language}
         onLanguageChange={handleLanguageChange}
         region={region}
@@ -1175,7 +1449,12 @@ export default function App() {
         clearNotifications={clearNotifications}
         enablePullRefresh={refreshablePages.has(page)}
         onPullRefresh={handlePullRefresh}
-        hideMobileGlassDock={hideMobileGlassDock || isLoginModalOpen}
+        hideMobileGlassDock={
+          hideMobileGlassDock ||
+          isLoginModalOpen ||
+          (page === "account" && accountSection === "refunds") ||
+          refundOverlayOpen
+        }
       >
         <AppErrorBoundary>
           <Suspense fallback={renderPageSkeleton()}>
@@ -1203,11 +1482,40 @@ export default function App() {
           borderBottom: "1px solid #f0f0f0",
         }}>
           <i
-            className={`fas ${cartToast?.action === "removed" ? "fa-trash-can" : "fa-check-circle"}`}
-            style={{ color: cartToast?.action === "removed" ? "#c62828" : "#2e7d32", fontSize: "16px" }}
+            className={`fas ${
+              cartToast?.action === "removed"
+                ? "fa-trash-can"
+                : cartToast?.action === "moved"
+                  ? "fa-arrow-right-arrow-left"
+                  : "fa-check-circle"
+            }`}
+            style={{
+              color:
+                cartToast?.action === "removed"
+                  ? "#c62828"
+                  : cartToast?.action === "moved"
+                    ? "#1d5ba0"
+                    : "#2e7d32",
+              fontSize: "16px",
+            }}
           ></i>
-          <span style={{ fontWeight: 700, fontSize: "13px", color: cartToast?.action === "removed" ? "#c62828" : "#2e7d32" }}>
-            {cartToast?.action === "removed" ? "Removed from Cart" : "Added to Cart"}
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: "13px",
+              color:
+                cartToast?.action === "removed"
+                  ? "#c62828"
+                  : cartToast?.action === "moved"
+                    ? "#1d5ba0"
+                    : "#2e7d32",
+            }}
+          >
+            {cartToast?.action === "removed"
+              ? "Removed from Cart"
+              : cartToast?.action === "moved"
+                ? "Moved to Cart"
+                : "Added to Cart"}
           </span>
         </div>
 
@@ -1246,6 +1554,8 @@ export default function App() {
                 }}>{name}</div>
                 {cartToast.action === "removed" ? (
                   <div style={{ fontSize: "11px", color: "#888", marginTop: "2px" }}>Item removed from your basket</div>
+                ) : cartToast.action === "moved" ? (
+                  <div style={{ fontSize: "11px", color: "#5c6f8b", marginTop: "2px" }}>Saved from wishlist and ready in your basket</div>
                 ) : (
                   unit && <div style={{ fontSize: "11px", color: "#888", marginTop: "2px" }}>{unit} ×{cartToast.qty}</div>
                 )}
@@ -1264,22 +1574,23 @@ export default function App() {
           );
         })()}
 
-        {/* Go to Cart Button */}
-        <div
-          onClick={() => { setCartToast(null); goCart(); }}
-          style={{
-            borderTop: "1px solid #f0f0f0",
-            padding: "10px 12px",
-            textAlign: "center",
-            fontWeight: 700, fontSize: "12px",
-            color: "#052694ff",
-            cursor: "pointer",
-            userSelect: "none",
-            letterSpacing: "0.2px",
-          }}
-        >
-          Go to Cart &nbsp;›
-        </div>
+        {cartToast?.action !== "removed" && (
+          <div
+            onClick={() => { setCartToast(null); goCart(); }}
+            style={{
+              borderTop: "1px solid #f0f0f0",
+              padding: "10px 12px",
+              textAlign: "center",
+              fontWeight: 700, fontSize: "12px",
+              color: "#052694ff",
+              cursor: "pointer",
+              userSelect: "none",
+              letterSpacing: "0.2px",
+            }}
+          >
+            Go to Cart &nbsp;›
+          </div>
+        )}
       </div>
 
       {/* Simple toast for wishlist/notification messages */}
@@ -1293,21 +1604,22 @@ export default function App() {
         width: "min(92vw, 430px)",
         padding: "12px 14px",
         borderRadius: "18px",
-        background: "linear-gradient(145deg, rgba(12,22,40,0.94), rgba(24,43,72,0.94))",
+        background: "linear-gradient(135deg, rgba(14,47,104,0.92), rgba(29,91,160,0.88), rgba(73,191,212,0.76))",
         color: "#fff",
-        boxShadow: "0 18px 38px rgba(15,23,42,0.26)",
-        border: "1px solid rgba(255,255,255,0.12)",
+        boxShadow: "0 18px 38px rgba(29,91,160,0.22)",
+        border: "1px solid rgba(191,219,254,0.34)",
         backdropFilter: "blur(18px)",
         zIndex: 99998,
         pointerEvents: "none",
       }}>
         <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
           <div
+            data-toast-icon-wrap
             style={{
               width: "34px",
               height: "34px",
               borderRadius: "12px",
-              background: "rgba(255,255,255,0.12)",
+              background: "rgba(239,246,255,0.18)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

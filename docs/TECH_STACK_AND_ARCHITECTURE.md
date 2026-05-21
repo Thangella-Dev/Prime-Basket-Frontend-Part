@@ -37,13 +37,13 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 ### App Shell
 
 - `src/App.jsx`
-  Controls top-level state such as page navigation, region, language, theme, cart, wishlist, checkout state, orders, login modal state, locale enforcement by phone-region, mobile dock visibility rules, and shared page-level error-boundary wrapping.
+  Controls top-level state such as page navigation, region, language, theme, cart, wishlist, checkout state, orders, login modal state, locale enforcement by phone-region, mobile dock visibility rules, context-aware cart toast behavior, and shared page-level error-boundary wrapping.
 
 - `src/components/Layout.jsx`
   Wraps the shared page shell, mobile glass bottom dock, pull-to-refresh handling, and shared overlay-aware dock suppression.
 
 - `src/components/Header.jsx`
-  Handles header behavior, region/language UI, notification dropdown, search overlay, and mobile drawer.
+  Handles header behavior, region/language UI, notification dropdown, search overlay, mobile drawer, and browse-category dropdown dismissal behavior.
 
 - `src/components/ChatbotWidget.jsx`
   Handles the floating assistant launcher, mobile/desktop chat panel behavior, home-only launcher visibility, footer-aware floating controls, and quantity/auth overlay suppression.
@@ -56,7 +56,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 
 ### State and Context
 
-- `src/context/AuthContext.jsx`
+- `src/context/AuthContext.jsx` 
   Manages session and user data with localStorage-backed persistence and consolidated session bootstrapping for lower startup overhead.
 
 - `src/context/TrackingContext.jsx`
@@ -72,6 +72,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
   Handles cart, mobile checkout presentation, promo flow, address selection, and recommended/special-deal product surfaces.
 - `src/pages/PaymentPage.jsx`
 - `src/pages/AccountPage.jsx`
+  Handles account dashboard flows including orders, buy-again, wallet, notifications, help, and the staged refund/return request lifecycle with proof uploads and refund timeline tracking.
 - `src/components/PhoneAuthModal.jsx`
   Handles phone sign-in, OTP verification, generated-OTP choice prompting, segmented OTP autofill/paste behavior, and verification UI state.
 - `src/pages/WishlistPage.jsx`
@@ -129,6 +130,8 @@ This works, but a future production refactor could move more navigation to a cle
 ### User and commerce state
 
 - localStorage-backed frontend persistence
+- wishlist-origin metadata for move-to-cart and restore-to-wishlist behavior
+- staged refund request persistence with history and proof metadata
 
 ### Chatbot
 

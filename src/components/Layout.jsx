@@ -7,7 +7,7 @@ const ChatbotWidget = lazy(() => import("./ChatbotWidget"));
 export default function Layout({
   children,
   onAccountClick, isLoggedIn, user,
-  onCategorySelect, onLogoClick,
+  onCategorySelect, onLogoClick, onLogoDoubleClick,
   cartCount = 0, wishlistCount = 0,
   onCartClick, onWishlistClick,
   onOpenProduct,
@@ -465,6 +465,7 @@ export default function Layout({
         user={user}
         onCategorySelect={onCategorySelect}
         onLogoClick={onLogoClick}
+        onLogoDoubleClick={onLogoDoubleClick}
         onBack={onLogoClick}
         currentPage={currentPage}
         cartCount={cartCount}

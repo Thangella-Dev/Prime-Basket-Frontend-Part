@@ -36,8 +36,13 @@ export default function TrackingPopup({
 }) {
   const { activeOrder, completedOrder, setCompletedOrder } = useTracking();
   const [dismissTick, setDismissTick] = useState(0);
+  const [closingDeliveredPrompt, setClosingDeliveredPrompt] = useState(false);
 
-  const isTrackingVisible = Boolean(activeOrder && activeOrder.status !== "Delivered");
+  const isTrackingVisible = Boolean(
+    activeOrder &&
+    activeOrder.status !== "Delivered" &&
+    !["order-success", "order-tracking", "payment"].includes(currentPage)
+  );
   const showDeliveredPrompt = useMemo(() => {
     if (currentPage !== "home" || !completedOrder?.orderId) return false;
     return !readDismissedPrompts().includes(completedOrder.orderId) && !hasOrderReview(completedOrder.orderId);
@@ -51,15 +56,39 @@ export default function TrackingPopup({
     };
   }, [showDeliveredPrompt]);
 
-  if (!isTrackingVisible && !showDeliveredPrompt) return null;
-
   const dismissDeliveredPrompt = () => {
+    setClosingDeliveredPrompt(true);
+    window.setTimeout(() => {
+      if (completedOrder?.orderId) {
+        saveDismissedPrompt(completedOrder.orderId);
+        setDismissTick((prev) => prev + 1);
+      }
+      setCompletedOrder(null);
+      setClosingDeliveredPrompt(false);
+    }, 240);
+  };
+
+  React.useEffect(() => {
+    if (!showDeliveredPrompt) {
+      setClosingDeliveredPrompt(false);
+      return undefined;
+    }
+    const timer = window.setTimeout(() => {
+      dismissDeliveredPrompt();
+    }, 5000);
+    return () => window.clearTimeout(timer);
+  }, [showDeliveredPrompt, completedOrder?.orderId]);
+
+  const dismissDeliveredPromptInstant = () => {
     if (completedOrder?.orderId) {
       saveDismissedPrompt(completedOrder.orderId);
       setDismissTick((prev) => prev + 1);
     }
     setCompletedOrder(null);
+    setClosingDeliveredPrompt(false);
   };
+
+  if (!isTrackingVisible && !showDeliveredPrompt) return null;
 
   if (showDeliveredPrompt) {
     return (
@@ -77,6 +106,9 @@ export default function TrackingPopup({
           border: "1px solid rgba(148,163,184,0.2)",
           boxShadow: "0 24px 52px rgba(15,23,42,0.16)",
           backdropFilter: "blur(20px)",
+          opacity: closingDeliveredPrompt ? 0 : 1,
+          transform: closingDeliveredPrompt ? "translateY(10px) scale(0.98)" : "translateY(0) scale(1)",
+          transition: "opacity .24s ease, transform .24s ease",
         }}
       >
         <style>{`
@@ -147,7 +179,6 @@ export default function TrackingPopup({
             </div>
             <button
               type="button"
-              onClick={dismissDeliveredPrompt}
               style={{
                 width: "34px",
                 height: "34px",
@@ -159,6 +190,7 @@ export default function TrackingPopup({
                 flexShrink: 0,
               }}
               aria-label="Dismiss delivery prompt"
+              onClick={dismissDeliveredPromptInstant}
             >
               <i className="fas fa-times"></i>
             </button>
@@ -177,7 +209,7 @@ export default function TrackingPopup({
               className="prime-tracking-btn"
               onClick={() => {
                 onOpenRating?.(completedOrder);
-                dismissDeliveredPrompt();
+                dismissDeliveredPromptInstant();
               }}
               style={{
                 padding: "13px 14px",
@@ -194,7 +226,7 @@ export default function TrackingPopup({
               className="prime-tracking-btn"
               onClick={() => {
                 onOpenOrderHelp?.(completedOrder);
-                dismissDeliveredPrompt();
+                dismissDeliveredPromptInstant();
               }}
               style={{
                 padding: "13px 14px",

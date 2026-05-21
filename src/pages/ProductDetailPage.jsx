@@ -1,5 +1,5 @@
 // src/pages/ProductDetailPage.jsx
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { database, hasFirebaseConfig } from "../firebase";
 import { ref, get } from "firebase/database";
 import { useT } from "../i18n/translations";
@@ -75,6 +75,23 @@ export default function ProductDetailPage({
   const [activeThumb, setActiveThumb]       = useState(0);
   const [copiedCode, setCopiedCode]         = useState("");
   const [tab, setTab]                       = useState("highlights");
+  const [lightboxOpen, setLightboxOpen]     = useState(false);
+  const [hoverZoomActive, setHoverZoomActive] = useState(false);
+  const [zoomOrigin, setZoomOrigin]         = useState({ x: 50, y: 50 });
+  const [lightboxScale, setLightboxScale]   = useState(1);
+  const [lightboxOffset, setLightboxOffset] = useState({ x: 0, y: 0 });
+  const zoomTouchRef = useRef({
+    startDistance: 0,
+    startScale: 1,
+    swipeStartX: 0,
+    swipeStartY: 0,
+    lastTapAt: 0,
+  });
+  const mainImageTouchRef = useRef({
+    lastTapAt: 0,
+    startX: 0,
+    startY: 0,
+  });
 
   const allCoupons = region === "ke" ? allCoupons_ke : allCoupons_en;
   
@@ -84,12 +101,48 @@ export default function ProductDetailPage({
   
   const isWished = wishlist.some((w) => w._uid === product._uid);
   const displayedCoupons = showAllCoupons ? allCoupons : allCoupons.slice(0, 3);
+  const galleryImages = useMemo(() => {
+    const rawImages = [
+      ...(Array.isArray(product.imageGallery) ? product.imageGallery : []),
+      ...(Array.isArray(product.gallery) ? product.gallery : []),
+      ...(Array.isArray(product.images) ? product.images : []),
+      product.imageUrl,
+      product.image,
+    ];
+
+    const normalized = rawImages
+      .map((entry) => {
+        if (!entry) return "";
+        if (typeof entry === "string") {
+          return resolveProductImage({ ...product, imageUrl: entry, image: entry });
+        }
+        if (typeof entry === "object") {
+          return resolveProductImage({
+            ...product,
+            imageUrl: entry.url || entry.src || entry.imageUrl || "",
+            image: entry.url || entry.src || entry.image || "",
+          });
+        }
+        return "";
+      })
+      .filter(Boolean);
+
+    const unique = [...new Set(normalized)];
+    return unique.length ? unique : [resolveProductImage(product)];
+  }, [product]);
+  const activeImage = galleryImages[activeThumb] || galleryImages[0] || resolveProductImage(product);
 
   const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
   const translatedName = getTranslatedName(product.name);
 
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [product._uid]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setActiveThumb(0);
+    setHoverZoomActive(false);
+    setLightboxScale(1);
+    setLightboxOffset({ x: 0, y: 0 });
+  }, [product._uid]);
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
@@ -175,7 +228,111 @@ export default function ProductDetailPage({
   };
 
   const handleDecreaseCart = () => {
-    onDecreaseCart && onDecreaseCart(product._uid, selectedUnit);
+    onDecreaseCart && onDecreaseCart({ ...product, selectedUnit });
+  };
+
+  const clampThumbIndex = (nextIndex) => {
+    if (!galleryImages.length) return 0;
+    if (nextIndex < 0) return galleryImages.length - 1;
+    if (nextIndex >= galleryImages.length) return 0;
+    return nextIndex;
+  };
+
+  const openLightboxAt = (nextIndex = activeThumb, initialScale = 1) => {
+    setActiveThumb(clampThumbIndex(nextIndex));
+    setLightboxOpen(true);
+    setLightboxScale(initialScale);
+    setLightboxOffset({ x: 0, y: 0 });
+  };
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+    setLightboxScale(1);
+    setLightboxOffset({ x: 0, y: 0 });
+  };
+
+  const handleMainImagePointerMove = (event) => {
+    if (typeof window === "undefined" || window.innerWidth < 980) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - bounds.left) / bounds.width) * 100;
+    const y = ((event.clientY - bounds.top) / bounds.height) * 100;
+    setZoomOrigin({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+  };
+
+  const handleMainImageTouchStart = (event) => {
+    const firstTouch = event.touches?.[0];
+    if (!firstTouch) return;
+    mainImageTouchRef.current.startX = firstTouch.clientX;
+    mainImageTouchRef.current.startY = firstTouch.clientY;
+  };
+
+  const handleMainImageTouchEnd = (event) => {
+    const changedTouch = event.changedTouches?.[0];
+    if (!changedTouch || viewportWidth >= 980) return;
+    const deltaX = changedTouch.clientX - mainImageTouchRef.current.startX;
+    const deltaY = changedTouch.clientY - mainImageTouchRef.current.startY;
+    if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) return;
+
+    const now = Date.now();
+    if (now - mainImageTouchRef.current.lastTapAt < 280) {
+      openLightboxAt(activeThumb, 2);
+      mainImageTouchRef.current.lastTapAt = 0;
+      return;
+    }
+
+    mainImageTouchRef.current.lastTapAt = now;
+    openLightboxAt(activeThumb, 1);
+  };
+
+  const goLightbox = (direction) => {
+    setActiveThumb((prev) => clampThumbIndex(prev + direction));
+    setLightboxScale(1);
+    setLightboxOffset({ x: 0, y: 0 });
+  };
+
+  const getTouchDistance = (touches) => {
+    if (!touches || touches.length < 2) return 0;
+    const [first, second] = touches;
+    return Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY);
+  };
+
+  const handleLightboxTouchStart = (event) => {
+    if (event.touches.length >= 2) {
+      zoomTouchRef.current.startDistance = getTouchDistance(event.touches);
+      zoomTouchRef.current.startScale = lightboxScale;
+      return;
+    }
+
+    const firstTouch = event.touches[0];
+    if (!firstTouch) return;
+    const now = Date.now();
+    if (now - zoomTouchRef.current.lastTapAt < 260) {
+      setLightboxScale((prev) => (prev > 1 ? 1 : 2));
+      zoomTouchRef.current.lastTapAt = 0;
+    } else {
+      zoomTouchRef.current.lastTapAt = now;
+    }
+    zoomTouchRef.current.swipeStartX = firstTouch.clientX;
+    zoomTouchRef.current.swipeStartY = firstTouch.clientY;
+  };
+
+  const handleLightboxTouchMove = (event) => {
+    if (event.touches.length >= 2) {
+      const nextDistance = getTouchDistance(event.touches);
+      if (!zoomTouchRef.current.startDistance) return;
+      const pinchScale = (nextDistance / zoomTouchRef.current.startDistance) * zoomTouchRef.current.startScale;
+      setLightboxScale(Math.max(1, Math.min(4, pinchScale)));
+    }
+  };
+
+  const handleLightboxTouchEnd = (event) => {
+    if (event.changedTouches.length !== 1 || lightboxScale > 1.05) return;
+    const { clientX, clientY } = event.changedTouches[0];
+    const deltaX = clientX - zoomTouchRef.current.swipeStartX;
+    const deltaY = clientY - zoomTouchRef.current.swipeStartY;
+    if (Math.abs(deltaX) > 48 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      goLightbox(deltaX < 0 ? 1 : -1);
+    }
   };
 
   return (
@@ -215,7 +372,7 @@ export default function ProductDetailPage({
         .pdp-thumb img { max-width:100%; max-height:100%; object-fit:contain; }
 
         .pdp-imgcard { flex:1; background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,250,255,0.98)); border:1px solid var(--border); border-radius:22px; padding:20px 20px 16px; display:flex; flex-direction:column; align-items:stretch; min-height:500px; position:relative; overflow:hidden; box-shadow: 0 24px 48px rgba(15,23,42,0.08); }
-        .pdp-img-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 10px; }
+        .pdp-img-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 10px; position:relative; cursor:zoom-in; overflow:hidden; border-radius:18px; }
         .pdp-disc-badge { position:absolute; top:14px; left:14px; background:#16a34a; color:#fff; font-size:11px; font-weight:800; padding:4px 10px; border-radius:4px 10px 4px 10px; z-index:2; }
         .pdp-icon-col { position:absolute; top:14px; right:14px; display:flex; flex-direction:column; gap:8px; z-index:2; }
         .pdp-icon-btn { width:40px; height:40px; border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,246,255,0.98)); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#1d5ba0; font-size:14px; box-shadow:0 12px 24px rgba(15,23,42,.08); transition:.22s ease; position:relative; overflow:hidden; }
@@ -223,8 +380,22 @@ export default function ProductDetailPage({
         .pdp-icon-btn:active { transform: scale(0.96); }
         .pdp-icon-btn.wished { background:#e63946; color:#fff; border-color:#e63946; }
         .pdp-share-toast { position:absolute; top:14px; left:50%; transform:translateX(-50%); background:#1d5ba0; color:#fff; font-size:12px; font-weight:700; padding:5px 14px; border-radius:8px; white-space:nowrap; z-index:10; }
-        .pdp-bigimg { max-height:320px; max-width:100%; object-fit:contain; display:block; transition:transform .35s; }
-        .pdp-imgcard:hover .pdp-bigimg { transform: scale(1.03); }
+        .pdp-bigimg { max-height:320px; max-width:100%; object-fit:contain; display:block; transition:transform .28s ease, transform-origin .16s ease; will-change:transform; }
+        .pdp-zoom-lens { position:absolute; width:126px; height:126px; border-radius:50%; pointer-events:none; border:1px solid rgba(29,91,160,0.18); background:radial-gradient(circle at center, rgba(255,255,255,0.35), rgba(255,255,255,0.08)); box-shadow:0 12px 24px rgba(15,23,42,0.12); backdrop-filter:blur(4px); transform:translate(-50%, -50%); }
+        .pdp-zoom-caption { position:absolute; left:14px; bottom:14px; padding:7px 12px; border-radius:999px; background:rgba(255,255,255,0.92); border:1px solid rgba(191,219,254,0.92); box-shadow:0 10px 20px rgba(15,23,42,0.08); font-size:11px; font-weight:800; color:#1d5ba0; }
+        .pdp-lightbox-overlay { position:fixed; inset:0; z-index:100120; background:rgba(7,14,27,0.78); backdrop-filter:blur(14px); display:flex; align-items:center; justify-content:center; padding:24px; animation:fadeIn .24s ease; }
+        .pdp-lightbox-shell { position:relative; width:min(96vw, 1180px); height:min(90vh, 820px); border-radius:28px; border:1px solid rgba(255,255,255,0.16); background:linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.04)); box-shadow:0 24px 60px rgba(0,0,0,0.32); overflow:hidden; display:grid; grid-template-columns:minmax(88px, 108px) 1fr; }
+        .pdp-lightbox-rail { padding:22px 14px; display:flex; flex-direction:column; gap:12px; background:rgba(7,14,27,0.22); border-right:1px solid rgba(255,255,255,0.12); overflow:auto; }
+        .pdp-lightbox-main { position:relative; display:flex; align-items:center; justify-content:center; padding:26px; overflow:hidden; }
+        .pdp-lightbox-main img { max-width:100%; max-height:100%; object-fit:contain; transition:transform .24s ease; will-change:transform; }
+        .pdp-lightbox-close,
+        .pdp-lightbox-nav { position:absolute; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.16); color:#fff; border-radius:18px; box-shadow:0 14px 28px rgba(0,0,0,0.18); backdrop-filter:blur(10px); }
+        .pdp-lightbox-close { top:18px; right:18px; width:46px; height:46px; z-index:3; }
+        .pdp-lightbox-nav { top:50%; transform:translateY(-50%); width:48px; height:48px; z-index:3; }
+        .pdp-lightbox-nav.prev { left:18px; }
+        .pdp-lightbox-nav.next { right:18px; }
+        .pdp-lightbox-meta { position:absolute; left:24px; right:24px; bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; z-index:3; }
+        .pdp-lightbox-chip { padding:9px 14px; border-radius:999px; background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.18); color:#fff; font-size:12px; font-weight:800; }
         
         .pdp-right { display:flex; flex-direction:column; gap:20px; }
         .pdp-infocard { background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,251,255,0.98)); border:1px solid var(--border); border-radius:22px; padding:30px; box-shadow:0 24px 48px rgba(15,23,42,0.08); }
@@ -266,6 +437,10 @@ export default function ProductDetailPage({
           .pdp-left { position: static; flex-direction: column-reverse; }
           .pdp-thumbs { flex-direction: row; overflow-x: auto; }
           .pdp-imgcard { min-height: 400px; }
+          .pdp-lightbox-shell { width:100vw; height:100vh; border-radius:0; grid-template-columns:1fr; }
+          .pdp-lightbox-rail { order:2; flex-direction:row; border-right:none; border-top:1px solid rgba(255,255,255,0.12); padding:14px; }
+          .pdp-lightbox-main { order:1; padding:18px 14px 84px; }
+          .pdp-lightbox-meta { left:14px; right:14px; bottom:14px; flex-direction:column; align-items:stretch; }
         }
 
         .pdp-trust-badges {
@@ -376,9 +551,9 @@ export default function ProductDetailPage({
             {/* Left: Images */}
             <div className="pdp-left">
               <div className="pdp-thumbs">
-                {[0,1,2].map((i) => (
+                {galleryImages.map((image, i) => (
                   <div key={i} className={`pdp-thumb${activeThumb === i ? " active" : ""}`} onClick={() => setActiveThumb(i)}>
-                    <img src={resolveProductImage(product)} alt="" />
+                    <img src={image} alt="" />
                   </div>
                 ))}
               </div>
@@ -395,8 +570,33 @@ export default function ProductDetailPage({
                   </button>
                 </div>
                 {shareMsg && <div className="pdp-share-toast">{shareMsg}</div>}
-                <div className="pdp-img-zone">
-                  <img src={resolveProductImage(product)} alt={translatedName} className="pdp-bigimg" />
+                <div
+                  className="pdp-img-zone"
+                  onMouseEnter={() => setHoverZoomActive(true)}
+                  onMouseLeave={() => setHoverZoomActive(false)}
+                  onMouseMove={handleMainImagePointerMove}
+                  onClick={() => openLightboxAt(activeThumb)}
+                  onTouchStart={handleMainImageTouchStart}
+                  onTouchEnd={handleMainImageTouchEnd}
+                >
+                  {hoverZoomActive && viewportWidth >= 980 ? (
+                    <div
+                      className="pdp-zoom-lens"
+                      style={{ left: `${zoomOrigin.x}%`, top: `${zoomOrigin.y}%` }}
+                    />
+                  ) : null}
+                  <img
+                    src={activeImage}
+                    alt={translatedName}
+                    className="pdp-bigimg"
+                    style={{
+                      transform: hoverZoomActive && viewportWidth >= 980 ? "scale(2.05)" : "scale(1)",
+                      transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                    }}
+                  />
+                  <div className="pdp-zoom-caption">
+                    {viewportWidth >= 980 ? "Hover to zoom" : "Tap, double tap, or pinch to zoom"}
+                  </div>
                 </div>
               </div>
             </div>
@@ -457,17 +657,6 @@ export default function ProductDetailPage({
                       {t.home.add || "ADD"}
                     </button>
                   )}
-                  
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); toggleWishlist && toggleWishlist(product); }}
-                    style={{ 
-                      width: 52, height: 52, borderRadius: 12, border: "2px solid #e2e8f0", 
-                      background: "#fff", color: isWished ? "#e63946" : "#64748b", 
-                      fontSize: 18, cursor: "pointer", transition: ".2s"
-                    }}
-                  >
-                    <i className={isWished ? "fas fa-heart" : "far fa-heart"}></i>
-                  </button>
                 </div>
 
                 {/* Trust Badges */}
@@ -625,6 +814,61 @@ export default function ProductDetailPage({
           </div>
         </div>
       </div>
+
+      {lightboxOpen ? (
+        <div className="pdp-lightbox-overlay" onClick={closeLightbox}>
+          <div
+            className="pdp-lightbox-shell"
+            onClick={(event) => event.stopPropagation()}
+            onTouchStart={handleLightboxTouchStart}
+            onTouchMove={handleLightboxTouchMove}
+            onTouchEnd={handleLightboxTouchEnd}
+          >
+            <div className="pdp-lightbox-rail">
+              {galleryImages.map((image, index) => (
+                <button
+                  key={`lightbox-thumb-${index}`}
+                  type="button"
+                  className={`pdp-thumb${activeThumb === index ? " active" : ""}`}
+                  onClick={() => setActiveThumb(index)}
+                >
+                  <img src={image} alt="" />
+                </button>
+              ))}
+            </div>
+            <div className="pdp-lightbox-main">
+              <button type="button" className="pdp-lightbox-close" onClick={closeLightbox}>
+                <i className="fas fa-times"></i>
+              </button>
+              {galleryImages.length > 1 ? (
+                <>
+                  <button type="button" className="pdp-lightbox-nav prev" onClick={() => goLightbox(-1)}>
+                    <i className="fas fa-chevron-left"></i>
+                  </button>
+                  <button type="button" className="pdp-lightbox-nav next" onClick={() => goLightbox(1)}>
+                    <i className="fas fa-chevron-right"></i>
+                  </button>
+                </>
+              ) : null}
+              <img
+                src={activeImage}
+                alt={translatedName}
+                style={{
+                  transform: `translate(${lightboxOffset.x}px, ${lightboxOffset.y}px) scale(${lightboxScale})`,
+                }}
+              />
+              <div className="pdp-lightbox-meta">
+                <div className="pdp-lightbox-chip">{translatedName}</div>
+                <div className="pdp-lightbox-chip">
+                  {galleryImages.length > 1
+                    ? `${activeThumb + 1} / ${galleryImages.length} • Swipe or use arrows`
+                    : "Double tap or pinch to zoom"}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

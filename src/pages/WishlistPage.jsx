@@ -7,6 +7,8 @@ export default function WishlistPage({
   wishlist,
   cart,
   toggleWishlist,
+  onMoveToCart,
+  onClearWishlist,
   onAddCart,
   onDecreaseCart,
   onOpenProduct,
@@ -17,6 +19,10 @@ export default function WishlistPage({
 
   const getTranslatedName = (name) => getLocalizedProductName(name, t);
   const handleMoveToCart = (item) => {
+    if (onMoveToCart) {
+      onMoveToCart(item);
+      return;
+    }
     onAddCart && onAddCart(item);
     toggleWishlist && toggleWishlist(item);
   };
@@ -54,9 +60,9 @@ export default function WishlistPage({
           background:#fff;
           border-radius:18px;
           border:1px solid rgba(148,163,184,.18);
-          padding:18px 24px;
+          padding:16px 22px;
           margin-top:28px;
-          margin-bottom:24px;
+          margin-bottom:20px;
           display:flex;
           align-items:center;
           justify-content:space-between;
@@ -84,10 +90,10 @@ export default function WishlistPage({
         }
         .wl-clear-btn:hover { background:#fde8ea; }
 
-        .wl-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:16px; }
+        .wl-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; }
         @media(max-width:1180px){ .wl-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
         @media(max-width:900px){ .wl-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
-        @media(max-width:640px){ .wl-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } }
+        @media(max-width:640px){ .wl-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } }
 
         .wl-card {
           background:linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(246,249,255,0.98) 100%);
@@ -99,8 +105,8 @@ export default function WishlistPage({
           position:relative;
           display:flex;
           flex-direction:column;
-          padding:12px;
-          min-height:312px;
+          padding:11px;
+          min-height:294px;
         }
         .wl-card::before {
           content:"";
@@ -123,13 +129,13 @@ export default function WishlistPage({
           display:flex;
           align-items:center;
           justify-content:center;
-          padding:14px;
+          padding:12px;
           cursor:pointer;
           background:linear-gradient(180deg, #f9fbff 0%, #edf4ff 100%);
           flex-shrink:0;
           border-radius:18px;
           overflow:hidden;
-          margin-bottom:12px;
+          margin-bottom:10px;
         }
         .wl-card-img img { width:100%; height:100%; object-fit:contain; transition:transform .34s ease; }
         .wl-card:hover .wl-card-img img { transform:scale(1.08); }
@@ -162,7 +168,7 @@ export default function WishlistPage({
         .wl-card-unit { font-size:11px; color:var(--body); margin-bottom:7px; }
         .wl-card-stars { font-size:10.5px; color:var(--body); margin-bottom:8px; min-height:15px; overflow:hidden; display:flex; align-items:center; gap:4px; }
         .wl-card-stars i { color:#f59e0b; }
-        .wl-card-price { display:flex; align-items:center; gap:7px; margin-bottom:10px; flex-wrap:wrap; min-height:24px; }
+        .wl-card-price { display:flex; align-items:center; gap:7px; margin-bottom:8px; flex-wrap:wrap; min-height:24px; }
         .wl-card-new { font-size:15px; font-weight:800; color:#1d5ba0; font-family:'Outfit','Quicksand',sans-serif; }
         .wl-card-old { font-size:11px; color:var(--body); text-decoration:line-through; }
         .wl-card-save { font-size:10px; font-weight:700; color:#16a34a; background:#dcfce7; padding:2px 7px; border-radius:20px; }
@@ -173,8 +179,8 @@ export default function WishlistPage({
           color:#fff;
           border:none;
           border-radius:14px;
-          padding:10px 0;
-          font-size:12px;
+          padding:9px 0;
+          font-size:11.5px;
           font-weight:800;
           cursor:pointer;
           font-family:inherit;
@@ -198,7 +204,7 @@ export default function WishlistPage({
           background:linear-gradient(135deg, var(--green), var(--green-dark));
           border-radius:14px;
           padding:4px;
-          min-height:40px;
+          min-height:38px;
           margin-top:auto;
           box-shadow:0 14px 26px rgba(31,92,161,.15);
         }
@@ -300,8 +306,8 @@ export default function WishlistPage({
         }
 
         @media(max-width:640px){
-          .wl-header-bar { padding:16px 18px; border-radius:16px; }
-          .wl-card { border-radius:18px; padding:10px; min-height:286px; }
+          .wl-header-bar { padding:15px 16px; border-radius:16px; }
+          .wl-card { border-radius:18px; padding:10px; min-height:274px; }
           .wl-card-img { border-radius:16px; padding:12px; margin-bottom:10px; }
           .wl-remove-btn { top:14px; right:14px; width:32px; height:32px; }
           .wl-card-name { font-size:12px; }
@@ -341,7 +347,7 @@ export default function WishlistPage({
                   <i className="fas fa-heart"></i> {t.wishlist.title}
                   <span className="wl-count-pill">{wishlist.length} {wishlist.length === 1 ? t.cart.itemsCount : t.cart.itemsCountPlural}</span>
                 </h2>
-                <button className="wl-clear-btn" onClick={() => wishlist.forEach((item) => toggleWishlist(item))}>
+                <button className="wl-clear-btn" onClick={() => (onClearWishlist ? onClearWishlist() : wishlist.forEach((item) => toggleWishlist(item)))}>
                   <i className="fas fa-trash-alt"></i> {t.cart.remove} All
                 </button>
               </div>

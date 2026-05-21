@@ -78,8 +78,27 @@ Primary production domain: `https://prime-basket.in`
 - Account help/support popup backdrops now use the app’s blue-tinted premium overlay treatment instead of a flat dark backdrop
 - The shared app shell now shows premium animated online/offline status popups so connectivity changes feel polished and product-native
 - Shared product imagery is now more deterministic in fallback mode, especially for India catalog categories like rice, pulses, masala, biscuits, oral care, body care, snacks, cool drinks, feminine care, baby care, and home needs
+- Cart feedback is now context-aware, so remove-from-cart actions no longer show a misleading `Go to Cart` CTA while add and move-to-cart actions still do
+- `Browse All Categories` now closes on outside interaction, main-app scrolling, resize, and navigation, while staying open during genuine interaction inside the dropdown itself
+- Refund and return requests now begin with explicit `Return Requested` or `Refund Requested` states before moving into review and later pickup/refund-processing stages
+- Refund timelines now behave more like order tracking with visible requested, review, pickup, processing, and completed steps plus staged notification updates
+- The mobile glass dock now hides correctly in refund tracking and return-request contexts so refund controls are not overlapped on small screens
+- Rapid repeated taps on the Prime Basket header logo are now ignored so accidental double-clicks no longer force unwanted scroll-to-top behavior
+- Re-entering category browsing now resets stale deal-discount filters instead of reopening with an old 0-10% discount state still applied
+- Desktop `My Account` spacing is now denser so sidebar items, cards, headers, and controls fit larger screens more cleanly without looking oversized
+- Clicking the Prime Basket logo while already on Home now safely no-ops instead of re-triggering a scroll-reset path
+- Category filter resets now restore true full price and discount bounds rather than leaving a zeroed range that still acts like an active filter
+- Fresh category entry now waits for the new category's real filter bounds before resetting state, which removes the lingering auto-applied `0-10% off` bug cleanly
+- The Prime Basket brand action now uses a throttled button flow with double-click suppression so repeated logo taps do not trigger duplicate top-scroll jumps
+- Desktop `My Account` no longer wraps section content inside an extra outer card or nested scroll panel, which removes duplicate vertical spacing and improves screen fit
+- Desktop account spacing was tightened further across section padding, profile fields, menu cards, and action buttons for a more compact premium layout
 - India fallback pricing strings were normalized again so rupee values render correctly instead of mojibake text when local data is used
 - A page-level error boundary now protects major lazy-loaded page regions from blank-screen failures
+- Home and category product-list views now restore their previous products, filters, sort state, and scroll position when users return from product detail
+- Product detail now includes a premium zoom flow with hover magnification, multi-image lightbox viewing, and touch-friendly mobile zoom gestures
+- Product detail now keeps only one primary wishlist action instead of showing duplicate wishlist controls
+- Shared home/category product rails were tightened slightly so cards fit better on laptop, tablet, and mobile screens without feeling cramped
+- Core in-app toast styling now uses Prime Basket themed gradients, blur, and softer shadows instead of generic dark popup styling
 
 ## Tech Stack
 
@@ -221,6 +240,11 @@ What still needs work:
 - Moved account logout through a confirmation dialog in mobile account-card navigation too
 - Tightened wallet amount entry rules and improved wallet/refund light-mode readability
 - Added OTP autofill and paste-friendly segmented verification handling
+- Preserved home and category browsing state when navigating back from product detail so loaded products, filters, sort choices, and scroll position restore instead of refetching immediately
+- Added a premium product-image preview flow on product detail with hover zoom, multi-image lightbox expansion, and mobile-friendly double-tap/pinch interactions
+- Removed the duplicate wishlist CTA from the product-detail action row so the page keeps one clear primary wishlist control
+- Reduced shared product-card and merchandising section spacing slightly so key storefront sections feel better balanced on 13-inch and 14-inch screens
+- Reworked the main in-app toast styling so popup notices align more closely with Prime Basket gradients, blur, and premium glassmorphism direction
 
 ## Backend Attachment Direction
 
@@ -241,7 +265,7 @@ Detailed backend guidance is available in [docs/BACKEND_INTEGRATION_GUIDE.md](./
 See the `docs` folder for detailed project documentation:
 
 - [Manager Mail Update](./docs/Mail_Update.md)
-- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-19.md)
+- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-20.md)
 - [Backend Readme](./docs/BACKEND.md)
 - [Application Overview](./docs/APPLICATION_OVERVIEW.md)
 - [Tech Stack and Architecture](./docs/TECH_STACK_AND_ARCHITECTURE.md)
