@@ -113,9 +113,11 @@ function normalizeRefundRequest(request) {
 
 function loadRefundRequests() {
   try {
-    return JSON.parse(localStorage.getItem(REFUND_REQUESTS_KEY) || "[]")
-      .map(normalizeRefundRequest)
+    const parsed = JSON.parse(localStorage.getItem(REFUND_REQUESTS_KEY) || "[]")
+      .map((request) => materializeRefundProgress(request))
       .filter(Boolean);
+    localStorage.setItem(REFUND_REQUESTS_KEY, JSON.stringify(parsed));
+    return parsed;
   } catch {
     return [];
   }
@@ -167,6 +169,56 @@ function statusClass(status) {
     return "processing";
   }
   return "pending";
+}
+
+function getRefundFlowSchedule(request) {
+  return request?.flowType === "return"
+    ? [
+        { status: "Under Review", delay: 2500, note: "Your return request entered the review queue." },
+        { status: "Approved", delay: 3500, note: "Our review team approved the request after checking the submitted proof." },
+        { status: "Pickup Scheduled", delay: 8500, note: "Pickup partner assigned and slot confirmed." },
+        { status: "Picked Up", delay: 13500, note: "The item has been collected by the delivery partner." },
+        { status: "Refund Processing", delay: 18500, note: "Warehouse verification finished and the refund is processing." },
+        { status: "Refunded", delay: 24000, note: "Refund sent to your selected refund method." },
+      ]
+    : [
+        { status: "Under Review", delay: 2500, note: "Your refund request entered the review queue." },
+        { status: "Approved", delay: 3500, note: "The refund request was approved after review." },
+        { status: "Refund Processing", delay: 9000, note: "The refund is being processed." },
+        { status: "Refunded", delay: request?.refundMethod === "Wallet" ? 13000 : 16000, note: "Refund sent to your selected refund method." },
+      ];
+}
+
+function materializeRefundProgress(request, nowMs = Date.now()) {
+  const normalized = normalizeRefundRequest(request);
+  if (!normalized) return null;
+
+  const submittedAtMs = new Date(normalized.submittedAt || normalized.timestamp || Date.now()).getTime();
+  if (!Number.isFinite(submittedAtMs)) return normalized;
+
+  const initialStatus = normalized.flowType === "return" ? "Return Requested" : "Refund Requested";
+  const nextHistory = Array.isArray(normalized.history) && normalized.history.length > 0
+    ? [...normalized.history]
+    : buildInitialRequestHistory({ ...normalized, submittedAt: new Date(submittedAtMs).toISOString() });
+
+  let nextStatus = normalized.status || initialStatus;
+  getRefundFlowSchedule(normalized).forEach(({ status, delay, note }) => {
+    if (nowMs - submittedAtMs < delay) return;
+    nextStatus = status;
+    if (!nextHistory.some((entry) => entry?.status === status)) {
+      nextHistory.push({
+        status,
+        at: new Date(submittedAtMs + delay).toISOString(),
+        note,
+      });
+    }
+  });
+
+  return {
+    ...normalized,
+    status: nextStatus,
+    history: nextHistory,
+  };
 }
 
 function makeOrderItemId(order, item, index) {
@@ -790,6 +842,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
   const [orderFilter, setOrderFilter] = useState("Delivered"); // Default filter
   const [orderToDelete, setOrderToDelete] = useState(null);
   const videoPreviewUrlsRef = useRef(new Set());
+  const refundTimerIdsRef = useRef([]);
 
   const [markedOrders, setMarkedOrders] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pb_marked_orders") || "[]"); } catch { return []; }
@@ -802,20 +855,38 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
   useEffect(() => {
     const sync = () => {
       setRefundRequests(loadRefundRequests());
-      setReviews(JSON.parse(localStorage.getItem("pb_order_reviews") || "[]"));
+      try {
+        setReviews(JSON.parse(localStorage.getItem("pb_order_reviews") || "[]"));
+      } catch {
+        setReviews([]);
+      }
     };
     window.addEventListener("storage", sync);
     window.addEventListener("refund-requests-updated", sync);
+    const intervalId = window.setInterval(() => {
+      setRefundRequests(loadRefundRequests());
+    }, 1000);
     return () => {
       window.removeEventListener("storage", sync);
       window.removeEventListener("refund-requests-updated", sync);
+      window.clearInterval(intervalId);
     };
   }, []);
 
   useEffect(() => () => {
     videoPreviewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     videoPreviewUrlsRef.current.clear();
+    refundTimerIdsRef.current.forEach((timerId) => window.clearTimeout(timerId));
+    refundTimerIdsRef.current = [];
   }, []);
+
+  useEffect(() => {
+    refundRequests.forEach((request) => {
+      if (request.status === "Refunded" && request.refundMethod === "Wallet") {
+        completeWalletCredit(request);
+      }
+    });
+  }, [refundRequests]);
 
   useEffect(() => {
     onRefundOverlayChange?.(Boolean(returnModal));
@@ -891,28 +962,13 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
   };
 
   const runDemoFlow = (request) => {
-    const flow = request.flowType === "return"
-      ? [
-          ["Under Review", 2500, "Your return request entered the review queue."],
-          ["Approved", 3500, "Our review team approved the request after checking the submitted proof."],
-          ["Pickup Scheduled", 8500, "Pickup partner assigned and slot confirmed."],
-          ["Picked Up", 13500, "The item has been collected by the delivery partner."],
-          ["Refund Processing", 18500, "Warehouse verification finished and the refund is processing."],
-          ["Refunded", 24000, "Refund sent to your selected refund method."],
-        ]
-      : [
-          ["Under Review", 2500, "Your refund request entered the review queue."],
-          ["Approved", 3500, "The refund request was approved after review."],
-          ["Refund Processing", 9000, "The refund is being processed."],
-          ["Refunded", request.refundMethod === "Wallet" ? 13000 : 16000, "Refund sent to your selected refund method."],
-        ];
-
-    flow.forEach(([status, delay, note]) => {
-      setTimeout(() => {
+    getRefundFlowSchedule(request).forEach(({ status, delay, note }) => {
+      const timerId = window.setTimeout(() => {
         updateRequestStatus(request.id, status, note);
         notifyReturnStatus(request, status);
         if (status === "Refunded") completeWalletCredit(request);
       }, delay);
+      refundTimerIdsRef.current.push(timerId);
     });
   };
 
@@ -962,6 +1018,14 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
 
   const selectedReasonMeta = RETURN_REASONS.find(reason => reason.value === returnReason);
   const selectedFlowType = selectedReasonMeta?.type || returnModal?.selectedType || "refund";
+  const submittedRequest = returnModal?.requestId
+    ? refundRequests.find((request) => request.id === returnModal.requestId) || null
+    : null;
+  const modalFlowType = submittedRequest?.flowType || selectedFlowType;
+  const modalSteps = statusSteps(modalFlowType);
+  const modalStatus = submittedRequest?.status || (modalFlowType === "return" ? "Return Requested" : "Refund Requested");
+  const modalStepIndex = Math.max(0, modalSteps.indexOf(modalStatus));
+  const modalCompleted = modalStatus === "Refunded";
 
   const setProofFileState = (id, updater) => {
     setProofFiles((prev) => prev.map((entry) => (entry.id === id ? { ...entry, ...updater(entry) } : entry)));
@@ -1073,7 +1137,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
     };
     request.history = buildInitialRequestHistory(request);
 
-    setTimeout(() => {
+    window.setTimeout(() => {
       setRefundRequests(prev => {
         const updated = [request, ...prev];
         saveRefundRequests(updated);
@@ -1081,6 +1145,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
         return updated;
       });
       setSubmittingRequest(false);
+      setReturnModal((prev) => (prev ? { ...prev, requestId: request.id } : prev));
       setReturnStep(3);
       notifyReturnStatus(request, request.status);
       runDemoFlow(request);
@@ -1108,8 +1173,10 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
     return filtered;
   }, [orders, orderFilter]);
 
-  // Simulate loading
-  useState(() => { setTimeout(() => setLoading(false), 800); });
+  useEffect(() => {
+    const timerId = window.setTimeout(() => setLoading(false), 800);
+    return () => window.clearTimeout(timerId);
+  }, []);
 
   const methodLabel = { upi: "UPI", card: "Card", netbanking: "Net Banking", wallet: "Wallet", cod: "COD" };
 
@@ -1174,11 +1241,22 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
           padding: 14px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center;
         }
         .ret-summary img { width: 48px; height: 48px; object-fit: contain; border-radius: 10px; background: #fff; border: 1px solid #edf2f7; }
-        .ret-progress { display:flex; flex-direction:column; gap:10px; margin:18px 0; }
-        .ret-progress-row { display:flex; align-items:center; gap:10px; color:#94a3b8; font-size:13px; font-weight:700; }
-        .ret-progress-dot { width:18px; height:18px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center; color:white; font-size:9px; }
+        .ret-progress { display:flex; flex-direction:column; gap:0; margin:18px 0; padding:14px 14px 8px; border-radius:18px; border:1px solid #e5eefb; background:linear-gradient(180deg,#fbfdff,#f4f8ff); }
+        .ret-progress-row { display:grid; grid-template-columns:28px minmax(0,1fr); align-items:start; gap:12px; color:#94a3b8; font-size:13px; font-weight:700; padding:0 0 14px; transition:color .22s ease, transform .22s ease; }
+        .ret-progress-row:last-child { padding-bottom:0; }
+        .ret-progress-rail { position:relative; width:28px; display:flex; justify-content:center; }
+        .ret-progress-rail::before { content:""; position:absolute; top:24px; bottom:-16px; left:50%; width:3px; transform:translateX(-50%); border-radius:999px; background:linear-gradient(180deg,#dbe7f7,#edf2f7); }
+        .ret-progress-row:last-child .ret-progress-rail::before { display:none; }
+        .ret-progress-dot { width:24px; height:24px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center; color:white; font-size:10px; border:3px solid rgba(255,255,255,.92); box-shadow:0 10px 18px rgba(15,23,42,.08); }
+        .ret-progress-copy { display:grid; gap:4px; padding-top:1px; }
+        .ret-progress-note { font-size:11px; font-weight:700; color:#94a3b8; }
+        .ret-progress-row.done,
         .ret-progress-row.active { color:#1d5ba0; }
-        .ret-progress-row.active .ret-progress-dot { background:#1d5ba0; }
+        .ret-progress-row.done .ret-progress-dot { background:linear-gradient(135deg,#1fb56f,#16a34a); }
+        .ret-progress-row.done .ret-progress-rail::before { background:linear-gradient(180deg,#16a34a,#1fb56f); }
+        .ret-progress-row.active { transform:translateX(1px); }
+        .ret-progress-row.active .ret-progress-dot { background:linear-gradient(135deg,#1d5ba0,#2f7de1); animation:pulse 1.2s infinite; }
+        .ret-progress-row.active .ret-progress-rail::before { background:linear-gradient(180deg,#1d5ba0,#7fb6ff); }
         .ret-textarea {
           width:100%; min-height:108px; resize:vertical; padding:14px 15px; margin-top:12px;
           border-radius:14px; border:1.5px solid #dbe5f1; background:#fff; color:#253d4e; font:inherit; font-size:13px;
@@ -1271,6 +1349,13 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
         .ord-btn-summary { background:#fff; border:1px solid #e2e8f0; color:#475569; }
         .ord-btn-rate { background:#fff; border:1px solid #e2e8f0; color:#475569; }
         .ord-btn-again { background:#1d5ba0; color:#fff; }
+        @media(max-width:700px){
+          .ret-progress { padding:12px 12px 6px; }
+          .ret-progress-row { grid-template-columns:24px minmax(0,1fr); gap:10px; }
+          .ret-progress-rail,.ret-progress-dot { width:22px; }
+          .ret-progress-dot { height:22px; font-size:9px; }
+          .ret-progress-rail::before { top:22px; }
+        }
       `}</style>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 5px 20px" }}>
@@ -1414,30 +1499,44 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
 
               {returnStep === 3 && (
                 <div style={{ padding: '8px 0' }}>
-                  <div className={`ret-status-chip ${statusClass(selectedFlowType === "return" ? "Return Requested" : "Refund Requested")}`}>
+                  <div className={`ret-status-chip ${statusClass(modalStatus)}`}>
                     <i className="fas fa-shield-check"></i>
-                    {statusLabel(selectedFlowType, selectedFlowType === "return" ? "Return Requested" : "Refund Requested")}
+                    {statusLabel(modalFlowType, modalStatus)}
                   </div>
                   <div className="ret-step-title">Step 3: Request submitted</div>
                   <p style={{ color: '#64748b', fontSize: 14, marginBottom: 12 }}>
-                    {selectedFlowType === "return" ? "Your return request has been logged and will move into review before pickup is scheduled." : "Your refund request has been logged and will move into review before processing starts."}
+                    {modalFlowType === "return" ? "Your return request is now moving through review, pickup, and refund stages." : "Your refund request is now moving through review and refund-processing stages."}
                   </p>
                   <div style={{ color: "#253d4e", fontSize: 13, lineHeight: 1.7 }}>
-                    <div><strong>Reason:</strong> {selectedReasonMeta?.label || returnReason}</div>
-                    <div><strong>Refund Method:</strong> {refundMethod}</div>
-                    <div><strong>Proof Files:</strong> {proofFiles.length || 0}</div>
-                    {returnDetailText.trim() && <div><strong>Details:</strong> {returnDetailText.trim()}</div>}
+                    <div><strong>Reason:</strong> {submittedRequest?.reason || selectedReasonMeta?.label || returnReason}</div>
+                    <div><strong>Refund Method:</strong> {submittedRequest?.refundMethod || refundMethod}</div>
+                    <div><strong>Proof Files:</strong> {(submittedRequest?.proofFiles || proofFiles).length || 0}</div>
+                    {(submittedRequest?.detailText || returnDetailText).trim() && <div><strong>Details:</strong> {(submittedRequest?.detailText || returnDetailText).trim()}</div>}
                   </div>
                   <div className="ret-progress">
-                    {statusSteps(selectedFlowType).map((step, i) => (
-                      <div key={step} className={`ret-progress-row ${i === 0 ? "active" : ""}`}>
-                        <span className="ret-progress-dot">{i + 1}</span>
-                        {statusLabel(selectedFlowType, step)}
+                    {modalSteps.map((step, i) => {
+                      const historyEntry = (submittedRequest?.history || []).find((entry) => entry.status === step);
+                      const rowClass = modalCompleted
+                        ? "done"
+                        : i < modalStepIndex
+                          ? "done"
+                          : i === modalStepIndex
+                            ? "active"
+                            : "";
+                      return (
+                      <div key={step} className={`ret-progress-row ${rowClass}`}>
+                        <span className="ret-progress-rail">
+                          <span className="ret-progress-dot">{i < modalStepIndex || modalCompleted ? <i className="fas fa-check"></i> : i + 1}</span>
+                        </span>
+                        <span className="ret-progress-copy">
+                          <span>{statusLabel(modalFlowType, step)}</span>
+                          <span className="ret-progress-note">{historyEntry?.at ? new Date(historyEntry.at).toLocaleString() : "Pending"}</span>
+                        </span>
                       </div>
-                    ))}
+                    )})}
                   </div>
                   <div className="ret-estimate">
-                    Expected refund completion by {new Date(estimateRefundDate(Date.now(), selectedFlowType)).toLocaleDateString()}.
+                    Expected refund completion by {new Date(submittedRequest?.expectedRefundDate || estimateRefundDate(Date.now(), modalFlowType)).toLocaleDateString()}.
                   </div>
                   <button style={{ width: '100%', padding: 14, borderRadius: 10, background: '#1d5ba0', color: 'white', border: 'none', fontWeight: 700 }} onClick={resetReturnModal}>
                     View in My Refunds
@@ -2124,7 +2223,9 @@ function RefundsDemoSection({ t, currSym, region }) {
         ) : (
           refunds.map((rfd) => {
             const steps = statusSteps(rfd.flowType || rfd.type);
-            const activeIndex = rfd.status === "Refunded" ? steps.length : steps.indexOf(rfd.status);
+            const rawIndex = steps.indexOf(rfd.status);
+            const activeIndex = rfd.status === "Refunded" ? steps.length - 1 : Math.max(0, rawIndex);
+            const completedFlow = rfd.status === "Refunded";
             return (
               <div key={rfd.id} className="rfd-demo-item">
                 <div className="rfd-demo-product">
@@ -2153,10 +2254,17 @@ function RefundsDemoSection({ t, currSym, region }) {
                 <div className="rfd-timeline">
                   {steps.map((step, index) => {
                     const historyEntry = (rfd.history || []).find((entry) => entry.status === step);
+                    const rowClass = completedFlow
+                      ? "done"
+                      : index < activeIndex
+                        ? "done"
+                        : index === activeIndex
+                          ? "active"
+                          : "";
                     return (
-                      <div key={step} className={`rfd-step ${index < activeIndex ? "done" : index === activeIndex ? "active" : ""}`}>
+                      <div key={step} className={`rfd-step ${rowClass}`}>
                         <span className="rfd-step-rail">
-                          <span className="rfd-step-dot">{index < activeIndex ? <i className="fas fa-check"></i> : index + 1}</span>
+                          <span className="rfd-step-dot">{index < activeIndex || completedFlow ? <i className="fas fa-check"></i> : index + 1}</span>
                         </span>
                         <div className="rfd-step-copy">
                           <span className="rfd-step-label">{statusLabel(rfd.flowType || rfd.type, step)}</span>
