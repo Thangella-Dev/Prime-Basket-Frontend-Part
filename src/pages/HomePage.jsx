@@ -69,6 +69,10 @@ const getRailMetricsForWidth = (width, itemCount) => {
 const isRailInteractiveTarget = (target) =>
   target instanceof Element && Boolean(target.closest(RAIL_INTERACTIVE_SELECTOR));
 
+const isTouchCapableDevice = () =>
+  typeof window !== "undefined" &&
+  ("ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0);
+
 const fetchCategory = (cat) =>
   get(ref(database, `categories/${cat}`)).then((snap) => {
     const val = snap.val();
@@ -171,6 +175,7 @@ export default function HomePage({
   const homeStateCacheKey = `${HOME_VIEW_CACHE_PREFIX}:${region}`;
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const touchCapableRef = useRef(isTouchCapableDevice());
 
   const homeUi =
     isKenya
@@ -435,6 +440,12 @@ export default function HomePage({
 
   const scrollRail = (key, direction) => {
     setRailIndex(key, (currentIndex) => currentIndex + direction);
+  };
+
+  const triggerRailControl = (event, key, direction) => {
+    event.preventDefault();
+    event.stopPropagation();
+    scrollRail(key, direction);
   };
 
   const setRailScrollFromRange = (key, value) => {
@@ -802,6 +813,7 @@ export default function HomePage({
                       type="button"
                       className="rail-control-btn"
                       onClick={() => scrollRail(col.key, -1)}
+                      onTouchStart={(event) => triggerRailControl(event, col.key, -1)}
                       disabled={currentIndex <= 0}
                       aria-label={`Scroll ${col.title} left`}
                     > 
@@ -811,6 +823,7 @@ export default function HomePage({
                       type="button"
                       className="rail-control-btn"
                       onClick={() => scrollRail(col.key, 1)}
+                      onTouchStart={(event) => triggerRailControl(event, col.key, 1)}
                       disabled={currentIndex >= metrics.maxIndex}
                       aria-label={`Scroll ${col.title} right`}
                     > 
@@ -823,6 +836,7 @@ export default function HomePage({
                   ref={(node) => registerRailViewport(col.key, node)}
                   style={{ "--rail-visible-count": metrics.visibleCount }}
                   onPointerDown={(event) => {
+                    if (touchCapableRef.current && event.pointerType !== "mouse") return;
                     if (event.pointerType === "mouse" && event.button !== 0) return;
                     if (isRailInteractiveTarget(event.target)) return;
                     if (event.pointerType === "mouse" && event.target instanceof Element && event.target.closest(".mprod")) return;
@@ -844,16 +858,24 @@ export default function HomePage({
                   }}
                   onTouchEnd={() => endRailGesture(col.key)}
                   onTouchCancel={() => endRailGesture(col.key)}
-                  onPointerMove={(event) => moveRailGesture(col.key, event.clientX, event.clientY, event)}
+                  onPointerMove={(event) => {
+                    if (touchCapableRef.current && event.pointerType !== "mouse") return;
+                    moveRailGesture(col.key, event.clientX, event.clientY, event);
+                  }}
                   onPointerUp={(event) => {
+                    if (touchCapableRef.current && event.pointerType !== "mouse") return;
                     endRailGesture(col.key);
                     event.currentTarget.releasePointerCapture?.(event.pointerId);
                   }}
                   onPointerCancel={(event) => {
+                    if (touchCapableRef.current && event.pointerType !== "mouse") return;
                     endRailGesture(col.key);
                     event.currentTarget.releasePointerCapture?.(event.pointerId);
                   }}
-                  onPointerLeave={() => endRailGesture(col.key)}
+                  onPointerLeave={(event) => {
+                    if (touchCapableRef.current && event.pointerType !== "mouse") return;
+                    endRailGesture(col.key);
+                  }}
                   onClickCapture={(event) => handleRailClickCapture(col.key, event)}
                 >
                   <div

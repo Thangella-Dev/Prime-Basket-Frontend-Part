@@ -1414,7 +1414,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <AppErrorBoundary>
       <Layout
         currentPage={page}
         cartCount={cartCount}
@@ -1456,11 +1456,9 @@ export default function App() {
           refundOverlayOpen
         }
       >
-        <AppErrorBoundary>
-          <Suspense fallback={renderPageSkeleton()}>
-            {renderPage()}
-          </Suspense>
-        </AppErrorBoundary>
+        <Suspense fallback={renderPageSkeleton()}>
+          {renderPage()}
+        </Suspense>
       </Layout>
 
       {/* ── Zepto-style Cart Preview Panel ── */}
@@ -1660,6 +1658,6 @@ export default function App() {
           window.dispatchEvent(new CustomEvent("open-chatbot"));
         }}
       />
-    </>
+    </AppErrorBoundary>
   );
 }

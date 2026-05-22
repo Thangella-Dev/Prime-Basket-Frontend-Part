@@ -2600,8 +2600,10 @@ body[data-theme="dark"] .browse-btn .chevron {
   overflow: hidden;
   width: 100%;
   min-width: 0;
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
+  overscroll-behavior-x: contain;
   user-select: none;
+  -webkit-user-select: none;
   cursor: grab;
 }
 .mcol-viewport:active { cursor: grabbing; }
@@ -2616,6 +2618,8 @@ body[data-theme="dark"] .browse-btn .chevron {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   box-shadow: 0 12px 22px rgba(15,23,42,0.06);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
