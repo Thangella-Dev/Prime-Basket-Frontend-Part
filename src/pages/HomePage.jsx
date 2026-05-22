@@ -40,8 +40,6 @@ const MULTICOL_CATS = {
 
 const RAIL_GAP_DESKTOP = 16;
 const RAIL_GAP_MOBILE = 12;
-const RAIL_INTERACTIVE_SELECTOR = 'button, a, input, select, textarea, [data-rail-ignore-drag="true"]';
-
 const getRailVisibleCount = (width) => {
   if (width <= 480) return 1;
   if (width <= 840) return 2;
@@ -65,13 +63,6 @@ const getRailMetricsForWidth = (width, itemCount) => {
     visibleCount,
   };
 };
-
-const isRailInteractiveTarget = (target) =>
-  target instanceof Element && Boolean(target.closest(RAIL_INTERACTIVE_SELECTOR));
-
-const isTouchCapableDevice = () =>
-  typeof window !== "undefined" &&
-  ("ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0);
 
 const fetchCategory = (cat) =>
   get(ref(database, `categories/${cat}`)).then((snap) => {
@@ -165,17 +156,14 @@ export default function HomePage({
   const [multiCols, setMultiCols] = useState({ topSelling: [], trending: [], recentlyAdded: [], topRated: [] });
   const [loading, setLoading] = useState(true);
   const [railState, setRailState] = useState({});
-  const [railDragOffset, setRailDragOffset] = useState({});
   const [railMetrics, setRailMetrics] = useState({});
   const railViewportRefs = useRef({});
-  const railGestureState = useRef({});
   const hasLoadedHomeRef = useRef(false);
   const restoredHomeCacheRef = useRef(false);
   const restoredHomeScrollYRef = useRef(0);
   const homeStateCacheKey = `${HOME_VIEW_CACHE_PREFIX}:${region}`;
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const touchCapableRef = useRef(isTouchCapableDevice());
 
   const homeUi =
     isKenya
@@ -417,16 +405,11 @@ export default function HomePage({
     }
 
     delete railViewportRefs.current[key];
-    delete railGestureState.current[key];
   };
 
-  const setRailIndex = (key, nextValue) => {
+  const syncRailIndex = (key, nextIndex) => {
     setRailState((prev) => {
       const currentIndex = prev[key]?.index ?? 0;
-      const resolvedValue = typeof nextValue === "function" ? nextValue(currentIndex) : nextValue;
-      const maxIndex = railMetrics[key]?.maxIndex ?? 0;
-      const nextIndex = Math.max(0, Math.min(resolvedValue, maxIndex));
-
       if (currentIndex === nextIndex && prev[key]) {
         return prev;
       }
@@ -438,92 +421,36 @@ export default function HomePage({
     });
   };
 
+  const setRailIndex = (key, nextValue, behavior = "smooth") => {
+    const currentIndex = railState[key]?.index ?? 0;
+    const resolvedValue = typeof nextValue === "function" ? nextValue(currentIndex) : nextValue;
+    const maxIndex = railMetrics[key]?.maxIndex ?? 0;
+    const nextIndex = Math.max(0, Math.min(resolvedValue, maxIndex));
+    const viewport = railViewportRefs.current[key];
+    const stepWidth = railMetrics[key]?.stepWidth ?? 0;
+
+    syncRailIndex(key, nextIndex);
+
+    if (viewport && stepWidth > 0) {
+      viewport.scrollTo({
+        left: nextIndex * stepWidth,
+        behavior,
+      });
+    }
+  };
+
   const scrollRail = (key, direction) => {
     setRailIndex(key, (currentIndex) => currentIndex + direction);
   };
 
-  const triggerRailControl = (event, key, direction) => {
-    event.preventDefault();
-    event.stopPropagation();
-    scrollRail(key, direction);
-  };
+  const handleRailScroll = (key) => {
+    const viewport = railViewportRefs.current[key];
+    const stepWidth = railMetrics[key]?.stepWidth ?? 0;
+    const maxIndex = railMetrics[key]?.maxIndex ?? 0;
+    if (!viewport || stepWidth <= 0) return;
 
-  const setRailScrollFromRange = (key, value) => {
-    setRailIndex(key, value);
-  };
-
-  const startRailGesture = (key, startX, startY = 0) => {
-    setRailDragOffset((prev) => (prev[key] ? { ...prev, [key]: 0 } : prev));
-    railGestureState.current[key] = {
-      blockClickUntil: railGestureState.current[key]?.blockClickUntil ?? 0,
-      currentX: startX,
-      currentY: startY,
-      dragX: 0,
-      lockedAxis: null,
-      startX,
-      startY,
-    };
-  };
-
-  const moveRailGesture = (key, currentX, currentY = 0, event) => {
-    const state = railGestureState.current[key];
-    if (!state) return;
-
-    const rawDeltaX = currentX - state.startX;
-    const deltaY = currentY - state.startY;
-    state.currentX = currentX;
-    state.currentY = currentY;
-
-    if (!state.lockedAxis) {
-      if (Math.abs(rawDeltaX) < 6 && Math.abs(deltaY) < 6) return;
-      state.lockedAxis = Math.abs(rawDeltaX) > Math.abs(deltaY) ? "x" : "y";
-    }
-
-    if (state.lockedAxis === "x") {
-      const maxIndex = railMetrics[key]?.maxIndex ?? 0;
-      const currentIndex = railState[key]?.index ?? 0;
-      let dragX = rawDeltaX;
-
-      if ((currentIndex <= 0 && dragX > 0) || (currentIndex >= maxIndex && dragX < 0)) {
-        dragX *= 0.34;
-      }
-
-      state.dragX = dragX;
-      setRailDragOffset((prev) => (prev[key] === dragX ? prev : { ...prev, [key]: dragX }));
-      if (event.cancelable) {
-        event.preventDefault();
-      }
-    }
-  };
-
-  const endRailGesture = (key) => {
-    const state = railGestureState.current[key];
-    if (!state) return;
-
-    const deltaX = state.dragX ?? ((state.currentX ?? state.startX) - state.startX);
-    setRailDragOffset((prev) => {
-      if (!(key in prev)) return prev;
-      const next = { ...prev };
-      delete next[key];
-      return next;
-    });
-
-    if (state.lockedAxis === "x" && Math.abs(deltaX) > 56) {
-      scrollRail(key, deltaX < 0 ? 1 : -1);
-      railGestureState.current[key] = { blockClickUntil: Date.now() + 180 };
-      return;
-    }
-
-    delete railGestureState.current[key];
-  };
-
-  const handleRailClickCapture = (key, event) => {
-    const blockClickUntil = railGestureState.current[key]?.blockClickUntil ?? 0;
-    if (blockClickUntil > Date.now()) {
-      event.preventDefault();
-      event.stopPropagation();
-      railGestureState.current[key] = { blockClickUntil: 0 };
-    }
+    const nextIndex = Math.max(0, Math.min(Math.round(viewport.scrollLeft / stepWidth), maxIndex));
+    syncRailIndex(key, nextIndex);
   };
 
   useEffect(() => {
@@ -579,7 +506,10 @@ export default function HomePage({
         if (event.cancelable) {
           event.preventDefault();
         }
-        scrollRail(section.key, dominantDelta > 0 ? 1 : -1);
+        const stepWidth = railMetrics[section.key]?.stepWidth ?? 0;
+        if (stepWidth > 0) {
+          node.scrollBy({ left: dominantDelta > 0 ? stepWidth : -stepWidth, behavior: "smooth" });
+        }
       };
 
       node.addEventListener("wheel", handleWheel, { passive: false });
@@ -610,6 +540,21 @@ export default function HomePage({
       return changed ? next : prev;
     });
   }, [railMetrics, multiCols.topSelling, multiCols.trending, multiCols.recentlyAdded, multiCols.topRated]);
+
+  useEffect(() => {
+    curatedSections.forEach((section) => {
+      const viewport = railViewportRefs.current[section.key];
+      const stepWidth = railMetrics[section.key]?.stepWidth ?? 0;
+      const currentIndex = railState[section.key]?.index ?? 0;
+
+      if (!viewport || stepWidth <= 0) return;
+
+      const expectedLeft = currentIndex * stepWidth;
+      if (Math.abs(viewport.scrollLeft - expectedLeft) > 2) {
+        viewport.scrollTo({ left: expectedLeft, behavior: "auto" });
+      }
+    });
+  }, [railMetrics, railState, multiCols.topSelling, multiCols.trending, multiCols.recentlyAdded, multiCols.topRated]);
 
   return (
     <>
@@ -801,8 +746,7 @@ export default function HomePage({
             {curatedSections.map((col) => {
               const metrics = railMetrics[col.key] ?? getRailMetricsForWidth(0, loading ? 4 : col.items.length);
               const currentIndex = Math.min(railState[col.key]?.index ?? 0, metrics.maxIndex);
-              const translateX = metrics.stepWidth > 0 ? currentIndex * metrics.stepWidth : 0;
-              const dragOffset = railDragOffset[col.key] ?? 0;
+              const itemWidth = metrics.stepWidth > 0 ? Math.max(metrics.stepWidth - metrics.gap, 0) : 0;
 
               return (
                 <div key={col.key} className="mcol-card">
@@ -813,7 +757,6 @@ export default function HomePage({
                       type="button"
                       className="rail-control-btn"
                       onClick={() => scrollRail(col.key, -1)}
-                      onTouchStart={(event) => triggerRailControl(event, col.key, -1)}
                       disabled={currentIndex <= 0}
                       aria-label={`Scroll ${col.title} left`}
                     > 
@@ -823,7 +766,6 @@ export default function HomePage({
                       type="button"
                       className="rail-control-btn"
                       onClick={() => scrollRail(col.key, 1)}
-                      onTouchStart={(event) => triggerRailControl(event, col.key, 1)}
                       disabled={currentIndex >= metrics.maxIndex}
                       aria-label={`Scroll ${col.title} right`}
                     > 
@@ -834,53 +776,15 @@ export default function HomePage({
                 <div
                   className="mcol-viewport"
                   ref={(node) => registerRailViewport(col.key, node)}
-                  style={{ "--rail-visible-count": metrics.visibleCount }}
-                  onPointerDown={(event) => {
-                    if (touchCapableRef.current && event.pointerType !== "mouse") return;
-                    if (event.pointerType === "mouse" && event.button !== 0) return;
-                    if (isRailInteractiveTarget(event.target)) return;
-                    if (event.pointerType === "mouse" && event.target instanceof Element && event.target.closest(".mprod")) return;
-                    if (metrics.maxIndex <= 0) return;
-                    startRailGesture(col.key, event.clientX, event.clientY);
-                    event.currentTarget.setPointerCapture?.(event.pointerId);
+                  style={{
+                    "--rail-visible-count": metrics.visibleCount,
+                    "--rail-gap": `${metrics.gap}px`,
+                    "--rail-item-width": itemWidth ? `${itemWidth}px` : undefined,
                   }}
-                  onTouchStart={(event) => {
-                    if (isRailInteractiveTarget(event.target)) return;
-                    if (metrics.maxIndex <= 0) return;
-                    const touch = event.touches?.[0];
-                    if (!touch) return;
-                    startRailGesture(col.key, touch.clientX, touch.clientY);
-                  }}
-                  onTouchMove={(event) => {
-                    const touch = event.touches?.[0];
-                    if (!touch) return;
-                    moveRailGesture(col.key, touch.clientX, touch.clientY, event);
-                  }}
-                  onTouchEnd={() => endRailGesture(col.key)}
-                  onTouchCancel={() => endRailGesture(col.key)}
-                  onPointerMove={(event) => {
-                    if (touchCapableRef.current && event.pointerType !== "mouse") return;
-                    moveRailGesture(col.key, event.clientX, event.clientY, event);
-                  }}
-                  onPointerUp={(event) => {
-                    if (touchCapableRef.current && event.pointerType !== "mouse") return;
-                    endRailGesture(col.key);
-                    event.currentTarget.releasePointerCapture?.(event.pointerId);
-                  }}
-                  onPointerCancel={(event) => {
-                    if (touchCapableRef.current && event.pointerType !== "mouse") return;
-                    endRailGesture(col.key);
-                    event.currentTarget.releasePointerCapture?.(event.pointerId);
-                  }}
-                  onPointerLeave={(event) => {
-                    if (touchCapableRef.current && event.pointerType !== "mouse") return;
-                    endRailGesture(col.key);
-                  }}
-                  onClickCapture={(event) => handleRailClickCapture(col.key, event)}
+                  onScroll={() => handleRailScroll(col.key)}
                 >
                   <div
                     className="mcol-track"
-                    style={{ transform: `translate3d(${dragOffset - translateX}px, 0, 0)` }}
                     aria-label={`${col.title} products`}
                   >
                     {loading
@@ -969,7 +873,7 @@ export default function HomePage({
                 </div>
                 <div className="rail-footer">
                   <span className="rail-hint">
-                    {isKenya ? "Telezesha moja kwa moja au tumia mishale" : "Drag the shelf directly or use the arrows"}
+                    {isKenya ? "Telezesha shelf au tumia mishale" : "Swipe the shelf or use the arrows"}
                   </span>
                   <span className="rail-page-indicator">
                     {metrics.maxIndex > 0 ? `${currentIndex + 1} / ${metrics.maxIndex + 1}` : "1 / 1"}

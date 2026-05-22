@@ -72,6 +72,8 @@ Recent storefront hardening also added:
 - hero CTA routing from `Explore now` into the related category flow
 - browse-category dropdown auto-dismissal on outside interaction while preserving internal dropdown scrolling
 - staged refund and return tracking with requested, review, pickup, refund-processing, and completed phases
+- native mobile swipe-first curated home rails with scroll-snap behavior and synced shelf arrows
+- full-shell error-boundary protection to reduce occasional blank-screen boot failures
 
 Other important state is currently stored in the browser through `localStorage`, including:
 
@@ -108,6 +110,8 @@ Other important state is currently stored in the browser through `localStorage`,
 - `Buy Again` now exists in `My Account` for quick reorders from previous purchases
 - Desktop account logout now confirms correctly and no longer fails silently
 - The shared storefront shell now has a more cohesive premium surface system, stronger mobile dock behavior, and page-level error-boundary protection
+- The home curated shelves now use a more reliable real-device interaction model instead of a fragile custom drag path
+- Refund tracking now reads more like order tracking, with clearer staged progress presentation
 - India fallback catalog presentation is now more trustworthy because category-safe imagery is mapped directly in the fallback dataset instead of depending on misleading placeholders
 
 ## Current Limitations

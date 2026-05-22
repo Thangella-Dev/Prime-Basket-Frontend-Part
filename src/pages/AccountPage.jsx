@@ -2089,18 +2089,26 @@ function RefundsDemoSection({ t, currSym, region }) {
         .rfd-completed { background:#dcfce7; color:#16a34a; }
         .rfd-processing { background:#fef9c3; color:#ca8a04; }
         .rfd-pending { background:#e8f0fb; color:#1d5ba0; }
-        .rfd-timeline { grid-column:1 / -1; display:grid; gap:10px; margin-top:6px; }
-        .rfd-step { display:grid; grid-template-columns:22px minmax(0,1fr); align-items:start; gap:10px; color:#94a3b8; font-size:11px; font-weight:800; }
-        .rfd-step-copy { display:grid; gap:3px; }
+        .rfd-timeline { grid-column:1 / -1; display:grid; gap:0; margin-top:10px; padding:14px 14px 6px; border-radius:18px; background:linear-gradient(180deg,#fbfdff,#f4f8ff); border:1px solid #e5eefb; }
+        .rfd-step { display:grid; grid-template-columns:32px minmax(0,1fr); align-items:start; gap:12px; color:#94a3b8; font-size:12px; font-weight:800; position:relative; padding:0 0 16px; transition:color .22s ease, transform .22s ease; }
+        .rfd-step:last-child { padding-bottom:0; }
+        .rfd-step-rail { position:relative; width:32px; display:flex; justify-content:center; }
+        .rfd-step-rail::before { content:""; position:absolute; top:30px; bottom:-18px; left:50%; width:3px; transform:translateX(-50%); border-radius:999px; background:linear-gradient(180deg,#dbe7f7,#edf2f7); }
+        .rfd-step:last-child .rfd-step-rail::before { display:none; }
+        .rfd-step-copy { display:grid; gap:4px; padding-top:2px; }
+        .rfd-step-label { color:inherit; line-height:1.35; }
         .rfd-step-time { font-size:10px; font-weight:700; color:#94a3b8; }
-        .rfd-step-dot { width:22px; height:22px; border-radius:50%; background:#e2e8f0; color:white; display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; margin-top:1px; }
+        .rfd-step-dot { width:28px; height:28px; border-radius:50%; background:#e2e8f0; color:white; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; margin-top:0; border:3px solid rgba(255,255,255,0.92); box-shadow:0 10px 18px rgba(15,23,42,0.08); }
         .rfd-step.done,.rfd-step.active { color:#1d5ba0; }
-        .rfd-step.done .rfd-step-dot { background:#16a34a; }
-        .rfd-step.active .rfd-step-dot { background:#1d5ba0; animation:pulse 1.2s infinite; }
+        .rfd-step.done .rfd-step-dot { background:linear-gradient(135deg,#1fb56f,#16a34a); }
+        .rfd-step.done .rfd-step-rail::before { background:linear-gradient(180deg,#16a34a,#1fb56f); }
+        .rfd-step.active { transform:translateX(1px); }
+        .rfd-step.active .rfd-step-dot { background:linear-gradient(135deg,#1d5ba0,#2f7de1); animation:pulse 1.2s infinite; }
+        .rfd-step.active .rfd-step-rail::before { background:linear-gradient(180deg,#1d5ba0,#7fb6ff); }
         .rfd-meta-row { grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
         .rfd-meta-pill { padding:7px 10px; border-radius:999px; background:#f8fbff; border:1px solid #dbeafe; color:#335276; font-size:11px; font-weight:800; }
         .rfd-extra-copy { grid-column:1 / -1; font-size:12px; color:#64748b; line-height:1.6; }
-        @media(max-width:700px){ .rfd-demo-item{ grid-template-columns:1fr; } }
+        @media(max-width:700px){ .rfd-demo-item{ grid-template-columns:1fr; } .rfd-timeline{ padding:12px 12px 4px; } .rfd-step{ grid-template-columns:28px minmax(0,1fr); gap:10px; } .rfd-step-rail,.rfd-step-dot{ width:24px; } .rfd-step-dot{ height:24px; font-size:10px; } .rfd-step-rail::before{ top:26px; } }
       `}</style>
       <h2 style={{ display: "flex", alignItems: "center", gap: "10px", color: "#17324d" }}>
         <i className="fas fa-undo" style={{ color: "#1d5ba0" }}></i> {t.account.myRefunds}
@@ -2147,9 +2155,11 @@ function RefundsDemoSection({ t, currSym, region }) {
                     const historyEntry = (rfd.history || []).find((entry) => entry.status === step);
                     return (
                       <div key={step} className={`rfd-step ${index < activeIndex ? "done" : index === activeIndex ? "active" : ""}`}>
-                        <span className="rfd-step-dot">{index < activeIndex ? <i className="fas fa-check"></i> : index + 1}</span>
+                        <span className="rfd-step-rail">
+                          <span className="rfd-step-dot">{index < activeIndex ? <i className="fas fa-check"></i> : index + 1}</span>
+                        </span>
                         <div className="rfd-step-copy">
-                          <span>{statusLabel(rfd.flowType || rfd.type, step)}</span>
+                          <span className="rfd-step-label">{statusLabel(rfd.flowType || rfd.type, step)}</span>
                           <span className="rfd-step-time">{historyEntry?.at ? new Date(historyEntry.at).toLocaleString() : "Pending"}</span>
                         </div>
                       </div>

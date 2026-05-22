@@ -40,7 +40,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
   Controls top-level state such as page navigation, region, language, theme, cart, wishlist, checkout state, orders, login modal state, locale enforcement by phone-region, mobile dock visibility rules, context-aware cart toast behavior, and shared page-level error-boundary wrapping.
 
 - `src/components/Layout.jsx`
-  Wraps the shared page shell, mobile glass bottom dock, pull-to-refresh handling, and shared overlay-aware dock suppression.
+  Wraps the shared page shell, mobile glass bottom dock, pull-to-refresh handling, connectivity surfaces, and shared overlay-aware dock suppression.
 
 - `src/components/Header.jsx`
   Handles header behavior, region/language UI, notification dropdown, search overlay, mobile drawer, and browse-category dropdown dismissal behavior.
@@ -65,6 +65,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 ### Main Pages
 
 - `src/pages/HomePage.jsx`
+  Handles hero, premium catalog merchandising, cached home-state restore, and the native scroll-snap curated shelves used for mobile-friendly swipe interaction.
 - `src/pages/CategoryPage.jsx`
   Handles category browsing, all-products mode, compact desktop filter controls, and category-specific product-grid presentation.
 - `src/pages/ProductDetailPage.jsx`
@@ -72,7 +73,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
   Handles cart, mobile checkout presentation, promo flow, address selection, and recommended/special-deal product surfaces.
 - `src/pages/PaymentPage.jsx`
 - `src/pages/AccountPage.jsx`
-  Handles account dashboard flows including orders, buy-again, wallet, notifications, help, and the staged refund/return request lifecycle with proof uploads and refund timeline tracking.
+  Handles account dashboard flows including orders, buy-again, wallet, notifications, help, and the staged refund/return request lifecycle with proof uploads and order-style refund timeline tracking.
 - `src/components/PhoneAuthModal.jsx`
   Handles phone sign-in, OTP verification, generated-OTP choice prompting, segmented OTP autofill/paste behavior, and verification UI state.
 - `src/pages/WishlistPage.jsx`
@@ -125,6 +126,7 @@ This works, but a future production refactor could move more navigation to a cle
 - local data fallback for region-specific flows in both India and Kenya
 - direct India fallback asset mapping for categories that previously showed misleading placeholder art
 - timeout-backed fallback protection on key homepage catalog surfaces to avoid prolonged skeleton-only states when live fetches stall
+- premium home skeleton coverage that now includes curated-rail-style placeholders instead of only generic product blocks
 - region-aware search fallback indexing so category/search results stay aligned to the active phone-region profile
 
 ### User and commerce state

@@ -31,9 +31,17 @@ export const RailSkeletonCard = () => (
   <div className="premium-rail-skeleton premium-skeleton-surface" aria-hidden="true">
     <span className="premium-skeleton-thumb"></span>
     <div className="premium-rail-skeleton-copy">
+      <span className="premium-skeleton-pill"></span>
       <span className="premium-skeleton-line premium-skeleton-line-lg"></span>
       <span className="premium-skeleton-line premium-skeleton-line-md"></span>
-      <span className="premium-skeleton-line"></span>
+      <div className="premium-skeleton-price-row">
+        <span className="premium-skeleton-price"></span>
+        <span className="premium-skeleton-price-muted"></span>
+      </div>
+      <div className="premium-rail-skeleton-actions">
+        <span className="premium-skeleton-cta"></span>
+        <span className="premium-skeleton-icon"></span>
+      </div>
     </div>
   </div>
 );
@@ -123,6 +131,15 @@ export const HomePageSkeleton = () => (
         <InlinePanelSkeleton lines={2} compact />
         {Array.from({ length: 7 }).map((_, index) => <CategorySkeletonLoader key={index} />)}
       </div>
+    </div>
+    <div className="premium-home-rails-skeleton">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div key={index} className="premium-home-rail-column">
+          <InlinePanelSkeleton lines={1} compact />
+          <RailSkeletonCard />
+          <RailSkeletonCard />
+        </div>
+      ))}
     </div>
   </div>
 );

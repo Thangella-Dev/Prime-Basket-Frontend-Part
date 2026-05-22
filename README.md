@@ -18,6 +18,7 @@ Primary production domain: `https://prime-basket.in`
 - Route-safe public asset loading for direct and nested entries
 - Safer homepage fallback loading when live catalog fetches are slow
 - Mobile curated-rail swipe support with right-aligned shelf controls
+- Home curated rails now use native horizontal scroll with scroll-snap, which improves real-device swipe reliability and keeps arrow controls synced to the actual shelf position
 - Improved category-page desktop layering and tappable range-slider filter behavior
 - Same-origin web manifest values for local and production compatibility
 - Category-page search/filter runtime stabilization for desktop refine-panel interactions
@@ -33,6 +34,7 @@ Primary production domain: `https://prime-basket.in`
 - Home `Deals Of The Day` now supports a denser 3-column mobile layout and pads to six cards when the available deal pool is smaller
 - Cart removal/decrement actions now clear top-right cart feedback immediately when the removed item no longer exists in cart
 - Mobile glass bottom navigation is now smaller, theme-aware, and visually better integrated with the app shell
+- The mobile glass bottom dock was tuned down slightly again so it feels lighter on small screens without losing the premium shell treatment
 - Mobile chatbot launcher now sits above the bottom dock instead of colliding with it
 - Mobile header actions are rebalanced so `Browse All Categories` stays readable while search remains accessible
 - Account logout now routes through a confirmation dialog across mobile and desktop account flows
@@ -94,11 +96,14 @@ Primary production domain: `https://prime-basket.in`
 - Desktop account spacing was tightened further across section padding, profile fields, menu cards, and action buttons for a more compact premium layout
 - India fallback pricing strings were normalized again so rupee values render correctly instead of mojibake text when local data is used
 - A page-level error boundary now protects major lazy-loaded page regions from blank-screen failures
+- The app shell is now also wrapped by the shared error boundary so intermittent boot-time white-screen failures degrade safely instead of leaving a blank page
 - Home and category product-list views now restore their previous products, filters, sort state, and scroll position when users return from product detail
 - Product detail now includes a premium zoom flow with hover magnification, multi-image lightbox viewing, and touch-friendly mobile zoom gestures
 - Product detail now keeps only one primary wishlist action instead of showing duplicate wishlist controls
 - Shared home/category product rails were tightened slightly so cards fit better on laptop, tablet, and mobile screens without feeling cramped
 - Core in-app toast styling now uses Prime Basket themed gradients, blur, and softer shadows instead of generic dark popup styling
+- Refund tracking now uses a more order-tracking-style vertical progress rail with clearer active and completed stages
+- Home and page-level skeleton loaders now better match the curated rail layout and premium card rhythm instead of falling back to overly generic placeholders
 
 ## Tech Stack
 

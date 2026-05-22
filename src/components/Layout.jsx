@@ -179,14 +179,14 @@ export default function Layout({
     <>
       <style>{`
         .page-shell.has-mobile-glass-dock {
-          padding-bottom: 112px;
+          padding-bottom: 102px;
         }
         .prime-mobile-glass-dock {
           position: fixed;
           left: 50%;
-          bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+          bottom: calc(20px + env(safe-area-inset-bottom, 0px));
           transform: translateX(-50%);
-          width: min(92vw, 430px);
+          width: min(91vw, 408px);
           z-index: 99988;
           display: none;
           pointer-events: none;
@@ -196,8 +196,8 @@ export default function Layout({
           display: grid;
           grid-template-columns: repeat(5, minmax(0, 1fr));
           gap: 4px;
-          padding: 9px;
-          border-radius: 26px;
+          padding: 8px;
+          border-radius: 24px;
           border: 1px solid rgba(255,255,255,0.24);
           background:
             linear-gradient(135deg, rgba(255,255,255,0.48), rgba(255,255,255,0.18)),
@@ -213,9 +213,9 @@ export default function Layout({
         .prime-mobile-dock-item {
           position: relative;
           border: none;
-          border-radius: 18px;
-          min-height: 60px;
-          padding: 8px 5px 7px;
+          border-radius: 16px;
+          min-height: 56px;
+          padding: 7px 5px 6px;
           background: transparent;
           color: #184d90;
           display: flex;
@@ -233,7 +233,7 @@ export default function Layout({
           content: "";
           position: absolute;
           inset: 0;
-          border-radius: 18px;
+          border-radius: 16px;
           background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04));
           opacity: 0;
           transition: opacity .22s ease;
@@ -262,15 +262,15 @@ export default function Layout({
         }
         .prime-mobile-dock-icon {
           position: relative;
-          width: 32px;
-          height: 32px;
-          border-radius: 11px;
+          width: 30px;
+          height: 30px;
+          border-radius: 10px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           background: rgba(255,255,255,0.24);
           border: 1px solid rgba(255,255,255,0.22);
-          font-size: 13px;
+          font-size: 12px;
           transition: transform .22s ease, background .22s ease, box-shadow .22s ease;
         }
         .prime-mobile-dock-item.active .prime-mobile-dock-icon,
@@ -280,7 +280,7 @@ export default function Layout({
         }
         .prime-mobile-dock-label {
           position: relative;
-          font-size: 9.8px;
+          font-size: 9.4px;
           font-weight: 800;
           line-height: 1;
           letter-spacing: 0.015em;
