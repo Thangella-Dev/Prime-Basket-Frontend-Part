@@ -82,27 +82,57 @@ export default function Header({
       key: "fresh",
       title: language === "ke" ? "Bidhaa safi" : "Fresh market",
       subtitle: language === "ke" ? "Matunda, mboga na maziwa" : "Fruits, vegetables and dairy",
+      icon: "fa-leaf",
       values: ["fruits", "vegetables", "dairyProducts", "meat"],
     },
     {
       key: "essentials",
       title: language === "ke" ? "Mahitaji ya kila siku" : "Daily essentials",
       subtitle: language === "ke" ? "Mchele, mafuta na viungo" : "Rice, oil, flour and spices",
+      icon: "fa-basket-shopping",
       values: ["rice", "oil", "wheat-flour", "salt", "sugar", "chilli-powder", "turmeric-powder", "pulses", "masala"],
     },
     {
       key: "snacks",
       title: language === "ke" ? "Vitafunio na vinywaji" : "Snacks and drinks",
       subtitle: language === "ke" ? "Chakula cha haraka na vinywaji" : "Quick bites, biscuits and beverages",
+      icon: "fa-cookie-bite",
       values: ["instantFood", "chipsAndNamkeens", "biscuitsAndCookies", "coolDrinks", "milkPowders"],
     },
     {
       key: "care",
       title: language === "ke" ? "Huduma ya nyumba" : "Home and care",
       subtitle: language === "ke" ? "Nyumbani, mwili na familia" : "Home, body, baby and family care",
+      icon: "fa-home",
       values: ["homeNeeds", "bodyCare", "oralCare", "feminineHygiene", "babyCare"],
     },
   ];
+  const desktopBrowseKicker = language === "ke" ? "Soko la haraka" : "Shop faster";
+  const desktopBrowseTitle = language === "ke" ? "Browse by aisle" : "Browse by aisle";
+  const desktopBrowseSubtitle = language === "ke"
+    ? "Chagua kundi la bidhaa na uende moja kwa moja kwenye sehemu yake."
+    : "Jump into curated grocery aisles without losing your current shopping flow.";
+  const desktopBrowseMeta = language === "ke" ? "Region-safe catalog" : "Region-safe catalog";
+  const headerPromiseItems = language === "ke"
+    ? [
+        { icon: "fa-bolt", label: "Haraka" },
+        { icon: "fa-shield-alt", label: "Imehakikiwa" },
+      ]
+    : [
+        { icon: "fa-bolt", label: "Fast delivery" },
+        { icon: "fa-shield-alt", label: "Fresh guarantee" },
+      ];
+  const headerExperienceItems = language === "ke"
+    ? [
+        { icon: "fa-crown", label: "Prime Basket premium" },
+        { icon: "fa-truck", label: "Uwasilishaji wa haraka" },
+        { icon: "fa-leaf", label: "Bidhaa mpya kila siku" },
+      ]
+    : [
+        { icon: "fa-crown", label: "Prime Basket premium" },
+        { icon: "fa-truck", label: "Quick doorstep delivery" },
+        { icon: "fa-leaf", label: "Fresh regional catalog" },
+      ];
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -520,6 +550,53 @@ export default function Header({
         </a>
       ))}
     </>
+  );
+
+  const DesktopCategoryMenu = () => (
+    <div className="desktop-browse-panel">
+      <div className="desktop-browse-hero">
+        <span className="desktop-browse-kicker">{desktopBrowseKicker}</span>
+        <strong>{desktopBrowseTitle}</strong>
+        <p>{desktopBrowseSubtitle}</p>
+        <span className="desktop-browse-meta">
+          <i className="fas fa-shield-alt"></i>
+          {desktopBrowseMeta}
+        </span>
+      </div>
+      <div className="desktop-browse-groups">
+        {mobileCategoryGroups.map((group) => (
+          <section className="desktop-browse-group" key={group.key}>
+            <div className="desktop-browse-group-head">
+              <span className="desktop-browse-group-icon">
+                <i className={`fas ${group.icon}`}></i>
+              </span>
+              <span className="desktop-browse-group-copy">
+                <strong>{group.title}</strong>
+                <small>{group.subtitle}</small>
+              </span>
+            </div>
+            <div className="desktop-browse-group-grid">
+              {group.values
+                .map((value) => categoryByValue[value])
+                .filter(Boolean)
+                .map((cat) => (
+                  <a
+                    key={cat.value}
+                    href="#"
+                    className="desktop-browse-category"
+                    onClick={(e) => handleCategoryClick(e, cat.value)}
+                  >
+                    <span className="desktop-browse-category-icon">
+                      <i className={`fas ${cat.icon}`}></i>
+                    </span>
+                    <span>{cat.label}</span>
+                  </a>
+                ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
   );
 
   const drawerLayer = typeof document !== "undefined"
@@ -1027,6 +1104,16 @@ export default function Header({
       </div>
 
       <div className="nav-secondary">
+        <div className="nav-experience-strip" aria-label={language === "ke" ? "Prime Basket benefits" : "Prime Basket benefits"}>
+          <div className="nav-experience-inner">
+            {headerExperienceItems.map((item) => (
+              <span key={item.label} className="nav-experience-item">
+                <i className={`fas ${item.icon}`}></i>
+                {item.label}
+              </span>
+            ))}
+          </div>
+        </div>
         <div className="nav-search-row">
           <div className="nav-search-inner">
             {!drawerOpen && (
@@ -1055,8 +1142,8 @@ export default function Header({
                   <span className="browse-btn-label">{t.header.browseAll}</span>
                   <i className="fa fa-chevron-down chevron"></i>
                 </button>
-                <nav className={`dropdown-menu${dropdownOpen ? " open" : ""}`} role="menu">
-                  <CategoryLinks />
+                <nav className={`dropdown-menu desktop-browse-menu${dropdownOpen ? " open" : ""}`} role="menu">
+                  <DesktopCategoryMenu />
                 </nav>
               </div>
             </div>
@@ -1100,6 +1187,14 @@ export default function Header({
                 language={language}
                 region={region}
               />
+            </div>
+            <div className="nav-promise-pills" aria-label={language === "ke" ? "Ahadi za duka" : "Prime Basket promises"}>
+              {headerPromiseItems.map((item) => (
+                <span key={item.label} className="nav-promise-pill">
+                  <i className={`fas ${item.icon}`}></i>
+                  {item.label}
+                </span>
+              ))}
             </div>
           </div>
         </div>
