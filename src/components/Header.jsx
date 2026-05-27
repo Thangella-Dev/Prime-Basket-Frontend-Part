@@ -136,6 +136,7 @@ export default function Header({
   const desktopLocaleRef = useRef(null);
   const brandTimerRef = useRef(null);
   const lastBrandClickRef = useRef(0);
+  const lastHomeBrandTapRef = useRef(0);
   const locationNoticeTimerRef = useRef(null);
   const lastScrollYRef = useRef(0);
   const scrollAnchorRef = useRef(0);
@@ -361,36 +362,31 @@ export default function Header({
     }
   };
 
+  const flashBrandTap = () => {
+    if (brandTimerRef.current) clearTimeout(brandTimerRef.current);
+    setBrandTap(true);
+    brandTimerRef.current = setTimeout(() => setBrandTap(false), 420);
+  };
+
   const handleBrandClick = (e) => {
     e.preventDefault();
     closeAllPanels();
+    flashBrandTap();
+
+    const now = Date.now();
     if (currentPage === "home") {
-      if (brandTimerRef.current) clearTimeout(brandTimerRef.current);
-      setBrandTap(true);
-      brandTimerRef.current = setTimeout(() => setBrandTap(false), 420);
+      const isDoubleTap = now - lastHomeBrandTapRef.current <= 450;
+      lastHomeBrandTapRef.current = isDoubleTap ? 0 : now;
+      if (isDoubleTap) {
+        onLogoDoubleClick?.();
+      }
       return;
     }
-    const now = Date.now();
+
     if (now - lastBrandClickRef.current < 450) {
       return;
     }
     lastBrandClickRef.current = now;
-    if (brandTimerRef.current) clearTimeout(brandTimerRef.current);
-    setBrandTap(true);
-    brandTimerRef.current = setTimeout(() => setBrandTap(false), 420);
-    onLogoClick?.();
-  };
-
-  const handleBrandDoubleClick = (e) => {
-    e.preventDefault();
-    closeAllPanels();
-    if (brandTimerRef.current) clearTimeout(brandTimerRef.current);
-    setBrandTap(true);
-    brandTimerRef.current = setTimeout(() => setBrandTap(false), 420);
-    if (currentPage === "home") {
-      onLogoDoubleClick?.();
-      return;
-    }
     onLogoClick?.();
   };
 
@@ -729,7 +725,6 @@ export default function Header({
             type="button"
             className={`logo brand-link${brandTap ? " brand-link-active" : ""}`}
             onClick={handleBrandClick}
-            onDoubleClick={handleBrandDoubleClick}
           >
             <img
               src="/assets/prime-basket-brand.png"

@@ -36,6 +36,7 @@ export default function Layout({
 }) {
   const shellRef = useRef(null);
   const pullStateRef = useRef({ active: false, startY: 0, distance: 0 });
+  const mobileHomeTapRef = useRef(0);
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [addressOverlayOpen, setAddressOverlayOpen] = useState(false);
@@ -50,6 +51,21 @@ export default function Layout({
   const mobileDockBadge = (count) => (
     count > 0 ? <span className="prime-mobile-dock-badge">{count > 99 ? "99+" : count}</span> : null
   );
+
+  const handleMobileHomeClick = () => {
+    const now = Date.now();
+    if (currentPage === "home") {
+      const isDoubleTap = now - mobileHomeTapRef.current <= 450;
+      mobileHomeTapRef.current = isDoubleTap ? 0 : now;
+      if (isDoubleTap) {
+        onLogoDoubleClick?.();
+      }
+      return;
+    }
+
+    mobileHomeTapRef.current = now;
+    onLogoClick?.();
+  };
 
   useEffect(() => {
     if (!enablePullRefresh) {
@@ -514,7 +530,7 @@ export default function Layout({
             <button
               type="button"
               className={`prime-mobile-dock-item${currentPage === "home" ? " active" : ""}`}
-              onClick={onLogoClick}
+              onClick={handleMobileHomeClick}
             >
               <span className="prime-mobile-dock-icon"><i className="fas fa-house"></i></span>
               <span className="prime-mobile-dock-label">Home</span>
