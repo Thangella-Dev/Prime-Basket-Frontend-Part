@@ -2,7 +2,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import "./ProductCard.css";
-import { enhanceProduct, getProductPrices, formatCurrency, resolveProductImage } from "../utils/productUtils";
+import { enhanceProduct, getProductPrices, formatCurrency, handleProductImageError, resolveProductImage } from "../utils/productUtils";
 import { getLocalizedProductName } from "../utils/translationUtils";
 import { Heart, ShoppingBasket, ChevronDown, Check, X } from 'lucide-react';
 
@@ -150,7 +150,7 @@ export default function ProductCard({
     <>
       <div className="unit-modal-header">
         <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
-          <img src={productImage} alt={p.name} loading="lazy" decoding="async" style={{ width: 44, height: 44, objectFit: "contain", borderRadius: 8, background: "#f8f9fa", padding: 4 }} />
+          <img src={productImage} alt={p.name} loading="lazy" decoding="async" onError={(event) => handleProductImageError(event, p)} style={{ width: 44, height: 44, objectFit: "contain", borderRadius: 8, background: "#f8f9fa", padding: 4 }} />
           <div>
             <h3 style={{ fontSize: 16, fontWeight: 800, color: "#253d4e", margin: 0 }}>{t.product.selectQuantity || "Select Quantity"}</h3>
             <p style={{ fontSize: 12, color: "#64748b", margin: 0 }}>{translatedName}</p>
@@ -249,7 +249,7 @@ export default function ProductCard({
 
       {/* Product Image */}
       <div className="pimg-v2">
-        <img src={productImage} alt={p.name} loading="lazy" decoding="async" />
+        <img src={productImage} alt={p.name} loading="lazy" decoding="async" onError={(event) => handleProductImageError(event, p)} />
       </div>
 
       {/* Content */}

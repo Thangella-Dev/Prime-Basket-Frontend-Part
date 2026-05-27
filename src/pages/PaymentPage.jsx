@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { useT } from "../i18n/translations";
 import { useTracking } from "../context/TrackingContext";
-import { formatCurrency, parsePrice, resolveProductImage } from "../utils/productUtils";
+import { formatCurrency, handleProductImageError, parsePrice, resolveProductImage } from "../utils/productUtils";
 
 import { PAYMENT_CONFIG } from "../config/paymentConfig";
 import PaymentMethods from "../components/payment/PaymentMethods";
@@ -538,7 +538,7 @@ export default function PaymentPage({ cart, total, delivery, vat = 0, handlingFe
                   return (
                     <div key={idx} className="pay-summary-item">
                       <div className="pay-summary-img">
-                        <img src={resolveProductImage(item)} alt={item.name} />
+                        <img src={resolveProductImage(item)} alt={item.name} onError={(event) => handleProductImageError(event, item)} />
                       </div>
                       <div className="pay-summary-copy">
                         <div className="pay-summary-name">{getTranslatedName(item.name)}</div>

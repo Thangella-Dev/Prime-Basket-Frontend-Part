@@ -12,7 +12,7 @@ import {
   validateAndNormalizePhone,
 } from "../utils/phoneValidation";
 import { getLocalizedProductName } from "../utils/translationUtils";
-import { resolveProductImage } from "../utils/productUtils";
+import { handleProductImageError, resolveProductImage } from "../utils/productUtils";
 
 // Shared key used by both AccountPage and CartPage
 export const ADDRESSES_KEY = "pb_saved_addresses";
@@ -799,7 +799,7 @@ function BuyAgainSection({ orders = [], t, currSym = "\u20b9", language = "en", 
             return (
               <article key={item._buyAgainKey} className="buy-again-item">
                 <div className="buy-again-thumb">
-                  <img src={resolveProductImage(item)} alt={translatedName} loading="lazy" decoding="async" />
+                  <img src={resolveProductImage(item)} alt={translatedName} loading="lazy" decoding="async" onError={(event) => handleProductImageError(event, item)} />
                 </div>
                 <div className="buy-again-copy">
                   <div className="buy-again-brand">{item.brand || (language === "ke" ? "Bidhaa ya zamani" : "Previous order item")}</div>
@@ -1397,7 +1397,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
             </div>
             <div className="ret-body">
               <div className="ret-summary">
-                {returnModal.item?.imageUrl && <img src={resolveProductImage(returnModal.item)} alt={getTranslatedName(returnModal.item?.name)} loading="lazy" decoding="async" />}
+                {returnModal.item?.imageUrl && <img src={resolveProductImage(returnModal.item)} alt={getTranslatedName(returnModal.item?.name)} loading="lazy" decoding="async" onError={(event) => handleProductImageError(event, returnModal.item)} />}
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontWeight: 800, color: "#253d4e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{getTranslatedName(returnModal.item?.name) || "Order item"}</div>
                   <div style={{ color: "#64748b", fontSize: 12, marginTop: 3 }}>Refund amount: <strong>{currSym}{returnModal.amount.toFixed(2)}</strong></div>
@@ -1636,7 +1636,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
                 <div className="ord-thumbs">
                   {itemsPreview.map((item, j) => (
                     <div key={item._uid || j} className="ord-thumb">
-                      <img src={resolveProductImage(item)} alt={getTranslatedName(item.name)} loading="lazy" decoding="async" />
+                      <img src={resolveProductImage(item)} alt={getTranslatedName(item.name)} loading="lazy" decoding="async" onError={(event) => handleProductImageError(event, item)} />
                     </div>
                   ))}
                   {extraCount > 0 && (
@@ -1664,7 +1664,7 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
                     return (
                       <div key={makeOrderItemId(order, item, itemIndex)} className="ord-line-item">
                         <div className="ord-line-img">
-                          {(item.image || item.imageUrl) ? <img src={resolveProductImage(item)} alt={itemName} loading="lazy" decoding="async" /> : <i className="fas fa-box" style={{ color: "#94a3b8" }}></i>}
+                          {(item.image || item.imageUrl) ? <img src={resolveProductImage(item)} alt={itemName} loading="lazy" decoding="async" onError={(event) => handleProductImageError(event, item)} /> : <i className="fas fa-box" style={{ color: "#94a3b8" }}></i>}
                         </div>
                         <div style={{ minWidth: 0 }}>
                           <div className="ord-line-name">{itemName}</div>

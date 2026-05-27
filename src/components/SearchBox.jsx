@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { useSearch } from "../hooks/useSearch";
 import { useT } from "../i18n/translations";
 import { getLocalizedProductName, getSearchHintSuggestions } from "../utils/translationUtils";
-import { resolveProductImage } from "../utils/productUtils";
+import { handleProductImageError, resolveProductImage } from "../utils/productUtils";
 
 function dismissKeyboard(target) {
   target?.blur?.();
@@ -465,7 +465,7 @@ export default function SearchBox({ onCategorySelect, onOpenProduct, mobile = fa
                     >
                       <div className="sb-ico prod">
                         {resolvedProductImage
-                          ? <img src={resolvedProductImage} alt={translatedName} loading="lazy" />
+                          ? <img src={resolvedProductImage} alt={translatedName} loading="lazy" onError={(event) => handleProductImageError(event, prod)} />
                           : <i className="fas fa-box" style={{ color: "#c8d4e8", fontSize: 13 }}></i>
                         }
                       </div>

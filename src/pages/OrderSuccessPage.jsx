@@ -1,6 +1,6 @@
 // src/pages/OrderSuccessPage.jsx
 import { useT } from "../i18n/translations";
-import { formatCurrency, resolveProductImage } from "../utils/productUtils";
+import { formatCurrency, handleProductImageError, resolveProductImage } from "../utils/productUtils";
 import { getLocalizedProductName } from "../utils/translationUtils";
 
 export default function OrderSuccessPage({ order, onGoHome, onGoOrders, onGoTracking, language = "en", region = "in" }) {
@@ -105,7 +105,7 @@ export default function OrderSuccessPage({ order, onGoHome, onGoOrders, onGoTrac
               <div className="os-items-header">{t.order.itemsOrdered} ({order.items.reduce((a, i) => a + i.quantity, 0)})</div>
               {order?.items?.map((item, idx) => (
                 <div className="os-item" key={idx}>
-                  <div className="os-item-img"><img src={resolveProductImage(item)} alt={item.name} /></div>
+                  <div className="os-item-img"><img src={resolveProductImage(item)} alt={item.name} onError={(event) => handleProductImageError(event, item)} /></div>
                   <div className="os-item-name">{getTranslatedName(item.name)}</div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
                     <div className="os-item-qty" style={{ fontWeight: 700 }}>{item.selectedUnit} × {item.quantity}</div>

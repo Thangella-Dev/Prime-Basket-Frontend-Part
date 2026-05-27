@@ -8,7 +8,7 @@ import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
 import { filterProductsForRegion, mergeCategoryProducts } from "../data/catalogFallback";
 import { formatCurrencyDisplay } from "../utils/currency";
 import { getLocalizedProductName, getSearchHintSuggestions } from "../utils/translationUtils";
-import { resolveProductImage } from "../utils/productUtils";
+import { handleProductImageError, resolveProductImage } from "../utils/productUtils";
 import { safeSessionGet, safeSessionRemove, safeSessionSet } from "../utils/safeStorage";
 import ProductCard from "../components/ProductCard";
 import {
@@ -1103,7 +1103,7 @@ export default function CategoryPage({
         </button>
 
         <div className="pimg">
-          <img src={resolveProductImage(item)} alt={name} loading="lazy" />
+          <img src={resolveProductImage(item)} alt={name} loading="lazy" onError={(event) => handleProductImageError(event, item)} />
         </div>
 
         <div className="pbrand">{item.brand}</div>

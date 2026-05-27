@@ -6,7 +6,7 @@ import { useT } from "../i18n/translations";
 import { INDIA_ALL_PRODUCTS } from "../data/india_products";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
 import { mergeCategoryProducts } from "../data/catalogFallback";
-import { enhanceProduct, formatCurrency, parsePrice, resolveProductImage } from "../utils/productUtils";
+import { enhanceProduct, formatCurrency, handleProductImageError, parsePrice, resolveProductImage } from "../utils/productUtils";
 import ProductCard from "../components/ProductCard";
 import { getLocalizedProductName } from "../utils/translationUtils";
 import { SkeletonCard } from "../components/SkeletonLoaders";
@@ -553,7 +553,7 @@ export default function ProductDetailPage({
               <div className="pdp-thumbs">
                 {galleryImages.map((image, i) => (
                   <div key={i} className={`pdp-thumb${activeThumb === i ? " active" : ""}`} onClick={() => setActiveThumb(i)}>
-                    <img src={image} alt="" />
+                    <img src={image} alt="" onError={(event) => handleProductImageError(event, product)} />
                   </div>
                 ))}
               </div>
@@ -589,6 +589,7 @@ export default function ProductDetailPage({
                     src={activeImage}
                     alt={translatedName}
                     className="pdp-bigimg"
+                    onError={(event) => handleProductImageError(event, product)}
                     style={{
                       transform: hoverZoomActive && viewportWidth >= 980 ? "scale(2.05)" : "scale(1)",
                       transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
@@ -832,7 +833,7 @@ export default function ProductDetailPage({
                   className={`pdp-thumb${activeThumb === index ? " active" : ""}`}
                   onClick={() => setActiveThumb(index)}
                 >
-                  <img src={image} alt="" />
+                  <img src={image} alt="" onError={(event) => handleProductImageError(event, product)} />
                 </button>
               ))}
             </div>
@@ -853,6 +854,7 @@ export default function ProductDetailPage({
               <img
                 src={activeImage}
                 alt={translatedName}
+                onError={(event) => handleProductImageError(event, product)}
                 style={{
                   transform: `translate(${lightboxOffset.x}px, ${lightboxOffset.y}px) scale(${lightboxScale})`,
                 }}

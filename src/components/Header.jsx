@@ -113,26 +113,6 @@ export default function Header({
     ? "Chagua kundi la bidhaa na uende moja kwa moja kwenye sehemu yake."
     : "Jump into curated grocery aisles without losing your current shopping flow.";
   const desktopBrowseMeta = language === "ke" ? "Region-safe catalog" : "Region-safe catalog";
-  const headerPromiseItems = language === "ke"
-    ? [
-        { icon: "fa-bolt", label: "Haraka" },
-        { icon: "fa-shield-alt", label: "Imehakikiwa" },
-      ]
-    : [
-        { icon: "fa-bolt", label: "Fast delivery" },
-        { icon: "fa-shield-alt", label: "Fresh guarantee" },
-      ];
-  const headerExperienceItems = language === "ke"
-    ? [
-        { icon: "fa-crown", label: "Prime Basket premium" },
-        { icon: "fa-truck", label: "Uwasilishaji wa haraka" },
-        { icon: "fa-leaf", label: "Bidhaa mpya kila siku" },
-      ]
-    : [
-        { icon: "fa-crown", label: "Prime Basket premium" },
-        { icon: "fa-truck", label: "Quick doorstep delivery" },
-        { icon: "fa-leaf", label: "Fresh regional catalog" },
-      ];
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -1104,16 +1084,6 @@ export default function Header({
       </div>
 
       <div className="nav-secondary">
-        <div className="nav-experience-strip" aria-label={language === "ke" ? "Prime Basket benefits" : "Prime Basket benefits"}>
-          <div className="nav-experience-inner">
-            {headerExperienceItems.map((item) => (
-              <span key={item.label} className="nav-experience-item">
-                <i className={`fas ${item.icon}`}></i>
-                {item.label}
-              </span>
-            ))}
-          </div>
-        </div>
         <div className="nav-search-row">
           <div className="nav-search-inner">
             {!drawerOpen && (
@@ -1187,14 +1157,6 @@ export default function Header({
                 language={language}
                 region={region}
               />
-            </div>
-            <div className="nav-promise-pills" aria-label={language === "ke" ? "Ahadi za duka" : "Prime Basket promises"}>
-              {headerPromiseItems.map((item) => (
-                <span key={item.label} className="nav-promise-pill">
-                  <i className={`fas ${item.icon}`}></i>
-                  {item.label}
-                </span>
-              ))}
             </div>
           </div>
         </div>

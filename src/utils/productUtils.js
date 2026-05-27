@@ -221,6 +221,8 @@ const CATEGORY_IMAGE_FALLBACKS = {
   meat: "/assets/chickenmeatballs.png",
 };
 
+const DEFAULT_PRODUCT_IMAGE = "/assets/grocery-items.png";
+
 const PRODUCT_IMAGE_RULES = [
   { match: /(rice|basmati|india gate|daawat)/i, image: "/assets/rice-pack.svg" },
   { match: /(sunflower oil|gold oil|mustard oil|coconut oil|olive oil|cooking oil|vegetable oil|oil)/i, image: "/assets/olive-oil.png" },
@@ -247,6 +249,27 @@ const PRODUCT_IMAGE_RULES = [
   { match: /(biscuit|cookie|oreo|good day)/i, image: "/assets/biscuit-pack.svg" },
   { match: /(cola|coca|sprite|fanta|drink|cool drinks|soft drink)/i, image: "/assets/cool-drink.svg" },
 ];
+
+function getCategorySpecificProductImage(category, name) {
+  const text = String(name || "");
+  if (category === "chipsAndNamkeens" && /(chips|crisps|namkeen|bhujia|puffs|pringles|krackles|kudos|norda|tropical heat|snack)/i.test(text)) {
+    return "/assets/snack-pack.svg";
+  }
+  if (category === "coolDrinks" && /(drink|cola|coca|sprite|fanta|mirinda|sting|schweppes|juice|soda|water)/i.test(text)) {
+    return "/assets/cool-drink.svg";
+  }
+  if (category === "biscuitsAndCookies" && /(biscuit|cookie|oreo|good day|shortcake|digestive|cream)/i.test(text)) {
+    return "/assets/biscuit-pack.svg";
+  }
+  if (category === "babyCare") return "/assets/baby-care.svg";
+  if (category === "oralCare") return "/assets/oral-care.svg";
+  if (category === "homeNeeds") return "/assets/home-needs.svg";
+  if (category === "bodyCare") return "/assets/body-care.svg";
+  if (category === "feminineHygiene") return "/assets/feminine-care.svg";
+  if (category === "instantFood") return "/assets/snack-pack.svg";
+  if (category === "milkPowders") return "/assets/milk.png";
+  return "";
+}
 
 const GENERIC_PLACEHOLDER_ASSETS = new Set([
   "/assets/grocery-items.png",
@@ -311,21 +334,42 @@ export function resolveProductImage(product) {
   const imageUrl = sanitizeImageUrl(product.imageUrl || product.image);
   const category = product._cat || "";
   const name = String(product.name || "");
-  const ruleBasedImage = PRODUCT_IMAGE_RULES.find((rule) => rule.match.test(name))?.image;
+  const ruleBasedImage = getCategorySpecificProductImage(category, name) || PRODUCT_IMAGE_RULES.find((rule) => rule.match.test(name))?.image;
+  const categoryFallback = CATEGORY_IMAGE_FALLBACKS[category] || DEFAULT_PRODUCT_IMAGE;
 
-  if (!imageUrl) return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || "";
+  if (!imageUrl) return ruleBasedImage || categoryFallback;
 
   if (GENERIC_PLACEHOLDER_ASSETS.has(imageUrl)) {
-    return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || imageUrl;
+    return ruleBasedImage || categoryFallback;
   }
 
   const lowered = imageUrl.toLowerCase();
   const looksLikeProduceArt = PRODUCE_IMAGE_KEYWORDS.some((keyword) => lowered.includes(keyword));
   if (looksLikeProduceArt && CATEGORIES_THAT_SHOULD_NOT_USE_PRODUCE_ART.has(category)) {
-    return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || imageUrl;
+    return ruleBasedImage || categoryFallback;
   }
 
-  return imageUrl || ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || "";
+  return imageUrl || ruleBasedImage || categoryFallback;
+}
+
+export function getProductImageFallback(product) {
+  if (!product || typeof product !== "object") return DEFAULT_PRODUCT_IMAGE;
+  const category = product._cat || "";
+  const name = String(product.name || "");
+  const ruleBasedImage = getCategorySpecificProductImage(category, name) || PRODUCT_IMAGE_RULES.find((rule) => rule.match.test(name))?.image;
+  return ruleBasedImage || CATEGORY_IMAGE_FALLBACKS[category] || DEFAULT_PRODUCT_IMAGE;
+}
+
+export function handleProductImageError(event, product) {
+  const image = event?.currentTarget;
+  if (!image) return;
+  const fallback = getProductImageFallback(product);
+  if (image.dataset.fallbackApplied === "true") {
+    image.style.visibility = "hidden";
+    return;
+  }
+  image.dataset.fallbackApplied = "true";
+  image.src = fallback;
 }
 
 /**

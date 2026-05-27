@@ -3,7 +3,7 @@ import { ADDRESSES_KEY } from "./AccountPage";
 import { useT } from "../i18n/translations";
 import AddressModal from "../components/AddressModal";
 import { formatPhoneForDisplay } from "../utils/phoneValidation";
-import { enhanceProduct, formatCurrency, getProductPrices, parsePrice, resolveProductImage } from "../utils/productUtils";
+import { enhanceProduct, formatCurrency, getProductPrices, handleProductImageError, parsePrice, resolveProductImage } from "../utils/productUtils";
 import { getFallbackDeals } from "../data/catalogFallback";
 import { KENYA_ALL_PRODUCTS } from "../data/kenya_products";
 import { getLocalizedProductName } from "../utils/translationUtils";
@@ -1359,7 +1359,7 @@ export default function CartPage({
                       <article key={`${product._uid || product.name}_${index}`} className="cart-special-card">
                         <div className="cart-special-card-inner">
                           <div className="cart-special-thumb">
-                            <img src={resolveProductImage(product)} alt={getTranslatedName(product.name)} loading="lazy" />
+                            <img src={resolveProductImage(product)} alt={getTranslatedName(product.name)} loading="lazy" onError={(event) => handleProductImageError(event, product)} />
                           </div>
                           <div className="cart-special-copy">
                             <div className="cart-special-title">{getTranslatedName(product.name)}</div>
@@ -1427,7 +1427,7 @@ export default function CartPage({
                       return (
                         <article key={`${item._uid}_${item.selectedUnit || "default"}`} className="cart-item-row">
                           <div className="cart-item-thumb" onClick={() => onOpenProduct?.(item)}>
-                            <img src={resolveProductImage(item)} alt={translatedName} loading="lazy" />
+                            <img src={resolveProductImage(item)} alt={translatedName} loading="lazy" onError={(event) => handleProductImageError(event, item)} />
                           </div>
 
                           <div className="cart-item-content">
@@ -1604,7 +1604,7 @@ export default function CartPage({
                           <span className="cart-rec-wish">
                             <i className="far fa-heart"></i>
                           </span>
-                          <img src={resolveProductImage(product)} alt={getTranslatedName(product.name)} loading="lazy" />
+                          <img src={resolveProductImage(product)} alt={getTranslatedName(product.name)} loading="lazy" onError={(event) => handleProductImageError(event, product)} />
                         </div>
                         <div className="cart-rec-name">{getTranslatedName(product.name)}</div>
                         <div className="cart-rec-price">

@@ -6,7 +6,7 @@ import {
   saveBotMessage,
 } from "../services/firebaseApi";
 import { useT, translations } from "../i18n/translations";
-import { formatCurrency, resolveProductImage } from "../utils/productUtils";
+import { formatCurrency, handleProductImageError, resolveProductImage } from "../utils/productUtils";
 
 // ── Telugu product name map ────────────────────────────────────────────────────
 const TELUGU_NAMES = {
@@ -434,7 +434,7 @@ function CartDisplay({ cartItems = [], region = "in" }) {
             <div key={i} style={{ display:"flex", alignItems:"center", gap:"10px", background:"white", borderRadius:"12px", padding:"8px 10px", boxShadow:"0 1px 6px rgba(0,0,0,0.07)" }}>
               <div style={{ width:"52px", height:"52px", borderRadius:"10px", overflow:"hidden", flexShrink:0, background:"#f1f5f9", border:"1px solid #e2e8f0" }}>
                 {item.imageUrl
-                  ? <img src={resolveProductImage(item)} alt={item.name} style={{ width:"100%", height:"100%", objectFit:"contain" }} onError={e=>{e.target.style.display="none";}} />
+                  ? <img src={resolveProductImage(item)} alt={item.name} style={{ width:"100%", height:"100%", objectFit:"contain" }} onError={(event) => handleProductImageError(event, item)} />
                   : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"22px" }}>🛒</div>
                 }
               </div>
@@ -475,7 +475,7 @@ function WishlistDisplay({ wishlistItems = [], region = "in" }) {
             <div key={i} style={{ display:"flex", alignItems:"center", gap:"10px", background:"white", borderRadius:"12px", padding:"8px 10px", boxShadow:"0 1px 6px rgba(0,0,0,0.07)" }}>
               <div style={{ width:"52px", height:"52px", borderRadius:"10px", overflow:"hidden", flexShrink:0, background:"#f1f5f9", border:"1px solid #e2e8f0" }}>
                 {item.imageUrl
-                  ? <img src={resolveProductImage(item)} alt={item.name} style={{ width:"100%", height:"100%", objectFit:"contain" }} onError={e=>{e.target.style.display="none";}} />
+                  ? <img src={resolveProductImage(item)} alt={item.name} style={{ width:"100%", height:"100%", objectFit:"contain" }} onError={(event) => handleProductImageError(event, item)} />
                   : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"22px" }}>❤️</div>
                 }
               </div>
@@ -690,10 +690,7 @@ function ProductCard({
               onMouseLeave={(e) =>
                 (e.currentTarget.style.transform = "scale(1)")
               }
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                e.currentTarget.nextSibling.style.display = "flex";
-              }}
+              onError={(event) => handleProductImageError(event, product)}
             />
             <div
               style={{

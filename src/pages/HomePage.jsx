@@ -15,7 +15,7 @@ import {
   RailSkeletonCard,
   SkeletonCard,
 } from "../components/SkeletonLoaders";
-import { resolveProductImage } from "../utils/productUtils";
+import { handleProductImageError, resolveProductImage } from "../utils/productUtils";
 import { Flame, Bolt, Compass, Crown, ChevronRight, ChevronLeft, ShoppingCart, Heart, ArrowRight } from "lucide-react";
 import { getLocalizedProductName } from "../utils/translationUtils";
 
@@ -797,7 +797,7 @@ export default function HomePage({
                       return (
                         <div key={ii} className="mprod" style={{ cursor: "pointer" }} onClick={() => onOpenProduct && onOpenProduct(item)}>
                           <div className="mimg">
-                            <img src={resolveProductImage(item)} alt={translatedName} loading="lazy" decoding="async" />
+                            <img src={resolveProductImage(item)} alt={translatedName} loading="lazy" decoding="async" onError={(event) => handleProductImageError(event, item)} />
                           </div>
                           <div className="minfo">
                             <h6>{translatedName}</h6>
