@@ -2,6 +2,12 @@
 
 ## Latest Stability Pass
 
+- Removed oversized desktop header marketing/trust chips and compacted the fixed header command row
+- Corrected desktop and mobile fixed-header offsets so the home hero/slideshow starts below the navbar
+- Constrained the desktop `Browse All Categories` dropdown to a smaller viewport-safe scrollable panel
+- Refined dark-mode header contrast, blue-tinted premium surfaces, search/location/browse readability, and compact account actions
+- Fixed the category-opening filter flash by preventing empty/loading categories from clamping into a stale `0-10%` discount range
+- Added pre-paint fresh category filter resets while preserving restore navigation from product detail
 - Added a premium shared refresh layer for core storefront sections, shell surfaces, and motion consistency
 - Added a page-level error boundary so major render failures degrade gracefully instead of blanking full views
 - Reduced app boot overhead by caching initial locale/session preference reads instead of repeatedly parsing localStorage on first render

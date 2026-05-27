@@ -104,6 +104,11 @@ Primary production domain: `https://prime-basket.in`
 - Core in-app toast styling now uses Prime Basket themed gradients, blur, and softer shadows instead of generic dark popup styling
 - Refund tracking now uses a more order-tracking-style vertical progress rail with clearer active and completed stages
 - Home and page-level skeleton loaders now better match the curated rail layout and premium card rhythm instead of falling back to overly generic placeholders
+- Desktop header marketing/trust chips were removed so the shell focuses on location, browse, search, and account actions without wasting vertical space
+- The fixed header offsets were corrected so the home hero/slideshow no longer starts behind the navbar on desktop or mobile
+- The desktop `Browse All Categories` dropdown is now constrained to a smaller scrollable premium panel that stays inside the viewport
+- Dark-mode header visuals were refined with clearer blue-tinted surfaces, stronger contrast, and compact action buttons
+- Category entry now resets stale filters before paint, preventing the temporary `0-10%` discount auto-filter glitch when opening categories
 
 ## Tech Stack
 
@@ -153,7 +158,7 @@ Optional AI/chat-related variables currently referenced:
   Main app orchestration, top-level page state, theme, region, language, cart, wishlist, checkout, and order flow state.
 
 - `src/components/Header.jsx`
-  Shared header, notification dropdown, search overlay, region/language UI, and mobile drawer.
+  Shared header, compact desktop command row, notification dropdown, search overlay, region/language UI, mobile drawer, dark-mode header polish, and browse-category dropdown behavior.
 
 - `src/context/AuthContext.jsx`
   Session and user state.
@@ -270,7 +275,8 @@ Detailed backend guidance is available in [docs/BACKEND_INTEGRATION_GUIDE.md](./
 See the `docs` folder for detailed project documentation:
 
 - [Manager Mail Update](./docs/Mail_Update.md)
-- [Today Manager Summary](./docs/DAILY_UPDATE_2026-05-20.md)
+- [Latest Daily Update](./docs/DAILY_UPDATE_2026-05-27.md)
+- [Previous Daily Update](./docs/DAILY_UPDATE_2026-05-26.md)
 - [Backend Readme](./docs/BACKEND.md)
 - [Application Overview](./docs/APPLICATION_OVERVIEW.md)
 - [Tech Stack and Architecture](./docs/TECH_STACK_AND_ARCHITECTURE.md)
@@ -289,6 +295,7 @@ See the `docs` folder for detailed project documentation:
 - Region-aware India fallback catalog, search indexing, wishlist/cart merge behavior, and address-modal mobile dock suppression were finalized in the latest pass
 - Locale selector consolidation, Kenya-English switching, home-only chatbot visibility, mobile dock/filter suppression, hero CTA routing, account `Buy Again`, and the latest `App.jsx` runtime crash fix were finalized in the latest pass
 - A professional QA-style frontend audit was completed in the latest pass, including premium shell polish, India fallback image/data cleanup, shared image-resolution hardening, and page-level error-boundary protection
+- The latest shell QA pass removed oversized desktop header chips, compacted the lower command row, fixed mobile/desktop hero offset, improved dark-mode header contrast, and stopped stale category discount filters from flashing on category entry
 - The app is suitable as a strong frontend demo/prototype
 - Final device-lab/browser QA and backend completion are still recommended before production use
 - Local preview/browser smoke checks are still limited in this environment by Windows `spawn EPERM`, though production builds remain green

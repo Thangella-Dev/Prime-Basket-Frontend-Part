@@ -71,9 +71,11 @@ Recent storefront hardening also added:
 - home-only chatbot visibility instead of global page-wide launcher presence
 - hero CTA routing from `Explore now` into the related category flow
 - browse-category dropdown auto-dismissal on outside interaction while preserving internal dropdown scrolling
+- compact desktop browse-category dropdown sizing so the category panel stays inside the viewport
 - staged refund and return tracking with requested, review, pickup, refund-processing, and completed phases
 - native mobile swipe-first curated home rails with scroll-snap behavior and synced shelf arrows
 - full-shell error-boundary protection to reduce occasional blank-screen boot failures
+- fresh category entry now resets stale filter state before paint, preventing the brief `0-10%` discount auto-filter flash
 
 Other important state is currently stored in the browser through `localStorage`, including:
 
@@ -113,6 +115,9 @@ Other important state is currently stored in the browser through `localStorage`,
 - The home curated shelves now use a more reliable real-device interaction model instead of a fragile custom drag path
 - Refund tracking now reads more like order tracking, with clearer staged progress presentation
 - India fallback catalog presentation is now more trustworthy because category-safe imagery is mapped directly in the fallback dataset instead of depending on misleading placeholders
+- The shared header is now more compact on desktop, with unnecessary marketing chips removed and clearer location/browse/search hierarchy
+- Dark-mode header surfaces now have stronger contrast, cleaner blue-tinted depth, and compact account action buttons
+- Mobile and desktop hero offsets now better respect the fixed header so primary content is not hidden behind the navbar
 
 ## Current Limitations
 

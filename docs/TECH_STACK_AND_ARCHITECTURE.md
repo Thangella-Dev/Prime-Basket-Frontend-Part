@@ -43,7 +43,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
   Wraps the shared page shell, mobile glass bottom dock, pull-to-refresh handling, connectivity surfaces, and shared overlay-aware dock suppression.
 
 - `src/components/Header.jsx`
-  Handles header behavior, region/language UI, notification dropdown, search overlay, mobile drawer, and browse-category dropdown dismissal behavior.
+  Handles header behavior, region/language UI, notification dropdown, search overlay, mobile drawer, compact desktop command-row behavior, dark-mode header polish, and browse-category dropdown dismissal/sizing behavior.
 
 - `src/components/ChatbotWidget.jsx`
   Handles the floating assistant launcher, mobile/desktop chat panel behavior, home-only launcher visibility, footer-aware floating controls, and quantity/auth overlay suppression.
@@ -67,7 +67,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 - `src/pages/HomePage.jsx`
   Handles hero, premium catalog merchandising, cached home-state restore, and the native scroll-snap curated shelves used for mobile-friendly swipe interaction.
 - `src/pages/CategoryPage.jsx`
-  Handles category browsing, all-products mode, compact desktop filter controls, and category-specific product-grid presentation.
+  Handles category browsing, all-products mode, compact desktop filter controls, category-specific product-grid presentation, state restoration from product detail, and pre-paint filter resets for fresh category entry.
 - `src/pages/ProductDetailPage.jsx`
 - `src/pages/CartPage.jsx`
   Handles cart, mobile checkout presentation, promo flow, address selection, and recommended/special-deal product surfaces.
@@ -128,6 +128,7 @@ This works, but a future production refactor could move more navigation to a cle
 - timeout-backed fallback protection on key homepage catalog surfaces to avoid prolonged skeleton-only states when live fetches stall
 - premium home skeleton coverage that now includes curated-rail-style placeholders instead of only generic product blocks
 - region-aware search fallback indexing so category/search results stay aligned to the active phone-region profile
+- category filter state is reset before fresh category paint so stale discount ranges do not briefly filter new category results
 
 ### User and commerce state
 
