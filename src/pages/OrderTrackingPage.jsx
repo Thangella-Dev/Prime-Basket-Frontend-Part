@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useT } from "../i18n/translations";
 import { useTracking } from "../context/TrackingContext";
-import { getLocalizedProductName } from "../utils/translationUtils";
 
 const getTrackingSteps = (t) => [
   { key: "Confirmed",  icon: "fa-clipboard-check", label: t.tracking.confirmed,  desc: t.tracking.confirmedDesc },
@@ -11,11 +10,8 @@ const getTrackingSteps = (t) => [
   { key: "Delivered",  icon: "fa-check-circle",     label: t.tracking.delivered, desc: t.tracking.deliveredDesc },
 ];
 
-export default function OrderTrackingPage({ order, onGoHome, onGoOrders, addNotification, onStatusUpdate, language = "en", region = "in" }) {
+export default function OrderTrackingPage({ order, onGoHome, onGoOrders, addNotification, onStatusUpdate: _onStatusUpdate, language = "en", region = "in" }) {
   const t = useT(language);
-  const currSym = region === "ke" ? "KES " : "\u20b9";
-
-  const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
   // Track current step index (0..3)
   const [currentStep, setCurrentStep] = useState(0);
@@ -62,7 +58,7 @@ export default function OrderTrackingPage({ order, onGoHome, onGoOrders, addNoti
         });
         localStorage.setItem("pb_product_ratings", JSON.stringify(storedRatings));
         window.dispatchEvent(new Event('storage'));
-      } catch (e) {}
+      } catch {}
     }
     setFeedbackSubmitted(true);
     if (addNotification) {

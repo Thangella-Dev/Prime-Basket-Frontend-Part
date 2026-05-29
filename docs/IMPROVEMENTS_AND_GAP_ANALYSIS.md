@@ -8,6 +8,8 @@
 - Refined dark-mode header contrast, blue-tinted premium surfaces, search/location/browse readability, and compact account actions
 - Fixed the category-opening filter flash by preventing empty/loading categories from clamping into a stale `0-10%` discount range
 - Added pre-paint fresh category filter resets while preserving restore navigation from product detail
+- Added a canonical backend README and linked it to the detailed backend integration module so backend handoff now has a clear entry point
+- Documented the backend service-layer plan, endpoint map, localStorage replacement map, validation rules, environment variables, and production checklist
 - Added a premium shared refresh layer for core storefront sections, shell surfaces, and motion consistency
 - Added a page-level error boundary so major render failures degrade gracefully instead of blanking full views
 - Reduced app boot overhead by caching initial locale/session preference reads instead of repeatedly parsing localStorage on first render
@@ -178,7 +180,7 @@ The following improvements were implemented during the recent Prime Basket front
 
 ### High priority
 
-- Attach backend APIs
+- Attach backend APIs using the staged migration plan in `docs/BACKEND.md`
 - Move AI/payment-sensitive logic off the client
 - Complete screen-by-screen dark-mode polish
 - Add testing for core user flows

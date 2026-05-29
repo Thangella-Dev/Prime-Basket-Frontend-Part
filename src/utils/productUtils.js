@@ -375,7 +375,7 @@ export function handleProductImageError(event, product) {
 /**
  * Enhances a product with dynamic weight/unit options if they don't exist.
  */
-export function enhanceProduct(p, region = "in", isDeal = false) {
+export function enhanceProduct(p, _region = "in", isDeal = false) {
   if (!p) return p;
 
   const cat = p._cat || "";

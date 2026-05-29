@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTracking } from '../context/TrackingContext';
 
-const RatingModal = ({ language, region, onSubmit }) => {
+const RatingModal = ({ language: _language, region, onSubmit }) => {
   const { isRatingModalOpen, setIsRatingModalOpen, completedOrder, setCompletedOrder } = useTracking();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);

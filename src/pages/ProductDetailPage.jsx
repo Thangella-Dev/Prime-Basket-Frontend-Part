@@ -51,7 +51,7 @@ const NAV_H = 88;
 export default function ProductDetailPage({ 
   product: rawProduct, onBack, onAddCart, onDecreaseCart, 
   cart = [], wishlist = [], toggleWishlist, 
-  language = "en", region = "in", onCategorySelect, onOpenProduct 
+  language = "en", region = "in", onCategorySelect
 }) {
   const t = useT(language);
   const [theme, setTheme] = useState(() => (typeof document !== "undefined" ? document.body.dataset.theme || "light" : "light"));

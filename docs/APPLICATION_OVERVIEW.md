@@ -138,15 +138,17 @@ Current readiness by area:
 - UI/UX quality: `Good`
 - Mobile responsiveness: `Good`, with more visual QA still recommended
 - Frontend architecture: `Moderate to good`
-- Backend integration readiness: `Moderate`
+- Backend integration readiness: `Ready to begin staged integration`
 - Production readiness: `Partial`, not complete
 
 ## Best Next Product Step
 
-The best next step is to convert the app from a strong frontend demo into a properly backed application by attaching:
+The best next step is to convert the app from a strong frontend demo into a properly backed application by following [BACKEND.md](./BACKEND.md) and attaching:
 
 - Real authentication APIs
 - Real cart/order APIs
 - Real payment processing
 - Real notification delivery
 - Real chatbot proxy/backend
+
+The backend documentation now includes the recommended frontend service layer, endpoint groups, localStorage migration map, validation rules, environment variables, and production checklist.

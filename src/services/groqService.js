@@ -200,7 +200,7 @@ function buildSystemPrompt(products, cartItems = [], wishlistItems = []) {
   };
 
   // ── Build cart section ──
-  let cartSection = "";
+  let cartSection;
   if (cartItems.length === 0) {
     cartSection = "USER'S CURRENT BASKET: Empty (no items added yet)";
   } else {
@@ -218,7 +218,7 @@ function buildSystemPrompt(products, cartItems = [], wishlistItems = []) {
   }
 
   // ── Build wishlist section ──
-  let wishlistSection = "";
+  let wishlistSection;
   if (wishlistItems.length === 0) {
     wishlistSection = "USER'S WISHLIST / FAVORITES: Empty";
   } else {

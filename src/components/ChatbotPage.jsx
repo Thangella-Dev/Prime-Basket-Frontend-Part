@@ -6,8 +6,8 @@ import { getSessions, createSession, deleteSession } from "../services/firebaseA
 import { useT } from "../i18n/translations";
 
 export default function ChatbotPage({
-  onGoCart,
-  onGoWishlist,
+  onGoCart: _onGoCart,
+  onGoWishlist: _onGoWishlist,
   onClose,
   cart = [],
   wishlist = [],

@@ -1,5 +1,11 @@
 # Backend Integration Guide
 
+## Current Docs Note
+
+This file is retained as the older high-level backend guide. The current canonical backend entry point is [BACKEND.md](./BACKEND.md), and the detailed implementation module is [BACKEND_Integration_Modeule.md](./BACKEND_Integration_Modeule.md).
+
+Use this file for a quick overview, and use `BACKEND.md` for the exact migration order, endpoint groups, frontend file map, validation rules, and production checklist.
+
 ## Current Situation
 
 The frontend already behaves like a functional storefront, but several important systems are still frontend/demo oriented:
@@ -112,28 +118,29 @@ Any of the following would work well:
 
 Suggested endpoint groups:
 
-- `POST /auth/login`
-- `POST /auth/verify-otp`
-- `POST /auth/refresh`
-- `GET /me`
-- `PATCH /me`
-- `GET /products`
-- `GET /products/:id`
-- `GET /categories`
-- `GET /search`
-- `GET /cart`
-- `POST /cart/items`
-- `PATCH /cart/items/:id`
-- `DELETE /cart/items/:id`
-- `POST /checkout/quote`
-- `POST /orders`
-- `GET /orders`
-- `GET /orders/:id`
-- `POST /payments/create`
-- `POST /payments/webhook`
-- `GET /notifications`
-- `PATCH /notifications/read`
-- `POST /chat`
+- `POST /api/auth/send-phone-otp`
+- `POST /api/auth/verify-phone-otp`
+- `POST /api/auth/refresh`
+- `GET /api/auth/me`
+- `PATCH /api/users/me`
+- `GET /api/catalog/home`
+- `GET /api/catalog/products/:id`
+- `GET /api/catalog/categories`
+- `GET /api/search`
+- `GET /api/cart`
+- `POST /api/cart/items`
+- `PATCH /api/cart/items/:id`
+- `DELETE /api/cart/items/:id`
+- `POST /api/checkout/quote`
+- `POST /api/orders`
+- `GET /api/orders`
+- `GET /api/orders/:id`
+- `POST /api/payments/session`
+- `POST /api/payments/confirm`
+- `POST /api/payments/webhook`
+- `GET /api/notifications`
+- `PATCH /api/notifications/:id/read`
+- `POST /api/chat`
 
 ## Frontend Changes Needed To Attach Backend
 

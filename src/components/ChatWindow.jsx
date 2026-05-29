@@ -212,14 +212,14 @@ function parseMessage(content) {
   if (prodMatch) {
     try {
       products = JSON.parse(prodMatch[1].trim());
-    } catch (e) {}
+    } catch {}
     remaining = remaining.replace(/```products\s*[\s\S]*?```/, "").trim();
   }
   const actMatch = remaining.match(/```action\s*([\s\S]*?)```/);
   if (actMatch) {
     try {
       action = JSON.parse(actMatch[1].trim());
-    } catch (e) {}
+    } catch {}
     remaining = remaining.replace(/```action\s*[\s\S]*?```/, "").trim();
   }
   return {

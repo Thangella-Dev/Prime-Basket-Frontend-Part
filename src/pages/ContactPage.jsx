@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useT } from "../i18n/translations";
 
-export default function ContactPage({ language = "en", onGoHome }) {
+export default function ContactPage({ language = "en", onGoHome: _onGoHome }) {
   const t = useT(language);
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
   const [status, setStatus] = useState("idle"); // idle, sending, success

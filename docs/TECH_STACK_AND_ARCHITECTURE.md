@@ -84,6 +84,12 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 
 ### Supporting Systems
 
+- `docs/BACKEND.md`
+  Canonical backend integration README with service-layer guidance, API endpoint map, localStorage migration plan, validation rules, environment variables, and production checklist.
+
+- `docs/BACKEND_Integration_Modeule.md`
+  Detailed backend integration module for auth, catalog, cart, wishlist, checkout, orders, payments, refunds, notifications, wallet, and chatbot proxy migration.
+
 - `src/firebase.js`
   Firebase app and Realtime Database setup through environment variables.
 
@@ -164,7 +170,7 @@ What should improve later:
 
 - Reduce giant page-level inline styles
 - Reduce amount of state living in `App.jsx`
-- Move from demo persistence to real API persistence
+- Move from demo persistence to real API persistence using the staged backend plan in `docs/BACKEND.md`
 - Consider route-driven navigation for long-term maintainability
 - Introduce testing and stronger data contracts
 - Add a preview/browser automation path outside the current Windows sandbox so runtime QA is not blocked by `spawn EPERM`

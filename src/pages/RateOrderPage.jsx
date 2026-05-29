@@ -1,6 +1,5 @@
 // src/pages/RateOrderPage.jsx
 import { useState } from "react";
-import { useT } from "../i18n/translations";
 
 const ISSUE_OPTIONS = [
   { key: "missing", icon: "fa-box-open", label: "Missing / Incorrect items" },
@@ -18,10 +17,7 @@ const TAG_OPTIONS = [
   { key: "value", icon: "💰", label: "Great value" },
 ];
 
-export default function RateOrderPage({ order, onGoBack, onSubmit, language = "en", region = "in" }) {
-  const t = useT(language);
-  const currSym = region === "ke" ? "KES " : "\u20b9";
-
+export default function RateOrderPage({ order, onGoBack, onSubmit }) {
   const [ratings, setRatings] = useState({ delivery: 0, quality: 0 });
   const [hoverRatings, setHoverRatings] = useState({ delivery: 0, quality: 0 });
   const [selectedIssues, setSelectedIssues] = useState([]);

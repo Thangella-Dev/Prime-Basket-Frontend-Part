@@ -111,11 +111,11 @@ const normalizeUnitKey = (value) =>
 const buildWishlistSnapshot = (product) => {
   const sanitizedProduct = sanitizeStoredProduct(product);
   const {
-    quantity,
-    selectedUnit,
-    wishlistOrigin,
-    wishlistRestoreEligible,
-    wishlistOriginSnapshot,
+    quantity: _quantity,
+    selectedUnit: _selectedUnit,
+    wishlistOrigin: _wishlistOrigin,
+    wishlistRestoreEligible: _wishlistRestoreEligible,
+    wishlistOriginSnapshot: _wishlistOriginSnapshot,
     ...wishlistProduct
   } = sanitizedProduct || {};
   return wishlistProduct;
@@ -173,7 +173,7 @@ const dedupeCartCollection = (items = []) => {
 
 export default function App() {
   const { isAuthenticated, user, login, logout } = useAuth();
-  const { startTracking, activeOrder, completedOrder, setCompletedOrder } = useTracking();
+  const { startTracking, activeOrder, setCompletedOrder } = useTracking();
   const [bootVisualReady, setBootVisualReady] = useState(false);
   const [refreshSignal, setRefreshSignal] = useState(0);
   const [hideMobileGlassDock, setHideMobileGlassDock] = useState(false);
@@ -224,7 +224,7 @@ export default function App() {
     const safeRegion = nextRegion === "ke" ? "ke" : "in";
     setRegion(safeRegion);
     setLanguage(getDefaultLanguageForRegion(safeRegion));
-  }, [language]);
+  }, []);
 
   // ── Notifications ──
   const [notifications, setNotifications] = useState(() => {
@@ -488,7 +488,7 @@ export default function App() {
       try {
         const localOrders = JSON.parse(localStorage.getItem("pb_orders") || "[]");
         setOrders(localOrders);
-      } catch (e) {}
+      } catch {}
     };
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);
@@ -535,7 +535,6 @@ export default function App() {
   }, []);
 
   // Sync state changes to history
-  const isInternalChange = useRef(false);
   useEffect(() => {
     const currentState = window.history.state;
     const newState = { 
@@ -679,7 +678,7 @@ export default function App() {
         const existing = JSON.parse(localStorage.getItem("pb_gift_cards") || "[]");
         const filtered = existing.filter(c => c.code !== order.promoCode);
         localStorage.setItem("pb_gift_cards", JSON.stringify(filtered));
-      } catch(e) {}
+      } catch {}
     }
 
     // Global tracking trigger
@@ -1311,7 +1310,7 @@ export default function App() {
               const updated = [feedback, ...existing];
               localStorage.setItem("pb_order_reviews", JSON.stringify(updated));
               window.dispatchEvent(new Event("storage")); // Notify components like AccountPage
-            } catch (e) {}
+            } catch {}
 
             addNotification(
               "Review Submitted",

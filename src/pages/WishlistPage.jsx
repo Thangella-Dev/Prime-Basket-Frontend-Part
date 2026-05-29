@@ -5,12 +5,10 @@ import { handleProductImageError, resolveProductImage } from "../utils/productUt
 
 export default function WishlistPage({
   wishlist,
-  cart,
   toggleWishlist,
   onMoveToCart,
   onClearWishlist,
   onAddCart,
-  onDecreaseCart,
   onOpenProduct,
   onContinueShopping,
   language = "en",

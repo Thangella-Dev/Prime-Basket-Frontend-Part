@@ -1,5 +1,9 @@
 # Backend Integration Guide
 
+## Documentation Role
+
+This is the detailed backend integration module. For the short project entry point and handoff summary, start with [BACKEND.md](./BACKEND.md). Keep this file as the deeper implementation reference for endpoint contracts, frontend file ownership, localStorage migration, validation, security, and QA.
+
 ## Current Status
 
 Prime Basket is ready to start backend integration now.
@@ -1056,4 +1060,3 @@ Can wait until later:
 Start backend integration now.
 
 Do not rewrite the entire frontend first. Add the service layer, connect one backend domain at a time, keep current fallbacks during migration, and only remove localStorage/demo flows after each backend feature is stable.
-

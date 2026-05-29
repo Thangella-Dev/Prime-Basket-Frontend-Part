@@ -102,8 +102,6 @@ export default function ChatbotWidget({
 }) {
   const [open, setOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
-  const [nearFooter, setNearFooter] = useState(false);
   const [isHomeAtTop, setIsHomeAtTop] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -131,8 +129,6 @@ export default function ChatbotWidget({
   }, []);
 
   useEffect(() => {
-    let scrollStopTimer = null;
-
     const handleScroll = () => {
       const viewportHeight = window.innerHeight || 0;
       const nextY = window.scrollY || 0;
@@ -141,18 +137,13 @@ export default function ChatbotWidget({
       const isNearFooter = footerRect ? footerRect.top <= viewportHeight - 32 : false;
 
       setShowScrollTop(isNearFooter);
-      setNearFooter(isNearFooter);
       setIsHomeAtTop(nextY <= 36);
-      setIsUserScrolling(true);
-      if (scrollStopTimer) clearTimeout(scrollStopTimer);
-      scrollStopTimer = setTimeout(() => setIsUserScrolling(false), 180);
     };
 
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("resize", handleScroll);
     return () => {
-      if (scrollStopTimer) clearTimeout(scrollStopTimer);
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleScroll);
     };

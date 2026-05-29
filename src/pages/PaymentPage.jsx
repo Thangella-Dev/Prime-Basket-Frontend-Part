@@ -10,7 +10,7 @@ import { getLocalizedProductName } from "../utils/translationUtils";
 
 export default function PaymentPage({ cart, total, delivery, vat = 0, handlingFee = 0, subtotal = 0, saving = 0, promoDiscount = 0, promoCode = "", address, onBack, onSuccess, language = "en", region = "in" }) {
   const t = useT(language);
-  const { walletBalance, useWalletMoney } = useTracking();
+  const { walletBalance, useWalletMoney: spendWalletMoney } = useTracking();
   
   const config = PAYMENT_CONFIG[region] || PAYMENT_CONFIG["in"];
   const currSym = config.currencySymbol;
@@ -40,21 +40,13 @@ export default function PaymentPage({ cart, total, delivery, vat = 0, handlingFe
 
   const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
-  const formatCard = (v) =>
-    v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
-
-  const formatExp = (v) => {
-    const d = v.replace(/\D/g, "").slice(0, 4);
-    return d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d;
-  };
-
   const validate = () => {
     const e = {};
     const isWalletFullyCovering = usePBWallet && walletBalance >= total;
     if (isWalletFullyCovering) return true;
 
     if (method === "upi") {
-      if (useUpiId && !/^[\w.\-]+@[\w]+$/.test(upiId.trim())) e.upiId = "Enter a valid UPI ID";
+      if (useUpiId && !/^[\w.-]+@[\w]+$/.test(upiId.trim())) e.upiId = "Enter a valid UPI ID";
     }
     if (method === "mpesa") {
       if (!/^(?:254|\+254|0)?([71]\d{8})$/.test(upiId.replace(/\D/g, ""))) e.mpesaPhone = "Enter a valid M-Pesa phone number";
@@ -92,7 +84,7 @@ export default function PaymentPage({ cart, total, delivery, vat = 0, handlingFe
     }
 
     if (usePBWallet && walletDeduction > 0) {
-      useWalletMoney(walletDeduction, "Order Payment");
+      spendWalletMoney(walletDeduction, "Order Payment");
     }
 
     setTimeout(() => {

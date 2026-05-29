@@ -69,7 +69,7 @@ export const validateExpiry = (expiry) => {
 };
 
 export const validateUPI = (upiId) => {
-  return /^[\w.\-]+@[\w]+$/.test(upiId.trim());
+  return /^[\w.-]+@[\w]+$/.test(upiId.trim());
 };
 
 export const validateMPesa = (phone) => {

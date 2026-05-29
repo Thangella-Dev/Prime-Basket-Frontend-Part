@@ -1,7 +1,6 @@
 // src/data/kenya_products.js
 // Kenya / Swahili-locale products — loaded when language === "ke"
 
-const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
 // ── BISCUITS & COOKIES ──────────────────────────────────────────────────
 export const KENYA_BISCUITS = [

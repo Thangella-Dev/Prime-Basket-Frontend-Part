@@ -16,8 +16,6 @@ export default function OrderDetailPage({ order, onGoBack, onGoRate, onOrderAgai
     wallet: t.payment.methods.wallet, 
     cod: t.payment.methods.cod 
   };
-  const deliveryMin = Math.floor(Math.random() * 15) + 5;
-
   // Get bill values from order object or fallback for older orders
   const itemTotal = order?.subtotal || (order?.items || []).reduce((sum, item) => {
     const price = parseFloat(String(item.price || "").replace(/[^0-9.]/g, "")) || 0;

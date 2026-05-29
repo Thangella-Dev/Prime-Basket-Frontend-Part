@@ -90,7 +90,7 @@ function validateAddressText(value, { label, min = 2, max = 80, required = false
   return "";
 }
 
-export default function AddressModal({ isOpen, onClose, onSave, initialData, t, region = "in" }) {
+export default function AddressModal({ isOpen, onClose, onSave, initialData, t: _t, region = "in" }) {
   const [formData, setFormData] = useState(defaultForm);
   const [formErrors, setFormErrors] = useState({});
   const [locationInfo, setLocationInfo] = useState(() => loadSavedLocation());

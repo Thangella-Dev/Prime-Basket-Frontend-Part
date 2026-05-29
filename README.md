@@ -258,7 +258,7 @@ What still needs work:
 
 ## Backend Attachment Direction
 
-To take this to production, attach:
+To take this to production, attach the backend in a staged service-layer migration:
 
 - Auth API
 - Catalog API or validated Firebase access layer
@@ -268,7 +268,7 @@ To take this to production, attach:
 - Notification service
 - Chatbot proxy/backend
 
-Detailed backend guidance is available in [docs/BACKEND_INTEGRATION_GUIDE.md](./docs/BACKEND_INTEGRATION_GUIDE.md).
+Detailed backend guidance is now available in [docs/BACKEND.md](./docs/BACKEND.md), with the full module-level implementation plan in [docs/BACKEND_Integration_Modeule.md](./docs/BACKEND_Integration_Modeule.md).
 
 ## Documentation
 
@@ -278,6 +278,8 @@ See the `docs` folder for detailed project documentation:
 - [Latest Daily Update](./docs/DAILY_UPDATE_2026-05-27.md)
 - [Previous Daily Update](./docs/DAILY_UPDATE_2026-05-26.md)
 - [Backend Readme](./docs/BACKEND.md)
+- [Backend Systems And Cost Estimate](./docs/BACKEND_SYSTEMS_AND_COST_ESTIMATE.md)
+- [Backend Integration Module](./docs/BACKEND_Integration_Modeule.md)
 - [Application Overview](./docs/APPLICATION_OVERVIEW.md)
 - [Tech Stack and Architecture](./docs/TECH_STACK_AND_ARCHITECTURE.md)
 - [Backend Integration Guide](./docs/BACKEND_INTEGRATION_GUIDE.md)
@@ -296,6 +298,7 @@ See the `docs` folder for detailed project documentation:
 - Locale selector consolidation, Kenya-English switching, home-only chatbot visibility, mobile dock/filter suppression, hero CTA routing, account `Buy Again`, and the latest `App.jsx` runtime crash fix were finalized in the latest pass
 - A professional QA-style frontend audit was completed in the latest pass, including premium shell polish, India fallback image/data cleanup, shared image-resolution hardening, and page-level error-boundary protection
 - The latest shell QA pass removed oversized desktop header chips, compacted the lower command row, fixed mobile/desktop hero offset, improved dark-mode header contrast, and stopped stale category discount filters from flashing on category entry
+- Backend documentation was refreshed with a canonical backend README, service-layer migration plan, endpoint map, localStorage migration map, validation rules, and production checklist
 - The app is suitable as a strong frontend demo/prototype
 - Final device-lab/browser QA and backend completion are still recommended before production use
 - Local preview/browser smoke checks are still limited in this environment by Windows `spawn EPERM`, though production builds remain green

@@ -7,9 +7,6 @@ import { useT } from "../i18n/translations";
 import AddressModal from "../components/AddressModal";
 import {
   formatPhoneForDisplay,
-  getPhoneInputMaxLength,
-  sanitizePhoneInput,
-  validateAndNormalizePhone,
 } from "../utils/phoneValidation";
 import { getLocalizedProductName } from "../utils/translationUtils";
 import { handleProductImageError, resolveProductImage } from "../utils/productUtils";
@@ -560,7 +557,7 @@ export default AccountPage;
 
 /* ─── Profile Component ──────────────────────────────────────────── */
 
-function Profile({ user, updateUser, t, language = "en", region = "in" }) {
+function Profile({ user, updateUser, t, language: _language = "en", region = "in" }) {
   const [isEditing, setIsEditing] = useState(false);
   const [photo, setPhoto] = useState(null); // Temporary preview
   const [displayPhoto, setDisplayPhoto] = useState(user?.profileImage || null);
@@ -826,8 +823,6 @@ function BuyAgainSection({ orders = [], t, currSym = "\u20b9", language = "en", 
 }
 
 function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onRateOrder, onOrderAgain, onDeleteOrder, onNotification, onRefundOverlayChange }) {
-  const [loading, setLoading] = useState(true);
-
   const [activeMenuOrderId, setActiveMenuOrderId] = useState(null);
   const [refundRequests, setRefundRequests] = useState(loadRefundRequests);
   const [returnModal, setReturnModal] = useState(null);
@@ -1172,11 +1167,6 @@ function OrdersSection({ orders = [], t, currSym = "\u20b9", onOrderSummary, onR
     }
     return filtered;
   }, [orders, orderFilter]);
-
-  useEffect(() => {
-    const timerId = window.setTimeout(() => setLoading(false), 800);
-    return () => window.clearTimeout(timerId);
-  }, []);
 
   const methodLabel = { upi: "UPI", card: "Card", netbanking: "Net Banking", wallet: "Wallet", cod: "COD" };
 
@@ -1880,7 +1870,7 @@ export function AddressSection({ t, language = "en", region = "in" }) {
 
 /* ─── Add Balance Modal Component ────────────────────────────────── */
 
-function AddBalanceModal({ isOpen, onClose, currSym, region, t, onSuccess }) {
+function AddBalanceModal({ isOpen, onClose, currSym, region: _region, t: _t, onSuccess }) {
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("upi");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -2164,7 +2154,7 @@ function WalletSection({ t, currSym, region, language = "en" }) {
   );
 }
 
-function RefundsDemoSection({ t, currSym, region }) {
+function RefundsDemoSection({ t, currSym, region: _region }) {
   const [refunds, setRefunds] = useState(loadRefundRequests);
 
   useEffect(() => {

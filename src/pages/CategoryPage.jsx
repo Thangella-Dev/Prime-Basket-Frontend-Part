@@ -282,13 +282,6 @@ export default function CategoryPage({
   const activeLabel = isAllView
     ? (t.home?.allCategories || "All Categories")
     : (t.categories?.[activeKey] || category);
-  const categorySelectOptions = [
-    { value: "all", label: t.home?.allCategories || "All Categories" },
-    ...CATEGORIES_DATA.map((cat) => ({
-      value: cat.value,
-      label: t.categories?.[cat.key] || cat.value,
-    })),
-  ];
   const categoryStateCacheKey = useMemo(
     () => `${CATEGORY_VIEW_CACHE_PREFIX}:${region}:${category || "unknown"}`,
     [category, region]
@@ -730,7 +723,7 @@ export default function CategoryPage({
     }
 
     return list;
-  }, [products, allProducts, searchQuery, selectedBrands, effectivePriceRange, effectiveDiscountRange, sortBy]);
+  }, [products, allProducts, searchQuery, selectedBrands, effectivePriceRange, effectiveDiscountRange, sortBy, getTranslatedName]);
 
   // ── Active filter tags ─────────────────────────────────────────────────────
   const activeTags = useMemo(() => {
@@ -1094,7 +1087,7 @@ export default function CategoryPage({
   // ══════════════════════════════════════════════════════════════════════════
   // RENDER: Product card
   // ══════════════════════════════════════════════════════════════════════════
-  const renderProductCard = (item, index) => {
+  const _renderProductCard = (item, index) => {
     const inCart = cart.find((c) => c._uid === item._uid);
     const qty = inCart ? inCart.quantity : 0;
     const isWished = wishlist.some((w) => w._uid === item._uid);

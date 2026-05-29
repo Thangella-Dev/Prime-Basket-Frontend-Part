@@ -5,7 +5,6 @@ import { getLocalizedProductName } from "../utils/translationUtils";
 
 export default function OrderSuccessPage({ order, onGoHome, onGoOrders, onGoTracking, language = "en", region = "in" }) {
   const t = useT(language);
-  const currSym = region === "ke" ? "KES " : "\u20b9";
   
   const getTranslatedName = (name) => getLocalizedProductName(name, t);
 

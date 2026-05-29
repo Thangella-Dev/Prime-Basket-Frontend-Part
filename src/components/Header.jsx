@@ -9,7 +9,7 @@ import { MoonStar, SunMedium } from "lucide-react";
 export default function Header({
   onAccountClick, isLoggedIn, user,
   onCategorySelect, onLogoClick, onLogoDoubleClick,
-  onBack, currentPage = "home",
+  currentPage = "home",
   cartCount = 0, wishlistCount = 0,
   onCartClick, onWishlistClick,
   onOpenProduct,
@@ -127,7 +127,6 @@ export default function Header({
   const [locationNotice, setLocationNotice] = useState("");
   const [mobileLanguageOpen, setMobileLanguageOpen] = useState(false);
   const [desktopLocaleOpen, setDesktopLocaleOpen] = useState(false);
-  const [expandedDrawerGroup, setExpandedDrawerGroup] = useState("fresh");
   const browseRef = useRef(null);
   const mobileBrowseRef = useRef(null);
   const notesRef = useRef(null);
@@ -413,41 +412,7 @@ export default function Header({
   const mobileLocationBarTitle =
     language === "ke" ? "Inapeleka hadi" : "Delivering to";
   const showMobileLocationBar = isHomePage && !drawerOpen && Boolean(locationState?.fullAddress || locationState?.label);
-  const regionOptions = [
-    { value: "in", label: "India", meta: "INR", flag: "🇮🇳", accent: "from-orange-400 via-white to-green-400" },
-    { value: "ke", label: "Kenya", meta: "KES", flag: "🇰🇪", accent: "from-green-500 via-red-500 to-black" },
-  ];
-  const languageOptionsByRegion = {
-    in: [
-      { value: "en", label: "English", native: "English", meta: "India default" },
-      { value: "te", label: "Telugu", native: "తెలుగు", meta: "Regional" },
-    ],
-    ke: [
-      { value: "en", label: "English", native: "English", meta: "Kenya option" },
-      { value: "ke", label: "Swahili", native: "Kiswahili", meta: "Kenya default" },
-    ],
-  };
-  const localeRegionOptions = [
-    { value: "in", label: "India", meta: "INR", flag: "\uD83C\uDDEE\uD83C\uDDF3", accent: "from-orange-400 via-white to-green-400" },
-    { value: "ke", label: "Kenya", meta: "KES", flag: "\uD83C\uDDF0\uD83C\uDDEA", accent: "from-green-500 via-red-500 to-black" },
-  ];
-  const localeLanguageOptionsByRegion = {
-    in: [
-      { value: "en", label: "English", native: "English", meta: "India default" },
-      { value: "hi", label: "Hindi", native: "\u0939\u093F\u0928\u094D\u0926\u0940", meta: "National" },
-      { value: "te", label: "Telugu", native: "\u0C24\u0C46\u0C32\u0C41\u0C17\u0C41", meta: "Regional" },
-    ],
-    ke: [
-      { value: "en", label: "English", native: "English", meta: "Kenya option" },
-      { value: "ke", label: "Swahili", native: "Kiswahili", meta: "Kenya default" },
-    ],
-  };
   const activeRegion = region === "ke" ? "ke" : "in";
-  const languageOptions = localeLanguageOptionsByRegion[activeRegion];
-  const currentRegionOption =
-    localeRegionOptions.find((option) => option.value === activeRegion) || localeRegionOptions[0];
-  const currentLanguageOption =
-    languageOptions.find((option) => option.value === language) || languageOptions[0];
   const profileRegionOptions = [
     { value: "in", label: "India", meta: "INR", flag: "\uD83C\uDDEE\uD83C\uDDF3" },
     { value: "ke", label: "Kenya", meta: "KES", flag: "\uD83C\uDDF0\uD83C\uDDEA" },

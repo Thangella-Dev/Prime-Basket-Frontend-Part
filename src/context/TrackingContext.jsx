@@ -67,7 +67,7 @@ export const TrackingProvider = ({ children }) => {
         if (wallet && wallet.balance !== undefined) {
           setWalletBalance(wallet.balance);
         }
-      } catch (e) {}
+      } catch {}
     };
     window.addEventListener("wallet-updated", syncWallet);
     window.addEventListener("storage", syncWallet);
@@ -110,7 +110,7 @@ export const TrackingProvider = ({ children }) => {
           );
           localStorage.setItem('pb_orders', JSON.stringify(updatedOrders));
           window.dispatchEvent(new Event('storage'));
-        } catch (e) {}
+        } catch {}
 
         if (nextStatus === 'Delivered') {
           setCompletedOrder(updated);
