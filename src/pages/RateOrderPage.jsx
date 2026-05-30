@@ -1,5 +1,5 @@
 // src/pages/RateOrderPage.jsx
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const ISSUE_OPTIONS = [
   { key: "missing", icon: "fa-box-open", label: "Missing / Incorrect items" },
@@ -19,6 +19,7 @@ const TAG_OPTIONS = [
 
 export default function RateOrderPage({ order, onGoBack, onSubmit }) {
   const [ratings, setRatings] = useState({ delivery: 0, quality: 0 });
+  const latestRatingsRef = useRef({ delivery: 0, quality: 0 });
   const [hoverRatings, setHoverRatings] = useState({ delivery: 0, quality: 0 });
   const [selectedIssues, setSelectedIssues] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -31,7 +32,6 @@ export default function RateOrderPage({ order, onGoBack, onSubmit }) {
   const qualityRating = ratings.quality;
   const deliveryHover = hoverRatings.delivery;
   const qualityHover = hoverRatings.quality;
-  const hasAnyRating = deliveryRating > 0 || qualityRating > 0;
 
   const averageRating = (deliveryRating + qualityRating) / 2;
   const ratingLevel = averageRating >= 4 ? "good" : averageRating >= 2.5 ? "medium" : averageRating > 0 ? "bad" : "none";
@@ -82,8 +82,21 @@ export default function RateOrderPage({ order, onGoBack, onSubmit }) {
     setPhotos(prev => prev.filter((_, i) => i !== idx));
   };
 
+  const updateRating = (type, value) => {
+    const nextRatings = {
+      ...latestRatingsRef.current,
+      [type]: value,
+    };
+    latestRatingsRef.current = nextRatings;
+    setRatings(nextRatings);
+    if (validationError) setValidationError("");
+  };
+
   const handleSubmit = () => {
-    if (!hasAnyRating) {
+    const finalRatings = latestRatingsRef.current;
+    const hasSubmittedRating = Number(finalRatings.delivery) > 0 || Number(finalRatings.quality) > 0;
+
+    if (!hasSubmittedRating) {
       setValidationError("Please provide at least one rating.");
       return;
     }
@@ -92,8 +105,8 @@ export default function RateOrderPage({ order, onGoBack, onSubmit }) {
     if (onSubmit) {
       onSubmit({
         orderId: order?.orderId,
-        deliveryRating: ratings.delivery,
-        qualityRating: ratings.quality,
+        deliveryRating: finalRatings.delivery,
+        qualityRating: finalRatings.quality,
         issues: selectedIssues,
         tags: selectedTags,
         reviewText,
@@ -129,10 +142,15 @@ export default function RateOrderPage({ order, onGoBack, onSubmit }) {
         {[1, 2, 3, 4, 5].map(star => (
           <span
             key={star}
+            onPointerDown={(event) => {
+              event.preventDefault();
+              onRate(star);
+            }}
             onClick={() => onRate(star)}
             onMouseEnter={() => onHover(star)}
             onMouseLeave={() => onLeave()}
             style={{
+              border: "none", background: "transparent", padding: 0,
               fontSize: 32, cursor: "pointer",
               color: star <= (hover || rating) ? "#f59e0b" : "#e0e4ea",
               transition: "transform 0.15s, color 0.15s",
@@ -317,8 +335,7 @@ export default function RateOrderPage({ order, onGoBack, onSubmit }) {
                 rating={deliveryRating}
                 hover={deliveryHover}
                 onRate={(value) => {
-                  setRatings((prev) => ({ ...prev, delivery: value }));
-                  if (validationError) setValidationError("");
+                  updateRating("delivery", value);
                 }}
                 onHover={(value) => setHoverRatings((prev) => ({ ...prev, delivery: value }))}
                 onLeave={() => setHoverRatings((prev) => ({ ...prev, delivery: 0 }))}
@@ -329,8 +346,7 @@ export default function RateOrderPage({ order, onGoBack, onSubmit }) {
                 rating={qualityRating}
                 hover={qualityHover}
                 onRate={(value) => {
-                  setRatings((prev) => ({ ...prev, quality: value }));
-                  if (validationError) setValidationError("");
+                  updateRating("quality", value);
                 }}
                 onHover={(value) => setHoverRatings((prev) => ({ ...prev, quality: value }))}
                 onLeave={() => setHoverRatings((prev) => ({ ...prev, quality: 0 }))}

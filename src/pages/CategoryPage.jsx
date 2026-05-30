@@ -900,6 +900,46 @@ export default function CategoryPage({
   ]);
 
   // ── Sort label ─────────────────────────────────────────────────────────────
+  const persistCategoryViewSnapshot = useCallback(() => {
+    if (!category || loading || typeof window === "undefined") return;
+    safeSessionSet(
+      categoryStateCacheKey,
+      JSON.stringify({
+        savedAt: Date.now(),
+        products,
+        allProducts,
+        selectedBrands,
+        brandSearch,
+        searchQuery,
+        priceRange: effectivePriceRange,
+        discountRange: effectiveDiscountRange,
+        priceRangeTouched,
+        discountRangeTouched,
+        sortBy,
+        scrollY: window.scrollY || 0,
+      })
+    );
+  }, [
+    allProducts,
+    brandSearch,
+    category,
+    categoryStateCacheKey,
+    effectiveDiscountRange,
+    effectivePriceRange,
+    discountRangeTouched,
+    loading,
+    priceRangeTouched,
+    products,
+    searchQuery,
+    selectedBrands,
+    sortBy,
+  ]);
+
+  const openProductFromCategory = useCallback((item) => {
+    persistCategoryViewSnapshot();
+    onOpenProduct?.(item);
+  }, [onOpenProduct, persistCategoryViewSnapshot]);
+
   const sortLabel = sortBy === "default"
     ? "Sort By"
     : (getSortOptions(t).find((o) => o.value === sortBy)?.label || "Sort By");
@@ -1139,7 +1179,7 @@ export default function CategoryPage({
       <div
         key={item._uid}
         className="cp-product-card pcard"
-        onClick={() => onOpenProduct?.(item)}
+        onClick={() => openProductFromCategory(item)}
         style={{ cursor: "pointer", position: "relative" }}
       >
         {disc > 0 ? (
@@ -1905,7 +1945,7 @@ export default function CategoryPage({
                     toggleWishlist={toggleWishlist}
                     t={t}
                     region={region}
-                    onOpenProduct={onOpenProduct}
+                    onOpenProduct={openProductFromCategory}
                   />
                 ))}
               </div>

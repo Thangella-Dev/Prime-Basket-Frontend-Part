@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { database, hasFirebaseConfig } from "../firebase";
 import { ref, get } from "firebase/database";
 import { useT } from "../i18n/translations";
@@ -145,7 +145,6 @@ export default function HomePage({
   language = "en",
   region = "in",
   refreshSignal = 0,
-  navigationMode = "push",
 }) {
   const t = useT(language);
   const isKenya = region === "ke";
@@ -229,7 +228,7 @@ export default function HomePage({
   useEffect(() => {
     restoredHomeCacheRef.current = false;
     restoredHomeScrollYRef.current = 0;
-    if (navigationMode !== "restore") return;
+    if (refreshSignal > 0) return;
 
     const cached = safeSessionGet(homeStateCacheKey);
     if (!cached) return;
@@ -254,7 +253,7 @@ export default function HomePage({
     } catch {
       safeSessionRemove(homeStateCacheKey);
     }
-  }, [homeStateCacheKey, navigationMode]);
+  }, [homeStateCacheKey, refreshSignal]);
 
   useEffect(() => {
     let cancelled = false;
@@ -390,6 +389,25 @@ export default function HomePage({
       window.removeEventListener("scroll", saveScroll);
     };
   }, [deals, homeStateCacheKey, loading, multiCols, popular15]);
+
+  const persistHomeViewSnapshot = useCallback(() => {
+    if (loading || typeof window === "undefined") return;
+    safeSessionSet(
+      homeStateCacheKey,
+      JSON.stringify({
+        savedAt: Date.now(),
+        popular15,
+        deals,
+        multiCols,
+        scrollY: window.scrollY || 0,
+      })
+    );
+  }, [deals, homeStateCacheKey, loading, multiCols, popular15]);
+
+  const openProductFromHome = useCallback((product) => {
+    persistHomeViewSnapshot();
+    onOpenProduct?.(product);
+  }, [onOpenProduct, persistHomeViewSnapshot]);
 
   const curatedSections = [
     { key: "topSelling", title: t.home.topSelling, items: (multiCols.topSelling || []).filter(Boolean) },
@@ -598,7 +616,7 @@ export default function HomePage({
                         toggleWishlist={toggleWishlist}
                         t={t}
                         region={region}
-                        onOpenProduct={onOpenProduct}
+                        onOpenProduct={openProductFromHome}
                       />
                     ))}
               </div>
@@ -672,7 +690,7 @@ export default function HomePage({
                   toggleWishlist={toggleWishlist}
                   t={t}
                   region={region}
-                  onOpenProduct={onOpenProduct}
+                  onOpenProduct={openProductFromHome}
                 />
               ))}
         </div>
@@ -795,7 +813,7 @@ export default function HomePage({
                       const isWished = wishlist.some((w) => w._uid === item._uid);
                       const translatedName = getTranslatedName(item.name);
                       return (
-                        <div key={ii} className="mprod" style={{ cursor: "pointer" }} onClick={() => onOpenProduct && onOpenProduct(item)}>
+                        <div key={ii} className="mprod" style={{ cursor: "pointer" }} onClick={() => openProductFromHome(item)}>
                           <div className="mimg">
                             <img src={resolveProductImage(item)} alt={translatedName} loading="lazy" decoding="async" onError={(event) => handleProductImageError(event, item)} />
                           </div>
