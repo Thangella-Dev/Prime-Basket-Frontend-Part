@@ -114,6 +114,8 @@ Primary production domain: `https://prime-basket.in`
 
 - `React 18`
 - `Vite 7`
+- `ESLint 10`
+- `@eslint/js`, `globals`, `eslint-plugin-react-hooks`, and `eslint-plugin-react-refresh`
 - `Firebase Realtime Database`
 - `i18next` and `react-i18next`
 - `react-router-dom` installed, though current navigation is mostly app-state driven
@@ -131,6 +133,12 @@ For a production build:
 ```bash
 npm run build
 npm run preview
+```
+
+For frontend code-quality checks:
+
+```bash
+npm run lint
 ```
 
 ## Environment Variables
@@ -178,6 +186,7 @@ What is already strong:
 - Broad feature coverage for a frontend ecommerce demo
 - Region-aware shopping foundation
 - Stable build output
+- Dedicated lint command now runs successfully with `0 errors`
 - Stronger account/help/payment UX than the earlier baseline
 - Better dark-mode coverage across shared navigation and key account flows
 - More polished checkout presentation and order-review flow
@@ -193,6 +202,7 @@ What still needs work:
 - Production-grade auth and payments
 - Complete end-to-end QA on all devices
 - More cleanup of inline page-level styles
+- Review remaining hook-dependency and Fast Refresh warnings before final production release
 - Final dark-mode consistency review across every subsection
 
 ## Improvements Completed In This Implementation Cycle
@@ -255,6 +265,11 @@ What still needs work:
 - Removed the duplicate wishlist CTA from the product-detail action row so the page keeps one clear primary wishlist control
 - Reduced shared product-card and merchandising section spacing slightly so key storefront sections feel better balanced on 13-inch and 14-inch screens
 - Reworked the main in-app toast styling so popup notices align more closely with Prime Basket gradients, blur, and premium glassmorphism direction
+- Added the `npm run lint` quality gate and installed the required ESLint/React lint dependencies
+- Cleaned lint errors across app, page, component, service, context, data, translation, and utility files so the current lint pass completes with `0 errors`
+- Removed unused imports, props, stale local state, empty catch bindings, and duplicate translation keys that could hide future regressions
+- Corrected UPI validation regex handling in both payment utilities and the payment page flow
+- Revalidated the production build after the frontend hardening pass
 
 ## Backend Attachment Direction
 
@@ -275,7 +290,8 @@ Detailed backend guidance is now available in [docs/BACKEND.md](./docs/BACKEND.m
 See the `docs` folder for detailed project documentation:
 
 - [Manager Mail Update](./docs/Mail_Update.md)
-- [Latest Daily Update](./docs/DAILY_UPDATE_2026-05-27.md)
+- [Latest Daily Update](./docs/DAILY_UPDATE_2026-05-29.md)
+- [Previous Daily Update](./docs/DAILY_UPDATE_2026-05-27.md)
 - [Previous Daily Update](./docs/DAILY_UPDATE_2026-05-26.md)
 - [Backend Readme](./docs/BACKEND.md)
 - [Backend Systems And Cost Estimate](./docs/BACKEND_SYSTEMS_AND_COST_ESTIMATE.md)
@@ -288,6 +304,7 @@ See the `docs` folder for detailed project documentation:
 ## Current Validation
 
 - `npm run build` passes
+- `npm run lint` passes with `0 errors` and remaining warnings limited to hook-dependency/Fast Refresh architecture follow-ups
 - Production metadata now targets `https://prime-basket.in`
 - Category browsing, cart-item layout, shared product-card density, and all-products mode were updated and revalidated in the latest pass
 - A focused code audit pass was completed on checkout, modal behavior, cart merging, chatbot currency handling, related-product/detail flows, and deployment-safe product-page behavior
@@ -298,6 +315,7 @@ See the `docs` folder for detailed project documentation:
 - Locale selector consolidation, Kenya-English switching, home-only chatbot visibility, mobile dock/filter suppression, hero CTA routing, account `Buy Again`, and the latest `App.jsx` runtime crash fix were finalized in the latest pass
 - A professional QA-style frontend audit was completed in the latest pass, including premium shell polish, India fallback image/data cleanup, shared image-resolution hardening, and page-level error-boundary protection
 - The latest shell QA pass removed oversized desktop header chips, compacted the lower command row, fixed mobile/desktop hero offset, improved dark-mode header contrast, and stopped stale category discount filters from flashing on category entry
+- The latest frontend hardening pass added ESLint, removed build-risk lint errors, cleaned duplicate translations, reduced unused code, and kept the production build green
 - Backend documentation was refreshed with a canonical backend README, service-layer migration plan, endpoint map, localStorage migration map, validation rules, and production checklist
 - The app is suitable as a strong frontend demo/prototype
 - Final device-lab/browser QA and backend completion are still recommended before production use

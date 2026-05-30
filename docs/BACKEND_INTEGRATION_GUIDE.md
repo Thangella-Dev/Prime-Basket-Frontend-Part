@@ -6,6 +6,12 @@ This file is retained as the older high-level backend guide. The current canonic
 
 Use this file for a quick overview, and use `BACKEND.md` for the exact migration order, endpoint groups, frontend file map, validation rules, and production checklist.
 
+Latest frontend readiness note:
+
+- `npm run build` passes.
+- `npm run lint` passes with `0 errors`.
+- The newest cleanup pass removed unused code paths, duplicate translation keys, and payment-validation regex issues before backend integration begins.
+
 ## Current Situation
 
 The frontend already behaves like a functional storefront, but several important systems are still frontend/demo oriented:

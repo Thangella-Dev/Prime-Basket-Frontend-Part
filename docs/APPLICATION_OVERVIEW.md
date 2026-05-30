@@ -76,6 +76,8 @@ Recent storefront hardening also added:
 - native mobile swipe-first curated home rails with scroll-snap behavior and synced shelf arrows
 - full-shell error-boundary protection to reduce occasional blank-screen boot failures
 - fresh category entry now resets stale filter state before paint, preventing the brief `0-10%` discount auto-filter flash
+- a dedicated lint workflow through `npm run lint`, currently passing with `0 errors`
+- frontend cleanup across unused imports/props/state, duplicate translation keys, payment validation regexes, and stale catch bindings
 
 Other important state is currently stored in the browser through `localStorage`, including:
 
@@ -118,6 +120,7 @@ Other important state is currently stored in the browser through `localStorage`,
 - The shared header is now more compact on desktop, with unnecessary marketing chips removed and clearer location/browse/search hierarchy
 - Dark-mode header surfaces now have stronger contrast, cleaner blue-tinted depth, and compact account action buttons
 - Mobile and desktop hero offsets now better respect the fixed header so primary content is not hidden behind the navbar
+- The latest hardening pass added ESLint coverage and removed current lint errors while keeping the production build green
 
 ## Current Limitations
 
@@ -129,6 +132,7 @@ This is still not a fully production-backed commerce system yet. The main limita
 - Payment flow is demo-oriented
 - Sensitive integrations should not stay fully client-side for production
 - Some pages still rely on inline styles and demo data
+- Remaining lint warnings should be reviewed as part of a deliberate hook-dependency/Fast Refresh cleanup instead of quick patching
 - Live browser/device QA is still needed outside this sandbox because local preview startup is blocked here by Windows `spawn EPERM`
 
 ## Overall Quality Assessment
@@ -137,7 +141,7 @@ Current readiness by area:
 
 - UI/UX quality: `Good`
 - Mobile responsiveness: `Good`, with more visual QA still recommended
-- Frontend architecture: `Moderate to good`
+- Frontend architecture: `Moderate to good`, with lint now enforcing a cleaner baseline
 - Backend integration readiness: `Ready to begin staged integration`
 - Production readiness: `Partial`, not complete
 

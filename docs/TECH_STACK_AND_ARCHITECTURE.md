@@ -10,6 +10,11 @@
 - `react-i18next`
 - `react-router-dom` is installed, but the app mainly uses internal page state instead of full router-driven navigation
 - `Tailwind CSS 4` is installed, but the current UI is mostly custom CSS driven
+- `ESLint 10`
+- `@eslint/js`
+- `globals`
+- `eslint-plugin-react-hooks`
+- `eslint-plugin-react-refresh`
 
 ## Styling Approach
 
@@ -114,6 +119,9 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 - `src/i18n/translations.js`
   Translation content and language text handling.
 
+- `eslint.config.js`
+  Frontend lint configuration for JavaScript/JSX quality checks, React Hooks warnings, Fast Refresh warnings, and relaxed legacy rules while the app is being production-hardened.
+
 ## Navigation Model
 
 The app is not currently router-first. It mostly uses:
@@ -165,6 +173,8 @@ What is already good:
 - Good utility reuse in product/currency handling
 - Context usage where it matters
 - Major pages are already split
+- `npm run lint` now runs successfully with `0 errors`
+- `npm run build` remains green after the latest hardening pass
 
 What should improve later:
 
@@ -173,4 +183,5 @@ What should improve later:
 - Move from demo persistence to real API persistence using the staged backend plan in `docs/BACKEND.md`
 - Consider route-driven navigation for long-term maintainability
 - Introduce testing and stronger data contracts
+- Review remaining hook-dependency and Fast Refresh warnings as part of a deliberate architecture cleanup
 - Add a preview/browser automation path outside the current Windows sandbox so runtime QA is not blocked by `spawn EPERM`

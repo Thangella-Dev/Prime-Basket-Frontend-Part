@@ -636,6 +636,96 @@ export default function HeroSlider({ language = "en", onCategorySelect }) {
 
       /* ========================= */
 
+      @media(min-width:769px){
+
+        .hs-root{
+          min-height:330px;
+          border-radius:22px;
+        }
+
+        .hs-inner{
+          max-width:1040px;
+          min-height:330px;
+          padding:18px 28px 44px;
+          gap:6px;
+        }
+
+        .hs-content{
+          gap:10px;
+          max-width:390px;
+        }
+
+        .hs-eyebrow{
+          padding:6px 11px;
+          font-size:11px;
+        }
+
+        .hs-badge{
+          font-size:13px;
+        }
+
+        .hs-title{
+          font-size:clamp(28px,3.35vw,44px);
+          line-height:1.01;
+        }
+
+        .hs-desc{
+          font-size:13px;
+          line-height:1.5;
+          max-width:320px;
+        }
+
+        .hs-cta{
+          padding:11px 20px;
+          font-size:13px;
+        }
+
+        .hs-carousel{
+          height:250px;
+        }
+
+        .hs-card{
+          width:145px;
+          height:225px;
+          border-radius:20px;
+        }
+
+        .hs-card-img{
+          padding:15px;
+        }
+
+        .hs-card-tag{
+          bottom:12px;
+          padding:6px 13px;
+          font-size:10px;
+        }
+
+        .hs-card[data-pos="right"]{
+          transform:
+            translateX(102px)
+            scale(.84)
+            rotate(6deg);
+        }
+
+        .hs-card[data-pos="left"]{
+          transform:
+            translateX(-102px)
+            scale(.84)
+            rotate(-6deg);
+        }
+
+        .hs-card[data-pos="far-right"]{
+          transform:
+            translateX(178px)
+            scale(.70)
+            rotate(10deg);
+        }
+
+        .hs-dots{
+          bottom:14px;
+        }
+      }
+
       /* =========================
          MOBILE
       ========================= */

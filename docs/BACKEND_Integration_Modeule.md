@@ -13,6 +13,8 @@ The frontend has working shopping, account, cart, wishlist, checkout, order, ref
 Important release note:
 
 - Backend integration can start now.
+- The latest frontend quality pass has `npm run lint` passing with `0 errors`.
+- `npm run build` remains green after lint cleanup and translation/payment validation cleanup.
 - Final production release should wait until real auth, payments, order persistence, security rules, and device QA are complete.
 
 ## Recommended Backend Architecture

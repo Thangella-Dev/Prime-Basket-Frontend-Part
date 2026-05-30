@@ -10,6 +10,11 @@
 - Added pre-paint fresh category filter resets while preserving restore navigation from product detail
 - Added a canonical backend README and linked it to the detailed backend integration module so backend handoff now has a clear entry point
 - Documented the backend service-layer plan, endpoint map, localStorage replacement map, validation rules, environment variables, and production checklist
+- Added an ESLint quality gate through `npm run lint`
+- Cleaned current lint errors across app, components, pages, services, contexts, utilities, data, and translation files
+- Removed unused imports/props/state, stale catch bindings, artificial loading state, and duplicate translation keys that could hide runtime regressions
+- Corrected UPI validation regex handling in payment utilities and payment page validation
+- Revalidated the app with both `npm run lint` and `npm run build`
 - Added a premium shared refresh layer for core storefront sections, shell surfaces, and motion consistency
 - Added a page-level error boundary so major render failures degrade gracefully instead of blanking full views
 - Reduced app boot overhead by caching initial locale/session preference reads instead of repeatedly parsing localStorage on first render
@@ -27,7 +32,7 @@
 - Improved the mobile dock’s motion and hid it during login/auth and mobile filter/sort overlays
 - Added `Buy Again` to account flows and direct address-entry opening from checkout when no saved address exists
 - Fixed the latest `App.jsx` temporal-dead-zone runtime crash caused by an effect reading `page` before initialization
-- Revalidated the app with `npm run build`
+- Kept the production build green after the lint cleanup pass
 
 ## Improvements Completed So Far
 
@@ -133,6 +138,7 @@ The following improvements were implemented during the recent Prime Basket front
 - Multi-page shopping flow coverage
 - Good amount of UI polish compared to the starting point
 - Stable production build
+- Lint now passes with `0 errors`, giving the project a stronger quality baseline before backend integration
 - Region-aware foundation
 - Better resilience on direct-entry rendering because shared assets now load from root-safe public URLs
 
@@ -168,6 +174,7 @@ The following improvements were implemented during the recent Prime Basket front
 - More reusable design tokens would help
 - More test coverage is needed
 - More API boundaries are needed
+- Remaining hook-dependency and Fast Refresh lint warnings need a deliberate cleanup pass before final production release
 - Some large inline style sections still exist in pages like payment and product detail, even though recent behavior and UX were improved
 
 ### Design gaps

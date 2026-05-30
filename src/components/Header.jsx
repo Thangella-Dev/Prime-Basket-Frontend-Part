@@ -346,11 +346,10 @@ export default function Header({
       setLocationError("");
       if (!silent) {
         const detectedLabel = location?.fullAddress || location?.label || locationUi.detect;
-        setLocationNotice(
-          language === "ke"
-            ? `Eneo limetambuliwa: ${detectedLabel}`
-            : `Detected location: ${detectedLabel}`
-        );
+        setLocationNotice({
+          title: language === "ke" ? "Eneo la delivery limepatikana" : "Delivery location detected",
+          address: detectedLabel,
+        });
         if (locationNoticeTimerRef.current) clearTimeout(locationNoticeTimerRef.current);
         locationNoticeTimerRef.current = setTimeout(() => setLocationNotice(""), 4200);
       }
@@ -1135,8 +1134,28 @@ export default function Header({
       </div>
 
       {(locationError || (locationNotice && !showMobileLocationBar)) && !drawerOpen && (
-        <div className={`nav-location-hint${locationNotice ? " success" : ""}`}>
-          {locationError || locationNotice}
+        <div className={`nav-location-hint${locationNotice ? " success" : ""}`} role="status" aria-live="polite">
+          {locationNotice ? (
+            <>
+              <span className="nav-location-hint-icon" aria-hidden="true">
+                <i className="fas fa-location-dot"></i>
+              </span>
+              <span className="nav-location-hint-copy">
+                <strong>{locationNotice.title}</strong>
+                <span>{locationNotice.address}</span>
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="nav-location-hint-icon error" aria-hidden="true">
+                <i className="fas fa-triangle-exclamation"></i>
+              </span>
+              <span className="nav-location-hint-copy">
+                <strong>{locationUi.autoError}</strong>
+                <span>{locationError}</span>
+              </span>
+            </>
+          )}
         </div>
       )}
       </header>

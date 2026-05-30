@@ -6,6 +6,14 @@ Prime Basket is ready to start backend integration now.
 
 The frontend already has working flows for home discovery, category browsing, product detail, cart, wishlist, checkout, account, order tracking, refunds, notifications, region/language behavior, and chatbot UI. The remaining production gap is that many of these flows still use Firebase reads, local fallback data, and `localStorage` instead of a real backend-owned commerce system.
 
+Latest frontend-readiness update:
+
+- `npm run build` passes.
+- `npm run lint` passes with `0 errors`.
+- ESLint is now installed and configured for React/JSX quality checks.
+- The latest hardening pass removed unused imports/props/state, duplicate translation keys, stale catch bindings, and payment-validation regex issues.
+- Remaining lint warnings are architecture follow-ups around hook dependencies and Fast Refresh export shape; they should be handled deliberately before final production release.
+
 Production release should wait until these backend-owned systems are complete:
 
 - Real authentication and session refresh

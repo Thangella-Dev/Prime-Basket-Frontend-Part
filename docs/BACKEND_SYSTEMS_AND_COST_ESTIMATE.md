@@ -13,6 +13,13 @@ Important pricing note:
 - Always verify pricing in the provider dashboard before buying.
 - USD to INR changes over time. Keep final budgeting in the currency charged by each provider.
 
+Frontend readiness note:
+
+- The current Prime Basket frontend can begin staged backend integration.
+- `npm run build` passes.
+- `npm run lint` passes with `0 errors`.
+- Backend work should still include real-device QA, API contract testing, payment webhook validation, OTP rate limiting, and production monitoring before public release.
+
 ## Short Recommendation
 
 For Prime Basket, the best practical production stack is:
