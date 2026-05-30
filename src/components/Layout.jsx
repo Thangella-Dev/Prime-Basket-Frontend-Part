@@ -366,35 +366,40 @@ export default function Layout({
         @media (max-width: 768px) {
           .prime-mobile-glass-dock {
             display: block;
-            bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-            width: min(88vw, 360px);
+            bottom: calc(13px + env(safe-area-inset-bottom, 0px));
+            width: min(90vw, 376px);
           }
           .prime-mobile-glass-dock-shell {
-            gap: 3px;
-            padding: 6px;
-            border-radius: 21px;
+            gap: 4px;
+            padding: 7px;
+            border-radius: 22px;
+            background:
+              linear-gradient(135deg, rgba(255,255,255,0.62), rgba(255,255,255,0.34)),
+              linear-gradient(135deg, rgba(29,91,160,0.28), rgba(68,196,212,0.1));
             box-shadow:
-              0 16px 34px rgba(10, 24, 48, 0.14),
+              0 16px 34px rgba(10, 24, 48, 0.13),
               inset 0 1px 0 rgba(255,255,255,0.24),
               inset 0 -1px 0 rgba(123, 160, 213, 0.1);
+            backdrop-filter: blur(14px) saturate(128%);
+            -webkit-backdrop-filter: blur(14px) saturate(128%);
           }
           .prime-mobile-dock-item {
-            min-height: 50px;
-            padding: 6px 4px 5px;
-            border-radius: 14px;
+            min-height: 53px;
+            padding: 7px 4px 6px;
+            border-radius: 15px;
             gap: 4px;
           }
           .prime-mobile-dock-icon {
-            width: 27px;
-            height: 27px;
-            border-radius: 9px;
-            font-size: 11px;
+            width: 29px;
+            height: 29px;
+            border-radius: 10px;
+            font-size: 11.5px;
           }
           .prime-mobile-dock-label {
-            font-size: 8.8px;
+            font-size: 9.1px;
           }
           .page-shell.has-mobile-glass-dock {
-            padding-bottom: 112px;
+            padding-bottom: 118px;
           }
         }
         @media (min-width: 769px) {
