@@ -30,6 +30,7 @@ const ALL_CATS = [
 const DEAL_CATS = ["fruits", "vegetables", "dairyProducts", "biscuitsAndCookies", "instantFood", "coolDrinks"];
 const HOME_VIEW_CACHE_PREFIX = "pb_home_view_v1";
 const HOME_VIEW_TTL_MS = 1000 * 60 * 20;
+const HOME_VIEW_MEMORY_CACHE = new Map();
 
 const MULTICOL_CATS = {
   topSelling: "rice",
@@ -95,6 +96,40 @@ const fetchWithCache = async (cat) => {
     }
   }
   return data;
+};
+
+const isFreshHomeSnapshot = (snapshot) =>
+  Boolean(snapshot?.savedAt && Date.now() - Number(snapshot.savedAt) <= HOME_VIEW_TTL_MS);
+
+const readHomeViewSnapshot = (cacheKey) => {
+  const memorySnapshot = HOME_VIEW_MEMORY_CACHE.get(cacheKey);
+  if (isFreshHomeSnapshot(memorySnapshot)) return memorySnapshot;
+  if (memorySnapshot) HOME_VIEW_MEMORY_CACHE.delete(cacheKey);
+
+  const cached = safeSessionGet(cacheKey);
+  if (!cached) return null;
+
+  try {
+    const parsed = JSON.parse(cached);
+    if (!isFreshHomeSnapshot(parsed)) {
+      safeSessionRemove(cacheKey);
+      return null;
+    }
+    HOME_VIEW_MEMORY_CACHE.set(cacheKey, parsed);
+    return parsed;
+  } catch {
+    safeSessionRemove(cacheKey);
+    return null;
+  }
+};
+
+const writeHomeViewSnapshot = (cacheKey, snapshot) => {
+  const nextSnapshot = {
+    ...snapshot,
+    savedAt: Date.now(),
+  };
+  HOME_VIEW_MEMORY_CACHE.set(cacheKey, nextSnapshot);
+  safeSessionSet(cacheKey, JSON.stringify(nextSnapshot));
 };
 
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
@@ -228,18 +263,11 @@ export default function HomePage({
   useEffect(() => {
     restoredHomeCacheRef.current = false;
     restoredHomeScrollYRef.current = 0;
-    if (refreshSignal > 0) return;
 
-    const cached = safeSessionGet(homeStateCacheKey);
-    if (!cached) return;
-
+    const parsed = readHomeViewSnapshot(homeStateCacheKey);
+    if (!parsed) return;
     try {
-      const parsed = JSON.parse(cached);
-      if (!parsed || Date.now() - Number(parsed.savedAt || 0) > HOME_VIEW_TTL_MS) {
-        safeSessionRemove(homeStateCacheKey);
-        return;
-      }
-
+      if (Number(parsed.refreshSignal || 0) < refreshSignal) return;
       if (Array.isArray(parsed.popular15)) setPopular15(parsed.popular15);
       if (Array.isArray(parsed.deals)) setDeals(parsed.deals);
       if (parsed.multiCols) setMultiCols(parsed.multiCols);
@@ -250,18 +278,25 @@ export default function HomePage({
       window.requestAnimationFrame(() => {
         window.scrollTo({ top: restoredHomeScrollYRef.current, behavior: "auto" });
       });
+      window.setTimeout(() => {
+        window.scrollTo({ top: restoredHomeScrollYRef.current, behavior: "auto" });
+      }, 120);
     } catch {
       safeSessionRemove(homeStateCacheKey);
+      HOME_VIEW_MEMORY_CACHE.delete(homeStateCacheKey);
     }
   }, [homeStateCacheKey, refreshSignal]);
 
   useEffect(() => {
     let cancelled = false;
     const keepContentVisible = hasLoadedHomeRef.current && refreshSignal > 0;
-    if (restoredHomeCacheRef.current && refreshSignal === 0) {
+    if (restoredHomeCacheRef.current) {
       window.requestAnimationFrame(() => {
         window.scrollTo({ top: restoredHomeScrollYRef.current, behavior: "auto" });
       });
+      window.setTimeout(() => {
+        window.scrollTo({ top: restoredHomeScrollYRef.current, behavior: "auto" });
+      }, 120);
       return () => {
         cancelled = true;
       };
@@ -353,17 +388,14 @@ export default function HomePage({
 
   useEffect(() => {
     if (loading) return;
-    safeSessionSet(
-      homeStateCacheKey,
-      JSON.stringify({
-        savedAt: Date.now(),
-        popular15,
-        deals,
-        multiCols,
-        scrollY: typeof window !== "undefined" ? window.scrollY || 0 : 0,
-      })
-    );
-  }, [deals, homeStateCacheKey, loading, multiCols, popular15]);
+    writeHomeViewSnapshot(homeStateCacheKey, {
+      popular15,
+      deals,
+      multiCols,
+      refreshSignal,
+      scrollY: typeof window !== "undefined" ? window.scrollY || 0 : 0,
+    });
+  }, [deals, homeStateCacheKey, loading, multiCols, popular15, refreshSignal]);
 
   useEffect(() => {
     if (loading || typeof window === "undefined") return undefined;
@@ -371,16 +403,13 @@ export default function HomePage({
     const saveScroll = () => {
       window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(() => {
-        safeSessionSet(
-          homeStateCacheKey,
-          JSON.stringify({
-            savedAt: Date.now(),
-            popular15,
-            deals,
-            multiCols,
-            scrollY: window.scrollY || 0,
-          })
-        );
+        writeHomeViewSnapshot(homeStateCacheKey, {
+          popular15,
+          deals,
+          multiCols,
+          refreshSignal,
+          scrollY: window.scrollY || 0,
+        });
       });
     };
     window.addEventListener("scroll", saveScroll, { passive: true });
@@ -388,21 +417,18 @@ export default function HomePage({
       window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", saveScroll);
     };
-  }, [deals, homeStateCacheKey, loading, multiCols, popular15]);
+  }, [deals, homeStateCacheKey, loading, multiCols, popular15, refreshSignal]);
 
   const persistHomeViewSnapshot = useCallback(() => {
     if (loading || typeof window === "undefined") return;
-    safeSessionSet(
-      homeStateCacheKey,
-      JSON.stringify({
-        savedAt: Date.now(),
-        popular15,
-        deals,
-        multiCols,
-        scrollY: window.scrollY || 0,
-      })
-    );
-  }, [deals, homeStateCacheKey, loading, multiCols, popular15]);
+    writeHomeViewSnapshot(homeStateCacheKey, {
+      popular15,
+      deals,
+      multiCols,
+      refreshSignal,
+      scrollY: window.scrollY || 0,
+    });
+  }, [deals, homeStateCacheKey, loading, multiCols, popular15, refreshSignal]);
 
   const openProductFromHome = useCallback((product) => {
     persistHomeViewSnapshot();

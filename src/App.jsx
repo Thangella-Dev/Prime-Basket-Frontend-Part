@@ -635,7 +635,10 @@ export default function App() {
       return;
     }
     if (selectedCategory) {
-      goCategory(selectedCategory);
+      skipNextScrollResetRef.current = true;
+      setNavigationMode(NAV_MODE_RESTORE);
+      setSelectedProduct(null);
+      setPage("category");
       return;
     }
     goHome();

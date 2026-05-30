@@ -46,6 +46,7 @@ const CATEGORIES_DATA = [
 const BADGE_CLS = ["bg-hot", "bg-sale", "bg-new", "bg-best"];
 const CATEGORY_VIEW_CACHE_PREFIX = "pb_category_view_v1";
 const CATEGORY_VIEW_TTL_MS = 1000 * 60 * 20;
+const CATEGORY_VIEW_MEMORY_CACHE = new Map();
 const DEFAULT_PRICE_RANGE = [0, 999999999];
 const DEFAULT_DISCOUNT_RANGE = [0, 100];
 
@@ -78,6 +79,45 @@ const clampRange = (range, min, max) => {
   const start = Math.max(min, Math.min(Number(range[0]) || min, max));
   const end = Math.max(min, Math.min(Number(range[1]) || max, max));
   return start <= end ? [start, end] : [end, start];
+};
+
+const isFreshCategorySnapshot = (snapshot) =>
+  Boolean(snapshot?.savedAt && Date.now() - Number(snapshot.savedAt) <= CATEGORY_VIEW_TTL_MS);
+
+const readCategoryViewSnapshot = (cacheKey) => {
+  const memorySnapshot = CATEGORY_VIEW_MEMORY_CACHE.get(cacheKey);
+  if (isFreshCategorySnapshot(memorySnapshot)) return memorySnapshot;
+  if (memorySnapshot) CATEGORY_VIEW_MEMORY_CACHE.delete(cacheKey);
+
+  const cached = safeSessionGet(cacheKey);
+  if (!cached) return null;
+
+  try {
+    const parsed = JSON.parse(cached);
+    if (!isFreshCategorySnapshot(parsed)) {
+      safeSessionRemove(cacheKey);
+      return null;
+    }
+    CATEGORY_VIEW_MEMORY_CACHE.set(cacheKey, parsed);
+    return parsed;
+  } catch {
+    safeSessionRemove(cacheKey);
+    return null;
+  }
+};
+
+const writeCategoryViewSnapshot = (cacheKey, snapshot) => {
+  const nextSnapshot = {
+    ...snapshot,
+    savedAt: Date.now(),
+  };
+  CATEGORY_VIEW_MEMORY_CACHE.set(cacheKey, nextSnapshot);
+  safeSessionSet(cacheKey, JSON.stringify(nextSnapshot));
+};
+
+const removeCategoryViewSnapshot = (cacheKey) => {
+  CATEGORY_VIEW_MEMORY_CACHE.delete(cacheKey);
+  safeSessionRemove(cacheKey);
 };
 
 const prepareCategoryProduct = (product, region) => ({
@@ -319,7 +359,7 @@ export default function CategoryPage({
     setMobileSortOpen(false);
     setSortOpen(false);
     if (categoryStateCacheKey) {
-      safeSessionRemove(categoryStateCacheKey);
+      removeCategoryViewSnapshot(categoryStateCacheKey);
     }
   }, [category, categoryStateCacheKey, navigationMode, region, visitToken]);
 
@@ -380,16 +420,9 @@ export default function CategoryPage({
     restoredScrollYRef.current = 0;
     if (!category || navigationMode !== "restore") return;
 
-    const cached = safeSessionGet(categoryStateCacheKey);
-    if (!cached) return;
-
+    const parsed = readCategoryViewSnapshot(categoryStateCacheKey);
+    if (!parsed) return;
     try {
-      const parsed = JSON.parse(cached);
-      if (!parsed || Date.now() - Number(parsed.savedAt || 0) > CATEGORY_VIEW_TTL_MS) {
-        safeSessionRemove(categoryStateCacheKey);
-        return;
-      }
-
       if (Array.isArray(parsed.products)) setProducts(parsed.products);
       if (Array.isArray(parsed.allProducts)) setAllProducts(parsed.allProducts);
       if (Array.isArray(parsed.selectedBrands)) setSelectedBrands(parsed.selectedBrands);
@@ -407,8 +440,11 @@ export default function CategoryPage({
       window.requestAnimationFrame(() => {
         window.scrollTo({ top: restoredScrollYRef.current, behavior: "auto" });
       });
+      window.setTimeout(() => {
+        window.scrollTo({ top: restoredScrollYRef.current, behavior: "auto" });
+      }, 120);
     } catch {
-      safeSessionRemove(categoryStateCacheKey);
+      removeCategoryViewSnapshot(categoryStateCacheKey);
     }
   }, [category, categoryStateCacheKey, navigationMode]);
 
@@ -425,6 +461,9 @@ export default function CategoryPage({
       window.requestAnimationFrame(() => {
         window.scrollTo({ top: restoredScrollYRef.current, behavior: "auto" });
       });
+      window.setTimeout(() => {
+        window.scrollTo({ top: restoredScrollYRef.current, behavior: "auto" });
+      }, 120);
       return;
     }
     const keepContentVisible = pullRefreshTriggered && !categoryChanged && !regionChanged && products.length > 0;
@@ -645,7 +684,7 @@ export default function CategoryPage({
     setDiscountRangeTouched(false);
     setSortBy("default");
     if (categoryStateCacheKey) {
-      safeSessionRemove(categoryStateCacheKey);
+      removeCategoryViewSnapshot(categoryStateCacheKey);
     }
   }, [
     category,
@@ -820,23 +859,19 @@ export default function CategoryPage({
 
   useEffect(() => {
     if (!category || loading) return;
-    safeSessionSet(
-      categoryStateCacheKey,
-      JSON.stringify({
-        savedAt: Date.now(),
-        products,
-        allProducts,
-        selectedBrands,
-        brandSearch,
-        searchQuery,
-        priceRange: effectivePriceRange,
-        discountRange: effectiveDiscountRange,
-        priceRangeTouched,
-        discountRangeTouched,
-        sortBy,
-        scrollY: typeof window !== "undefined" ? window.scrollY || 0 : 0,
-      })
-    );
+    writeCategoryViewSnapshot(categoryStateCacheKey, {
+      products,
+      allProducts,
+      selectedBrands,
+      brandSearch,
+      searchQuery,
+      priceRange: effectivePriceRange,
+      discountRange: effectiveDiscountRange,
+      priceRangeTouched,
+      discountRangeTouched,
+      sortBy,
+      scrollY: typeof window !== "undefined" ? window.scrollY || 0 : 0,
+    });
   }, [
     allProducts,
     brandSearch,
@@ -859,23 +894,19 @@ export default function CategoryPage({
     const saveScroll = () => {
       window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(() => {
-        safeSessionSet(
-          categoryStateCacheKey,
-          JSON.stringify({
-            savedAt: Date.now(),
-            products,
-            allProducts,
-            selectedBrands,
-            brandSearch,
-            searchQuery,
-            priceRange: effectivePriceRange,
-            discountRange: effectiveDiscountRange,
-            priceRangeTouched,
-            discountRangeTouched,
-            sortBy,
-            scrollY: window.scrollY || 0,
-          })
-        );
+        writeCategoryViewSnapshot(categoryStateCacheKey, {
+          products,
+          allProducts,
+          selectedBrands,
+          brandSearch,
+          searchQuery,
+          priceRange: effectivePriceRange,
+          discountRange: effectiveDiscountRange,
+          priceRangeTouched,
+          discountRangeTouched,
+          sortBy,
+          scrollY: window.scrollY || 0,
+        });
       });
     };
     window.addEventListener("scroll", saveScroll, { passive: true });
@@ -902,23 +933,19 @@ export default function CategoryPage({
   // ── Sort label ─────────────────────────────────────────────────────────────
   const persistCategoryViewSnapshot = useCallback(() => {
     if (!category || loading || typeof window === "undefined") return;
-    safeSessionSet(
-      categoryStateCacheKey,
-      JSON.stringify({
-        savedAt: Date.now(),
-        products,
-        allProducts,
-        selectedBrands,
-        brandSearch,
-        searchQuery,
-        priceRange: effectivePriceRange,
-        discountRange: effectiveDiscountRange,
-        priceRangeTouched,
-        discountRangeTouched,
-        sortBy,
-        scrollY: window.scrollY || 0,
-      })
-    );
+    writeCategoryViewSnapshot(categoryStateCacheKey, {
+      products,
+      allProducts,
+      selectedBrands,
+      brandSearch,
+      searchQuery,
+      priceRange: effectivePriceRange,
+      discountRange: effectiveDiscountRange,
+      priceRangeTouched,
+      discountRangeTouched,
+      sortBy,
+      scrollY: window.scrollY || 0,
+    });
   }, [
     allProducts,
     brandSearch,
