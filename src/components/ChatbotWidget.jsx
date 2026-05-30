@@ -388,35 +388,25 @@ export default function ChatbotWidget({
         }
         @media (max-width: 768px) {
           .prime-float-stack {
-            right: 14px;
-            bottom: calc(154px + env(safe-area-inset-bottom, 0px));
-            gap: 10px;
+            right: 12px;
+            bottom: calc(118px + env(safe-area-inset-bottom, 0px));
+            gap: 8px;
           }
           .prime-chat-trigger {
-            width: 50px;
-            height: 50px;
-            border-radius: 18px;
+            width: 44px;
+            height: 44px;
+            border-radius: 16px;
           }
           .prime-chat-core {
-            width: 41px;
-            height: 41px;
-            border-radius: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 13px;
           }
           .prime-chat-label {
-            display: inline-flex;
-            align-items: center;
-            right: 0;
-            top: auto;
-            bottom: calc(100% + 10px);
-            transform: none;
-            padding: 6px 10px;
-            font-size: 0.66rem;
+            display: none;
           }
           .prime-chat-label::after {
-            right: 14px;
-            top: auto;
-            bottom: -6px;
-            transform: rotate(45deg);
+            display: none;
           }
           .prime-chat-label-full {
             display: none;

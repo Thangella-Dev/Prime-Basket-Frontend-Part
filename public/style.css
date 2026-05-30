@@ -5884,12 +5884,12 @@ body[data-theme="dark"] .nav-location-hint-copy span {
     padding: 0 12px;
   }
   .products-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
   .deals-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
   .cat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -7352,7 +7352,8 @@ body[data-theme="dark"] .bbtn {
 @media (max-width: 480px) {
   .products-grid,
   .deals-grid {
-    gap: 6px !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
   }
 
   .products-section .container,
@@ -9206,5 +9207,134 @@ body[data-theme="dark"] .desktop-browse-menu {
 
   .home-showcase .hs-inner {
     max-width: 1240px !important;
+  }
+}
+
+/* May 30 mobile chrome trim: keep header actions useful without overpowering the page content. */
+@media (max-width: 768px) {
+  .nav-search-row {
+    border-top-color: rgba(148, 163, 184, 0.05) !important;
+    border-bottom-color: rgba(148, 163, 184, 0.06) !important;
+    background: linear-gradient(180deg, rgba(255,255,255,0.58), rgba(241,246,255,0.66)) !important;
+  }
+
+  .nav-search-inner {
+    padding: 5px 9px 4px !important;
+    gap: 4px !important;
+  }
+
+  .mobile-search-actions {
+    grid-template-columns: minmax(132px, 0.92fr) minmax(0, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .mobile-browse-btn {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 0 10px !important;
+    border-radius: 14px !important;
+    gap: 6px !important;
+    font-size: 0.66rem !important;
+    box-shadow: 0 8px 16px rgba(15, 91, 215, 0.1), inset 0 1px 0 rgba(255,255,255,0.18) !important;
+  }
+
+  .mobile-browse-btn .bar-icon {
+    gap: 2.5px !important;
+  }
+
+  .mobile-browse-btn .bar-icon span {
+    width: 10px !important;
+    height: 1.7px !important;
+  }
+
+  .mobile-browse-btn .browse-btn-label {
+    max-width: 86px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .mobile-browse-btn .chevron {
+    font-size: 0.58rem !important;
+  }
+
+  .mobile-search-launch {
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 9px !important;
+    border-radius: 13px !important;
+    gap: 6px !important;
+    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  .mobile-search-launch i {
+    font-size: 0.74rem !important;
+  }
+
+  .mobile-search-launch-text {
+    font-size: 0.64rem !important;
+    font-weight: 800 !important;
+  }
+
+  .mobile-location-status-bar {
+    min-height: 30px !important;
+    margin: 3px 10px 8px !important;
+    padding: 5px 10px !important;
+    gap: 6px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.045), inset 0 1px 0 rgba(255,255,255,0.62) !important;
+  }
+
+  .mobile-location-status-icon {
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 0.58rem !important;
+  }
+
+  .mobile-location-status-copy {
+    gap: 5px !important;
+  }
+
+  .mobile-location-status-copy strong {
+    font-size: 0.6rem !important;
+    letter-spacing: 0.035em !important;
+  }
+
+  .mobile-location-status-copy span {
+    font-size: 0.66rem !important;
+    line-height: 1.22 !important;
+  }
+
+  #navbar.has-mobile-location-bar + .page-shell {
+    padding-top: 168px !important;
+  }
+}
+
+/* May 30 mobile correction: keep three product cards across and prevent hero/header overlap. */
+@media (max-width: 768px) {
+  #navbar.has-mobile-location-bar + .page-shell {
+    padding-top: 168px !important;
+  }
+
+  .home-showcase {
+    padding-top: 8px !important;
+  }
+
+  .home-showcase .container {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .products-grid,
+  .deals-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .products-grid,
+  .deals-grid {
+    gap: 7px !important;
   }
 }

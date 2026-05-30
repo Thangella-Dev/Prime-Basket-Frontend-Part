@@ -366,6 +366,35 @@ export default function Layout({
         @media (max-width: 768px) {
           .prime-mobile-glass-dock {
             display: block;
+            bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+            width: min(88vw, 360px);
+          }
+          .prime-mobile-glass-dock-shell {
+            gap: 3px;
+            padding: 6px;
+            border-radius: 21px;
+            box-shadow:
+              0 16px 34px rgba(10, 24, 48, 0.14),
+              inset 0 1px 0 rgba(255,255,255,0.24),
+              inset 0 -1px 0 rgba(123, 160, 213, 0.1);
+          }
+          .prime-mobile-dock-item {
+            min-height: 50px;
+            padding: 6px 4px 5px;
+            border-radius: 14px;
+            gap: 4px;
+          }
+          .prime-mobile-dock-icon {
+            width: 27px;
+            height: 27px;
+            border-radius: 9px;
+            font-size: 11px;
+          }
+          .prime-mobile-dock-label {
+            font-size: 8.8px;
+          }
+          .page-shell.has-mobile-glass-dock {
+            padding-bottom: 112px;
           }
         }
         @media (min-width: 769px) {
