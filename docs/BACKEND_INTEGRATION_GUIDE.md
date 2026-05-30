@@ -1,244 +1,274 @@
 # Backend Integration Guide
 
-## Current Docs Note
+This is the single frontend-to-backend integration guide for Prime Basket. Use it when wiring the current React/Vite frontend to real backend APIs.
 
-This file is retained as the older high-level backend guide. The current canonical backend entry point is [BACKEND.md](./BACKEND.md), and the detailed implementation module is [BACKEND_Integration_Modeule.md](./BACKEND_Integration_Modeule.md).
+For backend build phases and timelines, use [BACKEND_IMPLEMENTATION_PLAN.md](./BACKEND_IMPLEMENTATION_PLAN.md). For provider choices and costs, use [BACKEND_SYSTEMS_AND_COST_ESTIMATE.md](./BACKEND_SYSTEMS_AND_COST_ESTIMATE.md).
 
-Use this file for a quick overview, and use `BACKEND.md` for the exact migration order, endpoint groups, frontend file map, validation rules, and production checklist.
+## Integration Principle
 
-Latest frontend readiness note:
+Do not add direct `fetch()` calls inside page components. Add a service layer first, then migrate one domain at a time while keeping existing fallbacks during the transition.
 
-- `npm run build` passes.
-- `npm run lint` passes with `0 errors`.
-- The newest cleanup pass removed unused code paths, duplicate translation keys, and payment-validation regex issues before backend integration begins.
+Recommended service files:
 
-## Current Situation
+- `src/services/apiClient.js`
+- `src/services/authApi.js`
+- `src/services/catalogApi.js`
+- `src/services/cartApi.js`
+- `src/services/wishlistApi.js`
+- `src/services/addressApi.js`
+- `src/services/checkoutApi.js`
+- `src/services/orderApi.js`
+- `src/services/paymentApi.js`
+- `src/services/refundApi.js`
+- `src/services/notificationApi.js`
+- `src/services/chatApi.js`
 
-The frontend already behaves like a functional storefront, but several important systems are still frontend/demo oriented:
+## Environment Variables
 
-- authentication
-- cart persistence
-- order creation
-- payment confirmation
-- refund handling
-- saved cards
-- notifications
-- chatbot API access
+Local:
 
-To make this production-safe, these flows should move behind a backend.
+```env
+VITE_API_BASE_URL=http://localhost:8080
+```
 
-## Minimum Backend Services To Add
+Production:
 
-### 1. Authentication Service
+```env
+VITE_API_BASE_URL=https://api.prime-basket.in
+```
 
-Needed for:
+Keep Firebase frontend variables only while the frontend still reads Firebase catalog data directly. Move sensitive provider keys behind backend APIs before production.
 
-- login and logout
-- phone/email identity verification
-- session refresh
-- user profile storage
+## API Client Pattern
 
-Recommended backend responsibilities:
+Create `src/services/apiClient.js`:
 
-- issue access token and refresh token
-- verify OTP or auth provider token
-- return normalized user profile
+```js
+import { fetchWithTimeout, parseJsonResponse } from "../utils/network";
 
-### 2. Catalog API
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
-Needed for:
+export async function apiRequest(path, options = {}) {
+  const token = localStorage.getItem("accessToken");
+  const response = await fetchWithTimeout(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
+  });
 
-- unified product listing
-- region-aware pricing
-- category listing
-- stock status
-- search
+  const data = await parseJsonResponse(response);
 
-Current frontend can still keep Firebase for catalog if preferred, but production teams usually add:
+  if (!response.ok) {
+    throw new Error(data?.message || data?.error || `HTTP ${response.status}`);
+  }
 
-- API validation layer
-- inventory rules
-- region-based product filtering
-- caching
+  return data;
+}
+```
 
-### 3. Cart API
+## API Groups To Add
 
-Needed for:
+### Auth
 
-- persistent cross-device cart
-- quantity updates
-- coupon application
-- cart validation before checkout
+- `POST /auth/send-otp`
+- `POST /auth/verify-otp`
+- `POST /auth/refresh`
+- `POST /auth/logout`
+- `GET /auth/me`
 
-### 4. Checkout and Order API
+Frontend areas:
 
-Needed for:
+- `src/context/AuthContext.jsx`
+- `src/components/PhoneAuthModal.jsx`
 
-- address attachment
-- shipping fee calculation
-- tax calculation
-- order creation
-- order history retrieval
-- status updates
+### Catalog
 
-### 5. Payment Backend
+- `GET /catalog/home?country=IN`
+- `GET /catalog/categories?country=IN`
+- `GET /catalog/products?country=IN&category=rice`
+- `GET /catalog/products/:id`
+- `GET /catalog/products/:id/related`
 
-Needed for:
+Frontend areas:
 
-- secure order payment initiation
-- payment verification webhooks
-- wallet top-up confirmation
-- refund initiation
+- `src/pages/HomePage.jsx`
+- `src/pages/CategoryPage.jsx`
+- `src/pages/ProductDetailPage.jsx`
+- `src/components/SearchBox.jsx`
+- `src/utils/productUtils.js`
 
-This should never remain purely client-side in production.
+### Cart
 
-### 6. Notification Service
+- `GET /cart`
+- `POST /cart/items`
+- `PATCH /cart/items/:itemId`
+- `DELETE /cart/items/:itemId`
+- `POST /cart/quote`
 
-Needed for:
+Frontend areas:
 
-- order events
-- refund status updates
-- offer notifications
-- read/unread sync across devices
+- `src/App.jsx`
+- `src/pages/CartPage.jsx`
+- `src/components/ProductCard.jsx`
 
-### 7. Chatbot Proxy / AI Backend
+### Wishlist
 
-Needed for:
+- `GET /wishlist`
+- `POST /wishlist/items`
+- `DELETE /wishlist/items/:productId`
+- `POST /wishlist/items/:productId/move-to-cart`
 
-- secure AI key handling
-- controlled prompt building
-- rate limiting
-- logging and moderation
-- optional retrieval and order/cart context injection
+Frontend areas:
 
-## Suggested Backend Stack Options
+- `src/App.jsx`
+- `src/pages/WishlistPage.jsx`
+- `src/components/ProductCard.jsx`
 
-Any of the following would work well:
+### Address And Checkout
 
-- `Node.js + Express/NestJS`
-- `Next.js API routes / server actions`
-- `Firebase Functions`
-- `Python FastAPI`
+- `GET /addresses`
+- `POST /addresses`
+- `PATCH /addresses/:id`
+- `DELETE /addresses/:id`
+- `POST /checkout/quote`
+- `POST /checkout/start`
 
-## Recommended API Surface
+Frontend areas:
 
-Suggested endpoint groups:
+- `src/components/AddressModal.jsx`
+- `src/pages/CartPage.jsx`
+- `src/pages/PaymentPage.jsx`
 
-- `POST /api/auth/send-phone-otp`
-- `POST /api/auth/verify-phone-otp`
-- `POST /api/auth/refresh`
-- `GET /api/auth/me`
-- `PATCH /api/users/me`
-- `GET /api/catalog/home`
-- `GET /api/catalog/products/:id`
-- `GET /api/catalog/categories`
-- `GET /api/search`
-- `GET /api/cart`
-- `POST /api/cart/items`
-- `PATCH /api/cart/items/:id`
-- `DELETE /api/cart/items/:id`
-- `POST /api/checkout/quote`
-- `POST /api/orders`
-- `GET /api/orders`
-- `GET /api/orders/:id`
-- `POST /api/payments/session`
-- `POST /api/payments/confirm`
-- `POST /api/payments/webhook`
-- `GET /api/notifications`
-- `PATCH /api/notifications/:id/read`
-- `POST /api/chat`
+### Orders And Tracking
 
-## Frontend Changes Needed To Attach Backend
+- `GET /orders`
+- `GET /orders/:id`
+- `GET /orders/:id/tracking`
+- `POST /orders/:id/buy-again`
+- `POST /orders/:id/rating`
 
-### Authentication
+Frontend areas:
 
-Replace:
-
-- localStorage-only session bootstrapping
-
-With:
-
-- token-based API login
-- secure refresh flow
-- backend user profile sync
-
-### Cart and wishlist
-
-Replace:
-
-- browser-only persistence
-
-With:
-
-- API-backed user cart
-- optional guest cart merge
-
-### Orders and tracking
-
-Replace:
-
-- simulated tracking progression
-
-With:
-
-- real order status retrieval from backend
+- `src/pages/AccountPage.jsx`
+- `src/pages/OrderSuccessPage.jsx`
+- `src/pages/OrderTrackingPage.jsx`
+- `src/pages/OrderDetailPage.jsx`
+- `src/pages/RateOrderPage.jsx`
+- `src/context/TrackingContext.jsx`
 
 ### Payments
 
-Replace:
+- `POST /payments/razorpay/create-order`
+- `POST /payments/razorpay/verify`
+- `POST /payments/razorpay/webhook`
+- `POST /payments/mpesa/stk-push`
+- `POST /payments/mpesa/callback`
 
-- demo completion flow
+Frontend area:
 
-With:
+- `src/pages/PaymentPage.jsx`
 
-- backend-generated payment intent/session
-- backend webhook confirmation
+Important rule: frontend payment success must not finalize an order by itself. The backend must verify payment webhooks/signatures.
 
-### Chatbot
+### Refunds And Returns
 
-Replace:
+- `POST /returns`
+- `GET /returns`
+- `GET /returns/:id`
+- `POST /returns/:id/proofs`
+- `PATCH /returns/:id/status`
 
-- direct client-side AI coupling
+Frontend areas:
 
-With:
+- `src/pages/AccountPage.jsx`
+- `src/pages/OrderDetailPage.jsx`
 
-- backend chatbot endpoint
+### Notifications
 
-## Environment Variables Already Relevant
+- `GET /notifications`
+- `PATCH /notifications/:id/read`
+- `PATCH /notifications/read-all`
+- `DELETE /notifications/:id`
+- `DELETE /notifications/clear-read`
 
-Current frontend already expects:
+Frontend areas:
 
-- `VITE_FIREBASE_API_KEY`
-- `VITE_FIREBASE_AUTH_DOMAIN`
-- `VITE_FIREBASE_DATABASE_URL`
-- `VITE_FIREBASE_PROJECT_ID`
-- `VITE_FIREBASE_STORAGE_BUCKET`
-- `VITE_FIREBASE_MESSAGING_SENDER_ID`
-- `VITE_FIREBASE_APP_ID`
-- `VITE_FIREBASE_MEASUREMENT_ID`
-- `VITE_GROQ_API_KEY`
-- `VITE_GROQ_API_URL`
-- `VITE_GROQ_MODEL`
+- `src/App.jsx`
+- `src/components/Header.jsx`
+- `src/components/TrackingPopup.jsx`
 
-For production, AI keys and sensitive payment logic should not be exposed from the client.
+### Chatbot Proxy
 
-## Recommended Integration Order
+- `POST /ai/chat`
+- `POST /ai/product-suggestions`
 
-1. Authentication
-2. Catalog API normalization
-3. Cart API
-4. Checkout and order creation
-5. Payment verification
-6. Notifications
-7. Chatbot backend proxy
+Frontend areas:
 
-## Production Readiness Advice
+- `src/services/groqService.js`
+- `src/components/ChatbotWidget.jsx`
+- `src/components/ChatbotPage.jsx`
 
-Before attaching the backend fully, also add:
+## LocalStorage Migration Map
 
-- request validation
-- error monitoring
-- analytics
-- test coverage
-- role-based admin tools
-- audit logging for orders and refunds
+- `auth/session`: move to backend tokens and `/auth/me`.
+- `cart`: move to `/cart`.
+- `wishlist`: move to `/wishlist`.
+- `orders`: move to `/orders`.
+- `addresses`: move to `/addresses`.
+- `notifications`: move to `/notifications`.
+- `refunds/returns`: move to `/returns`.
+- `wallet`: move to backend wallet ledger if wallet remains in scope.
+- region/language preferences: move to user preferences after login, keep guest fallback locally.
+
+## Safe Migration Order
+
+1. Add `apiClient.js` and domain API files.
+2. Connect auth and profile while keeping current UI.
+3. Connect catalog reads with Firebase/local fallback preserved.
+4. Connect cart and wishlist APIs with optimistic UI.
+5. Connect addresses and checkout quote.
+6. Connect payments through backend-created payment orders and webhooks.
+7. Connect order history and tracking.
+8. Connect refunds/returns and notifications.
+9. Move chatbot calls behind backend proxy.
+10. Remove obsolete demo persistence after API parity is confirmed.
+
+## Validation Rules Backend Must Own
+
+- Verify user session on protected APIs.
+- Detect country from phone/profile and enforce region-safe catalog results.
+- Never trust frontend prices, discounts, stock, delivery fee, or tax.
+- Validate cart item IDs, units, quantity, stock, and active price before checkout.
+- Validate address fields by country.
+- Verify payment signatures and webhook events.
+- Validate refund eligibility, reason, proof files, and status transitions.
+- Rate-limit OTP, auth, payment, upload, and chatbot endpoints.
+
+## Production QA Checklist
+
+- India and Kenya login flows work with correct catalog and language behavior.
+- Guest logout returns to guest storefront context.
+- Catalog products, prices, images, units, and stock match backend data.
+- Cart and wishlist survive refresh and login.
+- Checkout quote matches final order amount.
+- Payment success/failure/cancelled states are backend-confirmed.
+- Orders, tracking, ratings, buy-again, refunds, and notifications persist.
+- Mobile overlays, dock, chatbot, keyboard, and sheets do not overlap.
+- Sentry/log monitoring shows no release-blocking runtime errors.
+
+## First Production Beta Minimum
+
+Do not ship real checkout until these are complete:
+
+- Auth/OTP.
+- Region-safe catalog.
+- Cart/wishlist.
+- Addresses.
+- Checkout quote.
+- Payment webhook verification.
+- Order persistence.
+- Basic notifications.
+- Error monitoring.

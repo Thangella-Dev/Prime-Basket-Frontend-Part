@@ -215,6 +215,8 @@ export default function CategoryPage({
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [priceRange, setPriceRange] = useState(DEFAULT_PRICE_RANGE);
   const [discountRange, setDiscountRange] = useState(DEFAULT_DISCOUNT_RANGE);
+  const [priceRangeTouched, setPriceRangeTouched] = useState(false);
+  const [discountRangeTouched, setDiscountRangeTouched] = useState(false);
   const [sortBy, setSortBy] = useState("default");
 
   // UI state
@@ -310,6 +312,8 @@ export default function CategoryPage({
     setBrandSearch("");
     setPriceRange(DEFAULT_PRICE_RANGE);
     setDiscountRange(DEFAULT_DISCOUNT_RANGE);
+    setPriceRangeTouched(false);
+    setDiscountRangeTouched(false);
     setSortBy("default");
     setFilterOpen(false);
     setMobileSortOpen(false);
@@ -391,6 +395,8 @@ export default function CategoryPage({
       if (Array.isArray(parsed.selectedBrands)) setSelectedBrands(parsed.selectedBrands);
       if (Array.isArray(parsed.priceRange)) setPriceRange(parsed.priceRange);
       if (Array.isArray(parsed.discountRange)) setDiscountRange(parsed.discountRange);
+      setPriceRangeTouched(Boolean(parsed.priceRangeTouched));
+      setDiscountRangeTouched(Boolean(parsed.discountRangeTouched));
       setBrandSearch(parsed.brandSearch || "");
       setSearchQuery(parsed.searchQuery || "");
       setSortBy(parsed.sortBy || "default");
@@ -614,12 +620,16 @@ export default function CategoryPage({
   // Sync ranges when products change
   useEffect(() => {
     if (loading || products.length === 0) return;
-    setPriceRange((prev) => clampRange(prev, priceBounds[0], priceBounds[1]));
-  }, [loading, priceBounds[0], priceBounds[1], products.length]);
+    setPriceRange((prev) => (
+      priceRangeTouched ? clampRange(prev, priceBounds[0], priceBounds[1]) : priceBounds
+    ));
+  }, [loading, priceBounds, priceRangeTouched, products.length]);
   useEffect(() => {
     if (loading || products.length === 0) return;
-    setDiscountRange((prev) => clampRange(prev, discountBounds[0], discountBounds[1]));
-  }, [discountBounds[0], discountBounds[1], loading, products.length]);
+    setDiscountRange((prev) => (
+      discountRangeTouched ? clampRange(prev, discountBounds[0], discountBounds[1]) : discountBounds
+    ));
+  }, [discountBounds, discountRangeTouched, loading, products.length]);
 
   useEffect(() => {
     if (!category || navigationMode === "restore" || loading) return;
@@ -631,6 +641,8 @@ export default function CategoryPage({
     setBrandSearch("");
     setPriceRange(priceBounds);
     setDiscountRange(discountBounds);
+    setPriceRangeTouched(false);
+    setDiscountRangeTouched(false);
     setSortBy("default");
     if (categoryStateCacheKey) {
       safeSessionRemove(categoryStateCacheKey);
@@ -683,6 +695,8 @@ export default function CategoryPage({
     () => clampRange(discountRange, discountBounds[0], discountBounds[1]),
     [discountRange, discountBounds]
   );
+  const appliedPriceRange = priceRangeTouched ? effectivePriceRange : priceBounds;
+  const appliedDiscountRange = discountRangeTouched ? effectiveDiscountRange : discountBounds;
 
   // ── Filtered & sorted products ─────────────────────────────────────────────
   const filteredProducts = useMemo(() => {
@@ -707,10 +721,10 @@ export default function CategoryPage({
 
     list = list.filter(
       (prod) =>
-        prod._price >= effectivePriceRange[0] &&
-        prod._price <= effectivePriceRange[1] &&
-        prod._discount >= effectiveDiscountRange[0] &&
-        prod._discount <= effectiveDiscountRange[1]
+        prod._price >= appliedPriceRange[0] &&
+        prod._price <= appliedPriceRange[1] &&
+        prod._discount >= appliedDiscountRange[0] &&
+        prod._discount <= appliedDiscountRange[1]
     );
 
     switch (sortBy) {
@@ -723,7 +737,7 @@ export default function CategoryPage({
     }
 
     return list;
-  }, [products, allProducts, searchQuery, selectedBrands, effectivePriceRange, effectiveDiscountRange, sortBy, getTranslatedName]);
+  }, [products, allProducts, searchQuery, selectedBrands, appliedPriceRange, appliedDiscountRange, sortBy, getTranslatedName]);
 
   // ── Active filter tags ─────────────────────────────────────────────────────
   const activeTags = useMemo(() => {
@@ -732,22 +746,28 @@ export default function CategoryPage({
     selectedBrands.forEach((b) =>
       tags.push({ key: `brand_${b}`, label: b, onRemove: () => setSelectedBrands((prev) => prev.filter((x) => x !== b)) })
     );
-    if (effectivePriceRange[0] !== priceBounds[0] || effectivePriceRange[1] !== priceBounds[1]) {
+    if (priceRangeTouched && (effectivePriceRange[0] !== priceBounds[0] || effectivePriceRange[1] !== priceBounds[1])) {
       tags.push({
         key: "price",
         label: `${currPrefix}${effectivePriceRange[0]}–${currPrefix}${effectivePriceRange[1]}`,
-        onRemove: () => setPriceRange(priceBounds),
+        onRemove: () => {
+          setPriceRange(priceBounds);
+          setPriceRangeTouched(false);
+        },
       });
     }
-    if (effectiveDiscountRange[0] !== discountBounds[0] || effectiveDiscountRange[1] !== discountBounds[1]) {
+    if (discountRangeTouched && (effectiveDiscountRange[0] !== discountBounds[0] || effectiveDiscountRange[1] !== discountBounds[1])) {
       tags.push({
         key: "discount",
         label: `${effectiveDiscountRange[0]}%–${effectiveDiscountRange[1]}% off`,
-        onRemove: () => setDiscountRange(discountBounds),
+        onRemove: () => {
+          setDiscountRange(discountBounds);
+          setDiscountRangeTouched(false);
+        },
       });
     }
     return tags;
-  }, [searchQuery, selectedBrands, effectivePriceRange, effectiveDiscountRange, priceBounds, discountBounds, currPrefix]);
+  }, [searchQuery, selectedBrands, priceRangeTouched, effectivePriceRange, priceBounds, discountRangeTouched, effectiveDiscountRange, discountBounds, currPrefix]);
 
   const activeFilterCount = activeTags.length;
 
@@ -757,6 +777,8 @@ export default function CategoryPage({
     setBrandSearch("");
     setPriceRange(priceBounds);
     setDiscountRange(discountBounds);
+    setPriceRangeTouched(false);
+    setDiscountRangeTouched(false);
     setSortBy("default");
   }, [priceBounds, discountBounds]);
 
@@ -768,6 +790,7 @@ export default function CategoryPage({
 
   const handleAllDeals = useCallback(() => {
     setDiscountRange([Math.max(discountBounds[0], Math.min(5, discountBounds[1])), discountBounds[1]]);
+    setDiscountRangeTouched(true);
     setSortBy("best_discount");
     setSearchQuery("");
   }, [discountBounds]);
@@ -808,6 +831,8 @@ export default function CategoryPage({
         searchQuery,
         priceRange: effectivePriceRange,
         discountRange: effectiveDiscountRange,
+        priceRangeTouched,
+        discountRangeTouched,
         sortBy,
         scrollY: typeof window !== "undefined" ? window.scrollY || 0 : 0,
       })
@@ -819,7 +844,9 @@ export default function CategoryPage({
     categoryStateCacheKey,
     effectiveDiscountRange,
     effectivePriceRange,
+    discountRangeTouched,
     loading,
+    priceRangeTouched,
     products,
     searchQuery,
     selectedBrands,
@@ -843,6 +870,8 @@ export default function CategoryPage({
             searchQuery,
             priceRange: effectivePriceRange,
             discountRange: effectiveDiscountRange,
+            priceRangeTouched,
+            discountRangeTouched,
             sortBy,
             scrollY: window.scrollY || 0,
           })
@@ -861,7 +890,9 @@ export default function CategoryPage({
     categoryStateCacheKey,
     effectiveDiscountRange,
     effectivePriceRange,
+    discountRangeTouched,
     loading,
+    priceRangeTouched,
     products,
     searchQuery,
     selectedBrands,
@@ -955,7 +986,11 @@ export default function CategoryPage({
   const renderPriceFilter = () => (
     <RangeSlider
       min={priceBounds[0]} max={priceBounds[1]}
-      value={effectivePriceRange} onChange={setPriceRange}
+      value={effectivePriceRange}
+      onChange={(nextRange) => {
+        setPriceRangeTouched(true);
+        setPriceRange(nextRange);
+      }}
       prefix={currPrefix} accent={p.accent}
     />
   );
@@ -963,7 +998,11 @@ export default function CategoryPage({
   const renderDiscountFilter = () => (
     <RangeSlider
       min={discountBounds[0]} max={discountBounds[1]}
-      value={effectiveDiscountRange} onChange={setDiscountRange}
+      value={effectiveDiscountRange}
+      onChange={(nextRange) => {
+        setDiscountRangeTouched(true);
+        setDiscountRange(nextRange);
+      }}
       suffix="%" accent={p.accent}
     />
   );

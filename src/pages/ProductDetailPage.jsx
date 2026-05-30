@@ -78,6 +78,8 @@ export default function ProductDetailPage({
   const [lightboxOpen, setLightboxOpen]     = useState(false);
   const [hoverZoomActive, setHoverZoomActive] = useState(false);
   const [zoomOrigin, setZoomOrigin]         = useState({ x: 50, y: 50 });
+  const [mobileImageScale, setMobileImageScale] = useState(1);
+  const [mobileImageOrigin, setMobileImageOrigin] = useState({ x: 50, y: 50 });
   const [lightboxScale, setLightboxScale]   = useState(1);
   const [lightboxOffset, setLightboxOffset] = useState({ x: 0, y: 0 });
   const zoomTouchRef = useRef({
@@ -91,6 +93,11 @@ export default function ProductDetailPage({
     lastTapAt: 0,
     startX: 0,
     startY: 0,
+    startDistance: 0,
+    startScale: 1,
+    moved: false,
+    tapTimer: null,
+    suppressClickUntil: 0,
   });
 
   const allCoupons = region === "ke" ? allCoupons_ke : allCoupons_en;
@@ -131,17 +138,44 @@ export default function ProductDetailPage({
     return unique.length ? unique : [resolveProductImage(product)];
   }, [product]);
   const activeImage = galleryImages[activeThumb] || galleryImages[0] || resolveProductImage(product);
+  const safeActiveImage = activeImage || resolveProductImage(product) || "/assets/grocery-items.png";
+  const applySafeImageFallback = (event) => {
+    const image = event?.currentTarget;
+    if (!image) return;
+    if (image.dataset.safeFallbackApplied === "true") {
+      image.src = "/assets/grocery-items.png";
+      image.style.visibility = "visible";
+      return;
+    }
+    image.dataset.safeFallbackApplied = "true";
+    image.src = resolveProductImage(product) || "/assets/grocery-items.png";
+    image.style.visibility = "visible";
+  };
 
   const getTranslatedName = (name) => getLocalizedProductName(name, t);
 
   const translatedName = getTranslatedName(product.name);
+  const categoryLabel = t.categories?.[product._cat] || t.categories?.[product._cat?.replace("-", "")] || product._cat || "Grocery";
+  const productCode = product.sku || product.productCode || product._uid || `${product._cat || "item"}-${product._index ?? "0"}`;
+  const stockLabel = product.stockStatus || (product.outOfStock ? (t.wishlist?.outOfStock || "Out of stock") : (t.wishlist?.inStock || "In stock"));
+  const isPerishable = ["fruits", "vegetables", "dairyProducts", "meat"].includes(product._cat);
+  const deliveryPromise = product.deliveryPromise || (region === "ke" ? "Fast delivery in supported Kenya service areas" : "Fast delivery in supported India service areas");
+  const returnPolicy = product.returnPolicy || (isPerishable ? "Quality issue? Return at delivery" : "Easy return as per category policy");
+  const packagingLabel = product.packaging || product.standard || product.baseUnit || selectedUnit;
+  const productOrigin = product.origin || (region === "ke" ? "Kenya regional catalog" : "India regional catalog");
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setActiveThumb(0);
     setHoverZoomActive(false);
+    setMobileImageScale(1);
+    setMobileImageOrigin({ x: 50, y: 50 });
     setLightboxScale(1);
     setLightboxOffset({ x: 0, y: 0 });
+    if (mainImageTouchRef.current.tapTimer) {
+      window.clearTimeout(mainImageTouchRef.current.tapTimer);
+      mainImageTouchRef.current.tapTimer = null;
+    }
   }, [product._uid]);
 
   useEffect(() => {
@@ -259,29 +293,87 @@ export default function ProductDetailPage({
     setZoomOrigin({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
   };
 
+  const handleMainImageClick = () => {
+    if (viewportWidth < 980 && Date.now() < mainImageTouchRef.current.suppressClickUntil) return;
+    openLightboxAt(activeThumb, mobileImageScale > 1.05 ? mobileImageScale : 1);
+  };
+
+  const setMobileZoomOriginFromTouch = (target, touch) => {
+    if (!target || !touch) return;
+    const bounds = target.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) return;
+    const x = ((touch.clientX - bounds.left) / bounds.width) * 100;
+    const y = ((touch.clientY - bounds.top) / bounds.height) * 100;
+    setMobileImageOrigin({
+      x: Math.max(0, Math.min(100, x)),
+      y: Math.max(0, Math.min(100, y)),
+    });
+  };
+
   const handleMainImageTouchStart = (event) => {
     const firstTouch = event.touches?.[0];
     if (!firstTouch) return;
+    mainImageTouchRef.current.moved = false;
     mainImageTouchRef.current.startX = firstTouch.clientX;
     mainImageTouchRef.current.startY = firstTouch.clientY;
+    if (event.touches.length >= 2) {
+      mainImageTouchRef.current.startDistance = getTouchDistance(event.touches);
+      mainImageTouchRef.current.startScale = mobileImageScale;
+      return;
+    }
+    setMobileZoomOriginFromTouch(event.currentTarget, firstTouch);
+  };
+
+  const handleMainImageTouchMove = (event) => {
+    if (viewportWidth >= 980) return;
+    if (event.touches.length >= 2) {
+      event.preventDefault();
+      mainImageTouchRef.current.moved = true;
+      const nextDistance = getTouchDistance(event.touches);
+      if (!mainImageTouchRef.current.startDistance) return;
+      const pinchScale = (nextDistance / mainImageTouchRef.current.startDistance) * mainImageTouchRef.current.startScale;
+      setMobileImageScale(Math.max(1, Math.min(3.4, pinchScale)));
+      return;
+    }
+
+    const touch = event.touches?.[0];
+    if (!touch) return;
+    const deltaX = touch.clientX - mainImageTouchRef.current.startX;
+    const deltaY = touch.clientY - mainImageTouchRef.current.startY;
+    if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+      mainImageTouchRef.current.moved = true;
+    }
   };
 
   const handleMainImageTouchEnd = (event) => {
     const changedTouch = event.changedTouches?.[0];
     if (!changedTouch || viewportWidth >= 980) return;
+    mainImageTouchRef.current.suppressClickUntil = Date.now() + 420;
     const deltaX = changedTouch.clientX - mainImageTouchRef.current.startX;
     const deltaY = changedTouch.clientY - mainImageTouchRef.current.startY;
-    if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) return;
+    if (event.touches?.length > 0 || mainImageTouchRef.current.moved || Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) return;
 
     const now = Date.now();
     if (now - mainImageTouchRef.current.lastTapAt < 280) {
-      openLightboxAt(activeThumb, 2);
+      if (mainImageTouchRef.current.tapTimer) {
+        window.clearTimeout(mainImageTouchRef.current.tapTimer);
+        mainImageTouchRef.current.tapTimer = null;
+      }
+      setMobileZoomOriginFromTouch(event.currentTarget, changedTouch);
+      setMobileImageScale((prev) => (prev > 1.05 ? 1 : 2.25));
       mainImageTouchRef.current.lastTapAt = 0;
       return;
     }
 
     mainImageTouchRef.current.lastTapAt = now;
-    openLightboxAt(activeThumb, 1);
+    if (mainImageTouchRef.current.tapTimer) window.clearTimeout(mainImageTouchRef.current.tapTimer);
+    mainImageTouchRef.current.tapTimer = window.setTimeout(() => {
+      if (mainImageTouchRef.current.lastTapAt === now) {
+        mainImageTouchRef.current.lastTapAt = 0;
+        mainImageTouchRef.current.tapTimer = null;
+        openLightboxAt(activeThumb, mobileImageScale > 1.05 ? mobileImageScale : 1);
+      }
+    }, 270);
   };
 
   const goLightbox = (direction) => {
@@ -298,6 +390,7 @@ export default function ProductDetailPage({
 
   const handleLightboxTouchStart = (event) => {
     if (event.touches.length >= 2) {
+      event.preventDefault();
       zoomTouchRef.current.startDistance = getTouchDistance(event.touches);
       zoomTouchRef.current.startScale = lightboxScale;
       return;
@@ -318,6 +411,7 @@ export default function ProductDetailPage({
 
   const handleLightboxTouchMove = (event) => {
     if (event.touches.length >= 2) {
+      event.preventDefault();
       const nextDistance = getTouchDistance(event.touches);
       if (!zoomTouchRef.current.startDistance) return;
       const pinchScale = (nextDistance / zoomTouchRef.current.startDistance) * zoomTouchRef.current.startScale;
@@ -372,7 +466,7 @@ export default function ProductDetailPage({
         .pdp-thumb img { max-width:100%; max-height:100%; object-fit:contain; }
 
         .pdp-imgcard { flex:1; background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,250,255,0.98)); border:1px solid var(--border); border-radius:22px; padding:20px 20px 16px; display:flex; flex-direction:column; align-items:stretch; min-height:500px; position:relative; overflow:hidden; box-shadow: 0 24px 48px rgba(15,23,42,0.08); }
-        .pdp-img-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 10px; position:relative; cursor:zoom-in; overflow:hidden; border-radius:18px; }
+        .pdp-img-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 10px; position:relative; cursor:zoom-in; overflow:hidden; border-radius:18px; touch-action:manipulation; }
         .pdp-disc-badge { position:absolute; top:14px; left:14px; background:#16a34a; color:#fff; font-size:11px; font-weight:800; padding:4px 10px; border-radius:4px 10px 4px 10px; z-index:2; }
         .pdp-icon-col { position:absolute; top:14px; right:14px; display:flex; flex-direction:column; gap:8px; z-index:2; }
         .pdp-icon-btn { width:40px; height:40px; border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,246,255,0.98)); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#1d5ba0; font-size:14px; box-shadow:0 12px 24px rgba(15,23,42,.08); transition:.22s ease; position:relative; overflow:hidden; }
@@ -386,8 +480,8 @@ export default function ProductDetailPage({
         .pdp-lightbox-overlay { position:fixed; inset:0; z-index:100120; background:rgba(7,14,27,0.78); backdrop-filter:blur(14px); display:flex; align-items:center; justify-content:center; padding:24px; animation:fadeIn .24s ease; }
         .pdp-lightbox-shell { position:relative; width:min(96vw, 1180px); height:min(90vh, 820px); border-radius:28px; border:1px solid rgba(255,255,255,0.16); background:linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.04)); box-shadow:0 24px 60px rgba(0,0,0,0.32); overflow:hidden; display:grid; grid-template-columns:minmax(88px, 108px) 1fr; }
         .pdp-lightbox-rail { padding:22px 14px; display:flex; flex-direction:column; gap:12px; background:rgba(7,14,27,0.22); border-right:1px solid rgba(255,255,255,0.12); overflow:auto; }
-        .pdp-lightbox-main { position:relative; display:flex; align-items:center; justify-content:center; padding:26px; overflow:hidden; }
-        .pdp-lightbox-main img { max-width:100%; max-height:100%; object-fit:contain; transition:transform .24s ease; will-change:transform; }
+        .pdp-lightbox-main { position:relative; display:flex; align-items:center; justify-content:center; padding:26px; overflow:hidden; touch-action:none; }
+        .pdp-lightbox-main img { display:block; width:auto; height:auto; max-width:100%; max-height:100%; object-fit:contain; transition:transform .24s ease; will-change:transform; }
         .pdp-lightbox-close,
         .pdp-lightbox-nav { position:absolute; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.16); color:#fff; border-radius:18px; box-shadow:0 14px 28px rgba(0,0,0,0.18); backdrop-filter:blur(10px); }
         .pdp-lightbox-close { top:18px; right:18px; width:46px; height:46px; z-index:3; }
@@ -437,6 +531,7 @@ export default function ProductDetailPage({
           .pdp-left { position: static; flex-direction: column-reverse; }
           .pdp-thumbs { flex-direction: row; overflow-x: auto; }
           .pdp-imgcard { min-height: 400px; }
+          .pdp-img-zone { touch-action:none; }
           .pdp-lightbox-shell { width:100vw; height:100vh; border-radius:0; grid-template-columns:1fr; }
           .pdp-lightbox-rail { order:2; flex-direction:row; border-right:none; border-top:1px solid rgba(255,255,255,0.12); padding:14px; }
           .pdp-lightbox-main { order:1; padding:18px 14px 84px; }
@@ -483,6 +578,52 @@ export default function ProductDetailPage({
           color: #64748b;
           line-height: 1.2;
         }
+        .pdp-service-strip {
+          display:grid;
+          grid-template-columns:repeat(3, minmax(0, 1fr));
+          gap:10px;
+          margin:18px 0 22px;
+        }
+        .pdp-service-card {
+          min-width:0;
+          display:flex;
+          align-items:flex-start;
+          gap:10px;
+          padding:12px;
+          border-radius:16px;
+          border:1px solid rgba(191,219,254,0.9);
+          background:linear-gradient(180deg, rgba(248,251,255,0.98), rgba(239,247,255,0.98));
+          box-shadow:0 14px 26px rgba(29,91,160,0.07);
+        }
+        .pdp-service-card i {
+          flex:0 0 28px;
+          width:28px;
+          height:28px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          border-radius:10px;
+          color:#fff;
+          background:linear-gradient(135deg, #1d5ba0, #23a7d9);
+          font-size:12px;
+          box-shadow:0 10px 18px rgba(29,91,160,0.18);
+        }
+        .pdp-service-card strong {
+          display:block;
+          color:#16355e;
+          font-size:12px;
+          font-weight:900;
+          line-height:1.2;
+          margin-bottom:3px;
+        }
+        .pdp-service-card span {
+          display:block;
+          color:#64748b;
+          font-size:11px;
+          font-weight:700;
+          line-height:1.35;
+          overflow-wrap:anywhere;
+        }
         body[data-theme="dark"] .pdp {
           background:
             radial-gradient(circle at top left, rgba(15,91,215,0.18), transparent 28%),
@@ -528,8 +669,20 @@ export default function ProductDetailPage({
           background: rgba(34,197,94,0.16);
           color: #86efac;
         }
+        body[data-theme="dark"] .pdp-service-card {
+          background:linear-gradient(180deg, rgba(15,23,42,0.82), rgba(17,34,58,0.82));
+          border-color:rgba(96,165,250,0.2);
+          box-shadow:0 14px 28px rgba(2,8,23,0.18);
+        }
+        body[data-theme="dark"] .pdp-service-card strong {
+          color:#eaf4ff;
+        }
+        body[data-theme="dark"] .pdp-service-card span {
+          color:#a9bdd8;
+        }
         @media (max-width: 480px) {
           .pdp-trust-badges { grid-template-columns: repeat(2, 1fr); gap: 20px 10px; }
+          .pdp-service-strip { grid-template-columns:1fr; }
         }
       `}</style>
 
@@ -540,7 +693,7 @@ export default function ProductDetailPage({
               <i className="fas fa-arrow-left" style={{ fontSize: 10 }}></i> {t.cart.breadcrumbHome}
             </span>
             <i className="fas fa-chevron-right pdp-crumb-sep"></i>
-            <span className="pdp-crumb-cat" onClick={() => onCategorySelect && onCategorySelect(product._cat)}>{t.categories?.[product._cat.replace("-", "")] || product._cat}</span>
+            <span className="pdp-crumb-cat" onClick={() => onCategorySelect && onCategorySelect(product._cat)}>{categoryLabel}</span>
             <i className="fas fa-chevron-right pdp-crumb-sep"></i>
             <span className="pdp-crumb-name">{translatedName}</span>
           </div>
@@ -575,8 +728,9 @@ export default function ProductDetailPage({
                   onMouseEnter={() => setHoverZoomActive(true)}
                   onMouseLeave={() => setHoverZoomActive(false)}
                   onMouseMove={handleMainImagePointerMove}
-                  onClick={() => openLightboxAt(activeThumb)}
+                  onClick={handleMainImageClick}
                   onTouchStart={handleMainImageTouchStart}
+                  onTouchMove={handleMainImageTouchMove}
                   onTouchEnd={handleMainImageTouchEnd}
                 >
                   {hoverZoomActive && viewportWidth >= 980 ? (
@@ -586,13 +740,19 @@ export default function ProductDetailPage({
                     />
                   ) : null}
                   <img
-                    src={activeImage}
+                    src={safeActiveImage}
                     alt={translatedName}
                     className="pdp-bigimg"
-                    onError={(event) => handleProductImageError(event, product)}
+                    onError={applySafeImageFallback}
                     style={{
-                      transform: hoverZoomActive && viewportWidth >= 980 ? "scale(2.05)" : "scale(1)",
-                      transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                      transform: hoverZoomActive && viewportWidth >= 980
+                        ? "scale(2.05)"
+                        : viewportWidth < 980
+                          ? `scale(${mobileImageScale})`
+                          : "scale(1)",
+                      transformOrigin: viewportWidth < 980
+                        ? `${mobileImageOrigin.x}% ${mobileImageOrigin.y}%`
+                        : `${zoomOrigin.x}% ${zoomOrigin.y}%`,
                     }}
                   />
                   <div className="pdp-zoom-caption">
@@ -606,7 +766,7 @@ export default function ProductDetailPage({
             <div className="pdp-right">
               <div className="pdp-infocard">
                 <span className="pdp-cat-tag" onClick={() => onCategorySelect && onCategorySelect(product._cat)} style={{ cursor: "pointer" }}>
-                  {t.categories?.[product._cat.replace("-", "")] || product._cat}
+                  {categoryLabel}
                 </span>
                 <h1 className="pdp-pname">{translatedName}</h1>
                 
@@ -644,6 +804,30 @@ export default function ProductDetailPage({
                   )}
                 </div>
                 <p style={{ fontSize: 12, color: "#94a3b8", marginBottom: 24 }}>(Inclusive of all taxes)</p>
+
+                <div className="pdp-service-strip" aria-label="Product availability and delivery details">
+                  <div className="pdp-service-card">
+                    <i className="fas fa-check-circle"></i>
+                    <div>
+                      <strong>{stockLabel}</strong>
+                      <span>{packagingLabel} selected</span>
+                    </div>
+                  </div>
+                  <div className="pdp-service-card">
+                    <i className="fas fa-truck"></i>
+                    <div>
+                      <strong>Delivery</strong>
+                      <span>{deliveryPromise}</span>
+                    </div>
+                  </div>
+                  <div className="pdp-service-card">
+                    <i className="fas fa-undo-alt"></i>
+                    <div>
+                      <strong>Returns</strong>
+                      <span>{returnPolicy}</span>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Add to Cart Area */}
                 <div className="pdp-action-area">
@@ -730,12 +914,17 @@ export default function ProductDetailPage({
                   <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
                     {[
                       { label: t.product.brand, value: product.brand || "Prime Basket" },
-                      { label: t.product.category, value: t.categories?.[product._cat] || product._cat },
+                      { label: t.product.category, value: categoryLabel },
+                      { label: "Product Code", value: productCode },
+                      { label: t.product.packaging || "Packaging", value: packagingLabel },
+                      { label: t.wishlist?.stockStatus || "Stock Status", value: stockLabel },
                       { label: t.product.keyFeatures, value: t.product[product.keyFeatures] || product.keyFeatures },
                       { label: t.product.dietaryPreference, value: t.product[product.dietaryPreference.toLowerCase().replace("-","")] || product.dietaryPreference },
                       { label: t.product.shelfLife, value: product.shelfLife },
                       { label: t.product.storage, value: product.storage },
-                      { label: t.product.country, value: region === "ke" ? "Kenya" : "India" },
+                      { label: "Delivery Promise", value: deliveryPromise },
+                      { label: "Return Policy", value: returnPolicy },
+                      { label: t.product.country, value: productOrigin },
                     ].map((row) => (
                       <div key={row.label} style={{ display: "grid", gridTemplateColumns: isCompactDetails ? "1fr" : "minmax(138px, 186px) minmax(0, 1fr)", gap: isCompactDetails ? 6 : 16, padding: "14px 0", borderBottom: `1px solid ${isDark ? "rgba(71,85,105,0.52)" : "#f1f5f9"}` }}>
                         <span style={{ color: isDark ? "#94a3b8" : "#64748b", fontSize: 14, fontWeight: 700, textTransform: isCompactDetails ? "uppercase" : "none", letterSpacing: isCompactDetails ? "0.04em" : "normal" }}>{row.label}</span>
@@ -768,7 +957,12 @@ export default function ProductDetailPage({
                     {[
                       { label: t.product.customerCare, value: "support@primebasket.com" },
                       { label: t.product.seller, value: "Prime Basket Retail Ltd." },
+                      { label: "Product Code", value: productCode },
+                      { label: t.product.packaging || "Packaging", value: packagingLabel },
+                      { label: "Delivery", value: deliveryPromise },
+                      { label: "Return Policy", value: returnPolicy },
                       { label: t.product.shelfLife, value: product.shelfLife },
+                      { label: t.product.storage, value: product.storage },
                     ].map((row) => (
                       <div key={row.label} style={{ display: "grid", gridTemplateColumns: isCompactDetails ? "1fr" : "minmax(138px, 186px) minmax(0, 1fr)", gap: isCompactDetails ? 6 : 16, padding: "14px 0", borderBottom: `1px solid ${isDark ? "rgba(71,85,105,0.52)" : "#f1f5f9"}` }}>
                         <span style={{ color: isDark ? "#94a3b8" : "#64748b", fontSize: 14, fontWeight: 700, textTransform: isCompactDetails ? "uppercase" : "none", letterSpacing: isCompactDetails ? "0.04em" : "normal" }}>{row.label}</span>
@@ -833,7 +1027,7 @@ export default function ProductDetailPage({
                   className={`pdp-thumb${activeThumb === index ? " active" : ""}`}
                   onClick={() => setActiveThumb(index)}
                 >
-                  <img src={image} alt="" onError={(event) => handleProductImageError(event, product)} />
+                  <img src={image || safeActiveImage} alt="" onError={applySafeImageFallback} />
                 </button>
               ))}
             </div>
@@ -852,9 +1046,9 @@ export default function ProductDetailPage({
                 </>
               ) : null}
               <img
-                src={activeImage}
+                src={safeActiveImage}
                 alt={translatedName}
-                onError={(event) => handleProductImageError(event, product)}
+                onError={applySafeImageFallback}
                 style={{
                   transform: `translate(${lightboxOffset.x}px, ${lightboxOffset.y}px) scale(${lightboxScale})`,
                 }}

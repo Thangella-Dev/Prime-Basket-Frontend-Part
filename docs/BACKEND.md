@@ -1,308 +1,75 @@
-# Backend README
+# Backend Documentation Index
 
-## Current Decision
+Prime Basket has several backend planning documents, but they now have separate responsibilities. Start here, then open only the document needed for the current task.
 
-Prime Basket is ready to start backend integration now.
+## Current Backend Status
 
-The frontend already has working flows for home discovery, category browsing, product detail, cart, wishlist, checkout, account, order tracking, refunds, notifications, region/language behavior, and chatbot UI. The remaining production gap is that many of these flows still use Firebase reads, local fallback data, and `localStorage` instead of a real backend-owned commerce system.
+The frontend is ready to begin staged backend integration. It already has working UI flows for region/language selection, catalog browsing, product detail, cart, wishlist, checkout, account, order tracking, refunds, notifications, and chatbot interactions.
 
-Latest frontend-readiness update:
+The production gap is that many flows still rely on Firebase reads, local fallback data, frontend demo state, and `localStorage`. A real backend should own authentication, catalog, cart, wishlist, address, checkout, orders, payments, refunds, notifications, admin operations, and chatbot proxying.
 
-- `npm run build` passes.
-- `npm run lint` passes with `0 errors`.
-- ESLint is now installed and configured for React/JSX quality checks.
-- The latest hardening pass removed unused imports/props/state, duplicate translation keys, stale catch bindings, and payment-validation regex issues.
-- Remaining lint warnings are architecture follow-ups around hook dependencies and Fast Refresh export shape; they should be handled deliberately before final production release.
+## Which Backend Doc To Use
 
-Production release should wait until these backend-owned systems are complete:
+- [BACKEND_INTEGRATION_GUIDE.md](./BACKEND_INTEGRATION_GUIDE.md): Frontend-to-backend migration guide, service files, API groups, localStorage replacement, validation rules, and QA checklist.
+- [BACKEND_IMPLEMENTATION_PLAN.md](./BACKEND_IMPLEMENTATION_PLAN.md): Full backend build plan, module phases, estimated days, database tables, and production rollout checklist.
+- [BACKEND_SYSTEMS_AND_COST_ESTIMATE.md](./BACKEND_SYSTEMS_AND_COST_ESTIMATE.md): Recommended providers, infrastructure options, payment/OTP/notification systems, and rough cost planning.
+- [TECH_STACK_AND_ARCHITECTURE.md](./TECH_STACK_AND_ARCHITECTURE.md): Current frontend architecture context.
+- [BACKEND_Integration_Modeule.md](./BACKEND_Integration_Modeule.md): Legacy typo-named redirect kept only so old links do not break.
 
-- Real authentication and session refresh
-- Region-safe catalog API
-- Persistent cart and wishlist APIs
-- Address, checkout, order, and payment APIs
-- Payment webhook verification
-- Refund and return workflow persistence
-- Notification delivery and read-state sync
-- Chatbot backend proxy so AI keys are not exposed in the browser
+## Recommended Backend Direction
 
-## Canonical Backend Docs
+Use a staged migration. Do not replace every demo/local frontend flow at once.
 
-- Detailed module guide: [BACKEND_Integration_Modeule.md](./BACKEND_Integration_Modeule.md)
-- Backend systems and cost estimate: [BACKEND_SYSTEMS_AND_COST_ESTIMATE.md](./BACKEND_SYSTEMS_AND_COST_ESTIMATE.md)
-- Older high-level guide retained for compatibility: [BACKEND_INTEGRATION_GUIDE.md](./BACKEND_INTEGRATION_GUIDE.md)
-- Architecture context: [TECH_STACK_AND_ARCHITECTURE.md](./TECH_STACK_AND_ARCHITECTURE.md)
+Recommended first milestone:
 
-## Recommended Integration Approach
+- Real phone OTP auth and session refresh.
+- Backend user profile and preferences.
+- Region-safe catalog API for India and Kenya.
+- Persistent cart and wishlist APIs.
+- Backend address book and checkout quote.
 
-Do not add raw `fetch()` calls directly inside page components. Add a service layer first, then migrate each domain one by one.
+After that, move into:
 
-Recommended frontend service files:
+- Payment webhooks.
+- Orders and tracking.
+- Refund and return workflow.
+- Notifications.
+- Admin operations.
+- Chatbot backend proxy.
 
-- `src/services/apiClient.js`
-- `src/services/authApi.js`
-- `src/services/catalogApi.js`
-- `src/services/cartApi.js`
-- `src/services/wishlistApi.js`
-- `src/services/addressApi.js`
-- `src/services/checkoutApi.js`
-- `src/services/orderApi.js`
-- `src/services/paymentApi.js`
-- `src/services/walletApi.js`
-- `src/services/refundApi.js`
-- `src/services/notificationApi.js`
-- `src/services/chatApi.js`
+## Required Frontend Environment Variable
 
-Recommended starting API client:
-
-```js
-import { fetchWithTimeout, parseJsonResponse } from "../utils/network";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
-
-export async function apiRequest(path, options = {}) {
-  const token = localStorage.getItem("accessToken");
-  const response = await fetchWithTimeout(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
-  });
-
-  const data = await parseJsonResponse(response);
-
-  if (!response.ok) {
-    throw new Error(data?.message || data?.error || `HTTP ${response.status}`);
-  }
-
-  return data;
-}
-```
-
-Later improvements:
-
-- Refresh-token retry for `401`
-- Request IDs
-- Safe retry for idempotent `GET` calls
-- Backend error-code mapping for premium UI messages
-
-## Environment Variables
-
-Frontend:
+Local backend:
 
 ```env
 VITE_API_BASE_URL=http://localhost:8080
 ```
 
-Production frontend:
+Production backend:
 
 ```env
 VITE_API_BASE_URL=https://api.prime-basket.in
 ```
 
-Keep Firebase variables only while the frontend still reads Firebase directly:
+Sensitive keys such as payment secrets, OTP secrets, and `GROQ_API_KEY` must move to the backend before production release.
 
-```env
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_DATABASE_URL=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-VITE_FIREBASE_MEASUREMENT_ID=
-```
+## Production Readiness Summary
 
-Move these behind the backend before production:
+Prime Basket should not be treated as production-ready for real customer payments until these backend systems are complete:
 
-```env
-VITE_GROQ_API_KEY=
-VITE_GROQ_API_URL=
-VITE_GROQ_MODEL=
-```
+- Real authentication and session handling.
+- Backend-owned catalog, stock, prices, and image metadata.
+- Persistent cart, wishlist, address, and profile data.
+- Backend checkout quote and order creation.
+- Payment provider webhook verification.
+- Refund/return persistence and admin review.
+- In-app/SMS/email/push notification sync.
+- Backend chatbot proxy.
+- Monitoring, logging, rate limiting, and security validation.
 
-Backend-only secrets should never use `VITE_`:
+## Validation Note
 
-- OTP provider secret
-- Payment provider secret
-- Payment webhook secret
-- Groq/OpenAI/AI provider key
-- Firebase Admin credentials
-- JWT signing secret
-- Database connection string
+Latest frontend state before backend integration:
 
-## Endpoint Map
-
-### Auth
-
-- `POST /api/auth/send-phone-otp`
-- `POST /api/auth/verify-phone-otp`
-- `POST /api/auth/refresh`
-- `POST /api/auth/logout`
-- `GET /api/auth/me`
-- `PATCH /api/users/me`
-
-Frontend files to update:
-
-- `src/components/PhoneAuthModal.jsx`
-- `src/context/AuthContext.jsx`
-- `src/App.jsx`
-
-### Catalog And Search
-
-- `GET /api/catalog/home?region=in&language=en`
-- `GET /api/catalog/categories?region=in`
-- `GET /api/catalog/categories/:category/products?region=in&page=1&limit=24`
-- `GET /api/catalog/products/:productId?region=in`
-- `GET /api/catalog/products/:productId/related?region=in`
-- `GET /api/search?q=rice&region=in&language=en`
-
-Frontend files to update:
-
-- `src/pages/HomePage.jsx`
-- `src/pages/CategoryPage.jsx`
-- `src/pages/ProductDetailPage.jsx`
-- `src/components/SearchBox.jsx`
-- `src/utils/productUtils.js`
-
-### Cart And Wishlist
-
-- `GET /api/cart`
-- `POST /api/cart/items`
-- `PATCH /api/cart/items/:lineId`
-- `DELETE /api/cart/items/:lineId`
-- `POST /api/cart/merge`
-- `GET /api/wishlist`
-- `POST /api/wishlist/items`
-- `DELETE /api/wishlist/items/:productId`
-- `POST /api/wishlist/items/:productId/move-to-cart`
-
-Frontend files to update:
-
-- `src/App.jsx`
-- `src/pages/CartPage.jsx`
-- `src/pages/WishlistPage.jsx`
-- shared product-card components that call cart/wishlist actions
-
-### Addresses, Checkout, Orders, And Payments
-
-- `GET /api/addresses`
-- `POST /api/addresses`
-- `PATCH /api/addresses/:addressId`
-- `DELETE /api/addresses/:addressId`
-- `POST /api/checkout/quote`
-- `POST /api/orders`
-- `GET /api/orders`
-- `GET /api/orders/:orderId`
-- `GET /api/orders/:orderId/tracking`
-- `POST /api/orders/:orderId/reorder`
-- `POST /api/payments/session`
-- `POST /api/payments/confirm`
-
-Payment provider webhooks must be backend-only.
-
-Frontend files to update:
-
-- `src/pages/CartPage.jsx`
-- `src/pages/PaymentPage.jsx`
-- `src/pages/OrderSuccessPage.jsx`
-- `src/pages/OrderTrackingPage.jsx`
-- `src/pages/OrderDetailPage.jsx`
-- `src/context/TrackingContext.jsx`
-
-### Wallet, Refunds, Notifications, And Chat
-
-- `GET /api/wallet`
-- `POST /api/wallet/top-up`
-- `GET /api/wallet/transactions`
-- `POST /api/refunds`
-- `GET /api/refunds`
-- `GET /api/refunds/:requestId`
-- `GET /api/notifications`
-- `PATCH /api/notifications/:id/read`
-- `POST /api/notifications/read-all`
-- `DELETE /api/notifications/:id`
-- `POST /api/chat`
-
-Frontend files to update:
-
-- `src/pages/AccountPage.jsx`
-- `src/components/Header.jsx`
-- `src/services/groqService.js`
-- `src/context/TrackingContext.jsx`
-
-## LocalStorage Migration Map
-
-These keys should move to backend ownership:
-
-- `user`
-- `accessToken`
-- `refreshToken`
-- `pb_cart`
-- `pb_wishlist`
-- `pb_orders`
-- `pb_notifications`
-- `pb_saved_addresses`
-- `wallet`
-- `refund_requests`
-- `pb_refunds`
-- `pb_saved_cards`
-- `pb_gift_cards`
-- `pb_order_reviews`
-- `pb_active_tracking`
-
-These can stay local as UI preferences:
-
-- `pb_lang`
-- `pb_region`
-- `pb_theme`
-- page navigation cache
-- scroll/session restoration cache
-
-## Safe Migration Order
-
-1. Add `apiClient.js` and domain service files.
-2. Connect phone auth and `/api/auth/me`.
-3. Connect catalog APIs while keeping current Firebase/local fallback active.
-4. Connect cart and wishlist, including guest cart merge after login.
-5. Connect address and checkout quote APIs.
-6. Connect payment session/confirmation and order creation.
-7. Connect order history and tracking.
-8. Connect refunds, wallet, notifications, and review/rating flows.
-9. Move chatbot AI calls behind `/api/chat`.
-10. Remove demo/localStorage ownership only after each backend domain is stable.
-
-## Backend Validation Rules
-
-Backend must validate:
-
-- Phone country and digit length
-- Region/language compatibility
-- Product belongs to selected region
-- Unit exists for product
-- Stock availability
-- Cart quantity limits
-- Address required fields
-- India/Kenya postal-code formats
-- Checkout total from server-side pricing
-- Payment amount against backend quote
-- Wallet balance before debit
-- Refund eligibility and order status
-- Proof upload file type and size
-
-## Production Checklist
-
-- Use HTTPS only in production.
-- Add CORS allowlist for `https://prime-basket.in`, `http://localhost:5173`, and `http://localhost:4173`.
-- Verify payment webhooks server-side.
-- Use short-lived access tokens and refresh-token rotation.
-- Add OTP, checkout, payment, and chatbot rate limits.
-- Do not trust frontend prices, discounts, cart totals, or wallet deductions.
-- Add server logs, audit logs, and error monitoring.
-- Add database backups.
-- Add real-device QA for mobile Chrome, mobile Safari, desktop Chrome, and desktop Edge.
-
-## Final Recommendation
-
-Start backend integration now, but keep the current frontend fallbacks during migration. The safest path is to attach one backend domain at a time and remove demo/localStorage behavior only after the matching backend feature is verified.
+- `npm run build` passes.
+- `npm run lint` passes with `0 errors`; remaining warnings are known hook/Fast Refresh follow-ups.
