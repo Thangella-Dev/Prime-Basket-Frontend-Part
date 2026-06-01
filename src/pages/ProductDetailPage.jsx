@@ -63,6 +63,10 @@ export default function ProductDetailPage({
   const product = useMemo(() => enhanceProduct(rawProduct, region), [rawProduct, region]);
   const [selectedUnit, setSelectedUnit] = useState(product.baseUnit || (product.units && product.units[0]?.label) || "500g");
 
+  useEffect(() => {
+    setSelectedUnit(product.baseUnit || (product.units && product.units[0]?.label) || "1 unit");
+  }, [product._uid, product.baseUnit, product.units]);
+
   const currentUnitObj = (product.units || []).find(u => u.label === selectedUnit) || { label: selectedUnit, multiplier: 1 };
   const currentPrice = parsePrice(product.basePrice) * currentUnitObj.multiplier;
   const currentOldPrice = currentPrice + (currentPrice * (product.discountPercent || 0) / 100);

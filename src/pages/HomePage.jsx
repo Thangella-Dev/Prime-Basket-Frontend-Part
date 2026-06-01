@@ -28,9 +28,10 @@ const ALL_CATS = [
 ];
 
 const DEAL_CATS = ["fruits", "vegetables", "dairyProducts", "biscuitsAndCookies", "instantFood", "coolDrinks"];
-const HOME_VIEW_CACHE_PREFIX = "pb_home_view_v1";
+const HOME_VIEW_CACHE_PREFIX = "pb_home_view_v2";
 const HOME_VIEW_TTL_MS = 1000 * 60 * 20;
 const HOME_VIEW_MEMORY_CACHE = new Map();
+const CURATED_RAIL_MIN_ITEMS = 8;
 
 const MULTICOL_CATS = {
   topSelling: "rice",
@@ -49,7 +50,7 @@ const getRailVisibleCount = (width) => {
 };
 
 const getRailMetricsForWidth = (width, itemCount) => {
-  const safeWidth = Math.max(width || 0, 0);
+  const safeWidth = Math.max((width || 0) - 4, 0);
   const safeItemCount = Math.max(itemCount || 0, 1);
   const gap = safeWidth <= 768 ? RAIL_GAP_MOBILE : RAIL_GAP_DESKTOP;
   const visibleCount = Math.max(1, Math.min(safeItemCount, getRailVisibleCount(safeWidth)));
@@ -134,6 +135,75 @@ const writeHomeViewSnapshot = (cacheKey, snapshot) => {
 
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
+const getProductIdentity = (product) =>
+  String(product?._uid || `${product?.brand || ""}:${product?.name || ""}:${product?._cat || ""}`).toLowerCase();
+
+const uniqueProducts = (items) => {
+  const seen = new Set();
+  return (Array.isArray(items) ? items : []).filter((item) => {
+    if (!item) return false;
+    const key = getProductIdentity(item);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
+const getNumberValue = (value, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const getDiscountScore = (product) => {
+  const oldPrice = Number(String(product?.oldPrice || "").replace(/[^0-9.]/g, ""));
+  const price = Number(String(product?.price || "").replace(/[^0-9.]/g, ""));
+  if (!Number.isFinite(oldPrice) || !Number.isFinite(price) || oldPrice <= price) return 0;
+  return Math.round(((oldPrice - price) / oldPrice) * 100);
+};
+
+const sortCuratedRail = (items, key) => {
+  const list = uniqueProducts(items);
+  if (key === "topSelling") {
+    return list.sort((a, b) =>
+      getNumberValue(b.reviews) - getNumberValue(a.reviews) ||
+      getNumberValue(b.stars) - getNumberValue(a.stars)
+    );
+  }
+  if (key === "trending") {
+    return list.sort((a, b) =>
+      getDiscountScore(b) - getDiscountScore(a) ||
+      getNumberValue(b.reviews) - getNumberValue(a.reviews) ||
+      getNumberValue(b.stars) - getNumberValue(a.stars)
+    );
+  }
+  if (key === "topRated") {
+    return list.sort((a, b) =>
+      getNumberValue(b.stars) - getNumberValue(a.stars) ||
+      getNumberValue(b.reviews) - getNumberValue(a.reviews)
+    );
+  }
+  if (key === "recentlyAdded") {
+    return list.sort((a, b) =>
+      String(b._uid || b.name || "").localeCompare(String(a._uid || a.name || ""))
+    );
+  }
+  return list;
+};
+
+const fillCuratedRail = (primaryItems, allProducts, key, minimum = CURATED_RAIL_MIN_ITEMS) => {
+  const primary = uniqueProducts(primaryItems);
+  const seen = new Set(primary.map(getProductIdentity));
+  const rankedPool = sortCuratedRail(allProducts, key).filter((item) => !seen.has(getProductIdentity(item)));
+  return uniqueProducts([...primary, ...rankedPool]).slice(0, Math.max(minimum, primary.length));
+};
+
+const buildCuratedRailSections = (allProducts, primarySections = {}) => ({
+  topSelling: fillCuratedRail(primarySections.topSelling, allProducts, "topSelling"),
+  trending: fillCuratedRail(primarySections.trending, allProducts, "trending"),
+  recentlyAdded: fillCuratedRail(primarySections.recentlyAdded, allProducts, "recentlyAdded"),
+  topRated: fillCuratedRail(primarySections.topRated, allProducts, "topRated"),
+});
+
 const ensureMinimumItems = (items, minimum) => {
   const source = Array.isArray(items) ? items.filter(Boolean) : [];
   if (source.length === 0) return [];
@@ -153,10 +223,12 @@ const ensureMinimumItems = (items, minimum) => {
 };
 
 const buildFallbackHomeSections = (region = "in") => {
-  const topSelling = getFallbackCategoryProductsByRegion(MULTICOL_CATS.topSelling, region).slice(0, 6);
-  const trending = getFallbackCategoryProductsByRegion(MULTICOL_CATS.trending, region).slice(0, 6);
-  const recentlyAdded = getFallbackCategoryProductsByRegion(MULTICOL_CATS.recentlyAdded, region).slice(0, 6);
-  const topRated = getFallbackCategoryProductsByRegion(MULTICOL_CATS.topRated, region).slice(0, 6);
+  const primarySections = {
+    topSelling: getFallbackCategoryProductsByRegion(MULTICOL_CATS.topSelling, region),
+    trending: getFallbackCategoryProductsByRegion(MULTICOL_CATS.trending, region),
+    recentlyAdded: getFallbackCategoryProductsByRegion(MULTICOL_CATS.recentlyAdded, region),
+    topRated: getFallbackCategoryProductsByRegion(MULTICOL_CATS.topRated, region),
+  };
   const allPopular = ALL_CATS.flatMap((category) => getFallbackCategoryProductsByRegion(category, region));
   const allDeals = DEAL_CATS.flatMap((category) =>
     getFallbackCategoryProductsByRegion(category, region).filter((product) => product.oldPrice)
@@ -165,7 +237,7 @@ const buildFallbackHomeSections = (region = "in") => {
   return {
     popular15: shuffle(allPopular).slice(0, 15),
     deals: ensureMinimumItems(shuffle(allDeals), 6),
-    multiCols: { topSelling, trending, recentlyAdded, topRated },
+    multiCols: buildCuratedRailSections(allPopular, primarySections),
   };
 };
 
@@ -306,7 +378,7 @@ export default function HomePage({
       if (!cancelled) {
         setPopular15(shuffle(KENYA_ALL_PRODUCTS).slice(0, 15));
         setDeals(KENYA_DEALS);
-        setMultiCols(KENYA_SECTIONS);
+        setMultiCols(buildCuratedRailSections(KENYA_ALL_PRODUCTS, KENYA_SECTIONS));
         setLoading(false);
         hasLoadedHomeRef.current = true;
       }
@@ -358,12 +430,13 @@ export default function HomePage({
               6
             )
           );
-          setMultiCols({
-            topSelling: (ts.length ? ts : fallbackSections.multiCols.topSelling).slice(0, 6),
-            trending: (tr.length ? tr : fallbackSections.multiCols.trending).slice(0, 6),
-            recentlyAdded: (ra.length ? ra : fallbackSections.multiCols.recentlyAdded).slice(0, 6),
-            topRated: (tp.length ? tp : fallbackSections.multiCols.topRated).slice(0, 6),
-          });
+          const sourceProducts = allPopular.length ? allPopular : fallbackSections.popular15;
+          setMultiCols(buildCuratedRailSections(sourceProducts, {
+            topSelling: ts.length ? ts : fallbackSections.multiCols.topSelling,
+            trending: tr.length ? tr : fallbackSections.multiCols.trending,
+            recentlyAdded: ra.length ? ra : fallbackSections.multiCols.recentlyAdded,
+            topRated: tp.length ? tp : fallbackSections.multiCols.topRated,
+          }));
           setLoading(false);
           hasLoadedHomeRef.current = true;
         }

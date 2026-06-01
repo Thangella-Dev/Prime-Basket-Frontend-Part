@@ -75,7 +75,24 @@ const UNIT_TEMPLATES = {
   care_volume: [
     { label: "100ml", multiplier: 0.2 },
     { label: "250ml", multiplier: 0.5 },
-    { label: "500ml", multiplier: 1 }
+    { label: "500ml", multiplier: 1 },
+    { label: "1L", multiplier: 2 }
+  ],
+  cleaning_volume: [
+    { label: "500ml", multiplier: 0.5 },
+    { label: "1L", multiplier: 1 },
+    { label: "2L", multiplier: 2 },
+    { label: "5L", multiplier: 5 }
+  ],
+  care_weight: [
+    { label: "100g", multiplier: 0.5 },
+    { label: "200g", multiplier: 1 },
+    { label: "500g", multiplier: 2.5 }
+  ],
+  baby_weight: [
+    { label: "100g", multiplier: 0.5 },
+    { label: "200g", multiplier: 1 },
+    { label: "500g", multiplier: 2.5 }
   ]
 };
 
@@ -106,7 +123,68 @@ const CATEGORY_TO_TEMPLATE = {
   feminineHygiene: "household_pack"
 };
 
-const UNIT_FIELDS = ["selectedUnit", "baseUnit", "standard", "unit", "quantityLabel", "weight", "size", "volume", "packSize"];
+const UNIT_FIELDS = ["standard", "baseUnit", "unit", "quantityLabel", "weight", "size", "volume", "packSize", "selectedUnit"];
+
+function normalizeUnitLabel(label) {
+  return String(label || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function getUnitMagnitude(label) {
+  const unitMatch = String(label || "").match(/(\d+(?:\.\d+)?)\s*(kg|g|ml|l|pc|pcs|piece|pieces|unit|units|pack|packs|packet|packets|tray|trays|bottle|bottles|can|cans|sachet|sachets)\b/i);
+  if (!unitMatch) return null;
+
+  const quantity = Number(unitMatch[1]);
+  if (!Number.isFinite(quantity) || quantity <= 0) return null;
+  const unit = unitMatch[2].toLowerCase();
+
+  if (unit === "kg") return { type: "weight", amount: quantity * 1000 };
+  if (unit === "g") return { type: "weight", amount: quantity };
+  if (unit === "l") return { type: "volume", amount: quantity * 1000 };
+  if (unit === "ml") return { type: "volume", amount: quantity };
+  if (["pc", "pcs", "piece", "pieces", "unit", "units"].includes(unit)) return { type: "count", amount: quantity };
+  if (["pack", "packs", "packet", "packets", "tray", "trays", "bottle", "bottles", "can", "cans", "sachet", "sachets"].includes(unit)) {
+    return { type: "pack", amount: quantity };
+  }
+
+  return null;
+}
+
+function normalizeUnitMultipliers(units, baseLabel) {
+  const baseMagnitude = getUnitMagnitude(baseLabel);
+  const normalizedBase = normalizeUnitLabel(baseLabel);
+  const deduped = [];
+  const seen = new Set();
+
+  (Array.isArray(units) ? units : []).forEach((unit) => {
+    const label = unit?.label || unit?.name || "";
+    const key = normalizeUnitLabel(label);
+    if (!label || seen.has(key)) return;
+    seen.add(key);
+
+    const unitMagnitude = getUnitMagnitude(label);
+    const relativeMultiplier =
+      baseMagnitude && unitMagnitude && unitMagnitude.type === baseMagnitude.type
+        ? unitMagnitude.amount / baseMagnitude.amount
+        : Number(unit?.multiplier) > 0
+          ? Number(unit.multiplier)
+          : 1;
+
+    deduped.push({
+      label,
+      multiplier: Number(relativeMultiplier.toFixed(4)),
+    });
+  });
+
+  if (baseLabel && !seen.has(normalizedBase)) {
+    deduped.unshift({ label: baseLabel, multiplier: 1 });
+  }
+
+  return deduped.map((unit) =>
+    normalizeUnitLabel(unit.label) === normalizedBase
+      ? { ...unit, multiplier: 1 }
+      : unit
+  );
+}
 
 function normalizeDetectedUnit(value, unit) {
   const quantity = Number(value);
@@ -149,6 +227,23 @@ function detectExplicitUnit(product) {
 function inferTemplateKey(cat, nameLower, imgLower) {
   const text = `${nameLower} ${imgLower}`;
 
+  if (/(baby powder|talc|formula|cerelac|baby cereal)/.test(text)) return "baby_weight";
+  if (/(diaper|diapers|wipe|wipes|pads|tampon|tampons|sanitary|napkin)/.test(text)) return "household_pack";
+  if (/(detergent|surf excel|vim|dishwash|cleaner|floor cleaner|laundry liquid)/.test(text)) return "cleaning_volume";
+  if (/(toothpaste|tooth powder)/.test(text)) return "care_weight";
+  if (/(toothbrush|brush|soap|bar)/.test(text)) return "count";
+  if (/(body wash|face wash|hand wash|dishwash|detergent|cleaner|liquid|lotion|shampoo|conditioner|gel|cream|serum|oil)/.test(text)) return "care_volume";
+  if (/(rice|basmati|daawat|india gate)/.test(text)) return "bulk_weight";
+  if (/(atta|wheat flour|chakki|flour)/.test(text)) return "flour";
+  if (/(chilli|chili|turmeric|haldi|masala|spice|seasoning|powder)/.test(text) && !/(baby powder|milk powder|tooth powder)/.test(text)) return "spice";
+  if (/(sunflower oil|mustard oil|cooking oil|olive oil|vegetable oil)/.test(text)) return "volume";
+  if (/(cola|sprite|fanta|juice|drink|soda|water|beverage)/.test(text)) return "beverage";
+  if (/(milk|lassi|buttermilk)/.test(text)) return "milk";
+  if (/(butter|cheese|paneer|curd|yogurt|yoghurt|ghee|whitener|milk powder)/.test(text)) return "dairy_solid";
+  if (/(egg|eggs)/.test(text)) return "eggs";
+  if (/(biscuit|cookie|chips|namkeen|noodles|snack|bhujia|instant)/.test(text)) return "pack";
+  if (/(dal|pulse|pulses|moong|toor|masoor|rajma|beans|peas|salt|sugar|fruit|vegetable|tomato|potato|apple|mango|banana|meat|chicken|fish)/.test(text)) return "weight";
+
   if (cat === "rice") return "bulk_weight";
   if (cat === "wheat-flour") return "flour";
   if (["turmeric-powder", "chilli-powder", "masala"].includes(cat)) return "spice";
@@ -165,6 +260,7 @@ function inferTemplateKey(cat, nameLower, imgLower) {
   }
 
   if (["homeNeeds", "babyCare", "feminineHygiene"].includes(cat)) {
+    if (cat === "homeNeeds" && /(liquid|wash|cleaner|detergent|gel)/.test(text)) return "cleaning_volume";
     if (/(liquid|wash|cleaner|detergent|oil|lotion|shampoo|conditioner|gel|cream)/.test(text)) return "care_volume";
     return "household_pack";
   }
@@ -396,21 +492,29 @@ export function enhanceProduct(p, _region = "in", isDeal = false) {
 
   let units = incomingUnits.length > 0 ? incomingUnits : templateUnits;
   let baseUnitObj = null;
-
   const detectedLabel = detectExplicitUnit(p);
-  if (detectedLabel) {
-    baseUnitObj = units.find((u) => u.label.toLowerCase() === detectedLabel.toLowerCase()) || { label: detectedLabel, multiplier: 1 };
-    units = [baseUnitObj];
-  }
 
   if (!baseUnitObj) {
     baseUnitObj =
-      units.find((u) => p.baseUnit && u.label.toLowerCase() === String(p.baseUnit).toLowerCase()) ||
-      units.find((u) => p.selectedUnit && u.label.toLowerCase() === String(p.selectedUnit).toLowerCase()) ||
+      units.find((u) => detectedLabel && normalizeUnitLabel(u.label) === normalizeUnitLabel(detectedLabel)) ||
+      units.find((u) => p.baseUnit && normalizeUnitLabel(u.label) === normalizeUnitLabel(p.baseUnit)) ||
+      units.find((u) => p.standard && normalizeUnitLabel(u.label) === normalizeUnitLabel(p.standard)) ||
       units.find((u) => u.multiplier === 1) ||
       units[0] ||
       { label: "1 unit", multiplier: 1 };
   }
+
+  if (detectedLabel && !units.some((u) => normalizeUnitLabel(u.label) === normalizeUnitLabel(detectedLabel))) {
+    units = [{ label: detectedLabel, multiplier: 1 }, ...units];
+    baseUnitObj = { label: detectedLabel, multiplier: 1 };
+  }
+
+  units = normalizeUnitMultipliers(units, baseUnitObj.label);
+  baseUnitObj =
+    units.find((u) => normalizeUnitLabel(u.label) === normalizeUnitLabel(baseUnitObj.label)) ||
+    units.find((u) => u.multiplier === 1) ||
+    units[0] ||
+    { label: "1 unit", multiplier: 1 };
   
   const currentPrice = parsePrice(p.price);
   const oldPrice = parsePrice(p.oldPrice);

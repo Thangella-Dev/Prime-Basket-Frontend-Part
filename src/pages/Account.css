@@ -2999,3 +2999,239 @@ body[data-theme="dark"] .buy-again-meta {
     justify-content: center;
   }
 }
+
+/* May 31 Aceternity-inspired account pass: lighter dashboard depth and motion. */
+@keyframes accountAuroraFloat {
+  0% { transform: translate3d(-2%, -2%, 0) scale(1); opacity: 0.46; }
+  50% { transform: translate3d(3%, 2%, 0) scale(1.04); opacity: 0.68; }
+  100% { transform: translate3d(-2%, -2%, 0) scale(1); opacity: 0.46; }
+}
+
+@keyframes accountSheenSweep {
+  0% { transform: translateX(-145%) skewX(-16deg); opacity: 0; }
+  34% { opacity: 0.54; }
+  100% { transform: translateX(150%) skewX(-16deg); opacity: 0; }
+}
+
+.account-container.account-desktop-layout .account-sidebar,
+.account-container.account-desktop-layout .account-content > div,
+.account-menu-hero,
+.account-detail-bar,
+.account-menu-card,
+.profile-container,
+.orders-card,
+.address-card,
+.giftcards-card,
+.recent-card,
+.notifications-card,
+.payments-card,
+.help-card,
+.refunds-card,
+.buy-again-item {
+  position: relative;
+  isolation: isolate;
+}
+
+.account-menu-hero,
+.account-detail-bar {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(68,196,212,0.13), transparent 30%),
+    radial-gradient(circle at 94% 0%, rgba(15,91,215,0.12), transparent 34%),
+    linear-gradient(135deg, rgba(255,255,255,0.98), rgba(244,249,255,0.94)) !important;
+  border-color: rgba(142, 178, 225, 0.26) !important;
+  box-shadow:
+    0 26px 64px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.82) !important;
+}
+
+.account-menu-hero::after,
+.account-detail-bar::after {
+  content: "";
+  position: absolute;
+  inset: -42%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    conic-gradient(from 210deg, rgba(255,255,255,0.08), rgba(68,196,212,0.16), rgba(15,91,215,0.12), rgba(255,255,255,0.08));
+  animation: accountAuroraFloat 16s ease-in-out infinite;
+}
+
+.account-menu-hero > *,
+.account-detail-bar > * {
+  position: relative;
+  z-index: 1;
+}
+
+.account-container.account-desktop-layout .account-sidebar,
+.account-container.account-desktop-layout .account-content > div,
+.account-container.account-desktop-layout .profile-container,
+.account-container.account-desktop-layout .orders-card,
+.account-container.account-desktop-layout .address-card,
+.account-container.account-desktop-layout .giftcards-card,
+.account-container.account-desktop-layout .recent-card,
+.account-container.account-desktop-layout .notifications-card,
+.account-container.account-desktop-layout .payments-card,
+.account-container.account-desktop-layout .help-card,
+.account-container.account-desktop-layout .refunds-card {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(68,196,212,0.08), transparent 28%),
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,251,255,0.92)) !important;
+  border-color: rgba(142, 178, 225, 0.2) !important;
+  box-shadow:
+    0 20px 48px rgba(15, 23, 42, 0.065),
+    inset 0 1px 0 rgba(255,255,255,0.78) !important;
+}
+
+.account-container.account-desktop-layout .account-sidebar::before,
+.account-container.account-desktop-layout .account-content > div::before,
+.account-container.account-desktop-layout .profile-container::before,
+.account-container.account-desktop-layout .orders-card::before,
+.account-container.account-desktop-layout .address-card::before,
+.account-container.account-desktop-layout .giftcards-card::before,
+.account-container.account-desktop-layout .recent-card::before,
+.account-container.account-desktop-layout .notifications-card::before,
+.account-container.account-desktop-layout .payments-card::before,
+.account-container.account-desktop-layout .help-card::before,
+.account-container.account-desktop-layout .refunds-card::before,
+.buy-again-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(120deg, rgba(255,255,255,0.5), transparent 34%, transparent 70%, rgba(255,255,255,0.2)),
+    radial-gradient(circle at 100% 0%, rgba(15,91,215,0.07), transparent 36%);
+  opacity: 0.82;
+}
+
+.account-container.account-desktop-layout .account-sidebar > *,
+.account-container.account-desktop-layout .account-content > div > *,
+.account-container.account-desktop-layout .profile-container > *,
+.account-container.account-desktop-layout .orders-card > *,
+.account-container.account-desktop-layout .address-card > *,
+.account-container.account-desktop-layout .giftcards-card > *,
+.account-container.account-desktop-layout .recent-card > *,
+.account-container.account-desktop-layout .notifications-card > *,
+.account-container.account-desktop-layout .payments-card > *,
+.account-container.account-desktop-layout .help-card > *,
+.account-container.account-desktop-layout .refunds-card > *,
+.buy-again-item > * {
+  position: relative;
+  z-index: 1;
+}
+
+.account-container.account-desktop-layout .account-item,
+.account-menu-card,
+.account-back-btn,
+.account-panel-action,
+.save-btn,
+.buy-again-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.account-container.account-desktop-layout .account-item::after,
+.account-menu-card::before,
+.account-back-btn::after,
+.account-panel-action::after,
+.save-btn::after,
+.buy-again-btn::after {
+  content: "";
+  position: absolute;
+  top: -32%;
+  bottom: -32%;
+  left: 0;
+  width: 34%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.42), transparent);
+  opacity: 0;
+  transform: translateX(-145%) skewX(-16deg);
+}
+
+.account-container.account-desktop-layout .account-item:hover::after,
+.account-menu-card:hover::before,
+.account-back-btn:hover::after,
+.account-panel-action:hover::after,
+.save-btn:hover::after,
+.buy-again-btn:hover::after {
+  animation: accountSheenSweep 780ms ease;
+}
+
+.account-container.account-desktop-layout .account-item.active {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255,255,255,0.38), transparent 34%),
+    linear-gradient(135deg, #174d8a, #0f5bd7 58%, #29a7c4) !important;
+  box-shadow:
+    0 14px 28px rgba(15, 91, 215, 0.2),
+    inset 0 1px 0 rgba(255,255,255,0.26) !important;
+}
+
+.account-menu-card {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(68,196,212,0.09), transparent 32%),
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,251,255,0.94)) !important;
+  border-color: rgba(142, 178, 225, 0.22) !important;
+}
+
+.account-menu-card-icon,
+.account-container.account-desktop-layout .account-item i,
+.profile-photo,
+.profile-photo-fallback {
+  box-shadow:
+    0 14px 28px rgba(15,23,42,0.075),
+    inset 0 1px 0 rgba(255,255,255,0.78) !important;
+}
+
+body[data-theme="dark"] .account-menu-hero,
+body[data-theme="dark"] .account-detail-bar,
+body[data-theme="dark"] .account-container.account-desktop-layout .account-sidebar,
+body[data-theme="dark"] .account-container.account-desktop-layout .account-content > div,
+body[data-theme="dark"] .account-container.account-desktop-layout .profile-container,
+body[data-theme="dark"] .account-container.account-desktop-layout .orders-card,
+body[data-theme="dark"] .account-container.account-desktop-layout .address-card,
+body[data-theme="dark"] .account-container.account-desktop-layout .giftcards-card,
+body[data-theme="dark"] .account-container.account-desktop-layout .recent-card,
+body[data-theme="dark"] .account-container.account-desktop-layout .notifications-card,
+body[data-theme="dark"] .account-container.account-desktop-layout .payments-card,
+body[data-theme="dark"] .account-container.account-desktop-layout .help-card,
+body[data-theme="dark"] .account-container.account-desktop-layout .refunds-card,
+body[data-theme="dark"] .buy-again-item {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(68,196,212,0.08), transparent 32%),
+    linear-gradient(180deg, rgba(13, 25, 43, 0.96), rgba(7, 18, 34, 0.94)) !important;
+  border-color: rgba(96,165,250,0.2) !important;
+}
+
+body[data-theme="dark"] .account-menu-hero::after,
+body[data-theme="dark"] .account-detail-bar::after {
+  opacity: 0.38;
+}
+
+body[data-theme="dark"] .account-container.account-desktop-layout .account-item.active {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255,255,255,0.14), transparent 34%),
+    linear-gradient(135deg, #123f75, #0f5bd7 58%, #1c879f) !important;
+}
+
+@media (max-width: 720px) {
+  .account-menu-hero::after,
+  .account-detail-bar::after {
+    opacity: 0.34;
+    animation-duration: 22s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-menu-hero::after,
+  .account-detail-bar::after,
+  .account-container.account-desktop-layout .account-item:hover::after,
+  .account-menu-card:hover::before,
+  .account-back-btn:hover::after,
+  .account-panel-action:hover::after,
+  .save-btn:hover::after,
+  .buy-again-btn:hover::after {
+    animation: none !important;
+  }
+}

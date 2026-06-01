@@ -17,9 +17,16 @@ function loadAddresses() {
   }
 }
 
+const normalizeUnitLabel = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+
 export default function CartPage({
   cart,
   onUpdateQty,
+  onChangeUnit,
   onRemove,
   onOpenProduct,
   onContinueShopping,
@@ -585,6 +592,39 @@ export default function CartPage({
           font-size: 0.94rem;
           line-height: 1.35;
         }
+        .cart-unit-control {
+          margin-top: 10px;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          max-width: 100%;
+          padding: 6px 8px 6px 10px;
+          border-radius: 14px;
+          border: 1px solid rgba(29,91,160,0.14);
+          background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(241,247,255,0.96));
+          box-shadow: 0 10px 20px rgba(15,23,42,0.045);
+        }
+        .cart-unit-control i {
+          color: #1d5ba0;
+          font-size: 0.78rem;
+        }
+        .cart-unit-control select {
+          border: none;
+          outline: none;
+          background: transparent;
+          color: var(--navy);
+          font-family: inherit;
+          font-size: 0.82rem;
+          font-weight: 800;
+          cursor: pointer;
+          max-width: 180px;
+          min-width: 86px;
+        }
+        .cart-unit-control select:focus-visible {
+          outline: 2px solid rgba(29,91,160,0.18);
+          outline-offset: 3px;
+          border-radius: 8px;
+        }
         .cart-item-badges {
           margin-top: 10px;
           display: flex;
@@ -1046,9 +1086,13 @@ export default function CartPage({
         body[data-theme="dark"] .cart-rec-thumb,
         body[data-theme="dark"] .cart-special-add,
         body[data-theme="dark"] .cart-address-item,
+        body[data-theme="dark"] .cart-unit-control,
         body[data-theme="dark"] .cart-promo input {
           background: var(--white);
           border-color: var(--border);
+        }
+        body[data-theme="dark"] .cart-unit-control select {
+          color: var(--navy);
         }
         body[data-theme="dark"] .cart-special-card {
           background: linear-gradient(180deg, rgba(47,23,98,0.92), rgba(33,19,77,0.92));
@@ -1228,6 +1272,17 @@ export default function CartPage({
             margin-top: 6px;
             font-size: 0.82rem;
           }
+          .cart-unit-control {
+            margin-top: 8px;
+            max-width: 100%;
+            padding: 5px 7px 5px 8px;
+            border-radius: 12px;
+          }
+          .cart-unit-control select {
+            min-width: 72px;
+            max-width: 116px;
+            font-size: 0.76rem;
+          }
           .cart-item-badges {
             margin-top: 8px;
             gap: 6px;
@@ -1302,6 +1357,9 @@ export default function CartPage({
           .cart-item-thumb {
             width: 72px;
             height: 72px;
+          }
+          .cart-unit-control select {
+            max-width: 102px;
           }
           .cart-item-side {
             min-width: 104px;
@@ -1417,15 +1475,23 @@ export default function CartPage({
                 ) : (
                   <div className="cart-list">
                     {cart.map((item) => {
+                      const enhancedItem = enhanceProduct(item, region);
+                      const unitOptions = Array.isArray(enhancedItem.units) ? enhancedItem.units : [];
+                      const selectedUnitLabel =
+                        unitOptions.find((unit) => normalizeUnitLabel(unit.label) === normalizeUnitLabel(item.selectedUnit))?.label ||
+                        item.selectedUnit ||
+                        enhancedItem.baseUnit ||
+                        item.standard ||
+                        item.unit ||
+                        "1 unit";
                       const unitPrice = parsePrice(item.price);
                       const oldUnitPrice = parsePrice(item.oldPrice || item.price);
                       const lineTotal = unitPrice * item.quantity;
                       const lineSavings = oldUnitPrice > unitPrice ? (oldUnitPrice - unitPrice) * item.quantity : 0;
                       const translatedName = getTranslatedName(item.name);
-                      const unitLabel = item.selectedUnit || item.standard || item.unit || "1 unit";
 
                       return (
-                        <article key={`${item._uid}_${item.selectedUnit || "default"}`} className="cart-item-row">
+                        <article key={`${item._uid}_${selectedUnitLabel || "default"}`} className="cart-item-row">
                           <div className="cart-item-thumb" onClick={() => onOpenProduct?.(item)}>
                             <img src={resolveProductImage(item)} alt={translatedName} loading="lazy" onError={(event) => handleProductImageError(event, item)} />
                           </div>
@@ -1435,9 +1501,25 @@ export default function CartPage({
                             <div className="cart-item-name" onClick={() => onOpenProduct?.(item)}>
                               {translatedName}
                             </div>
-                            <div className="cart-item-subline">{unitLabel}</div>
+                            <div className="cart-item-subline">{selectedUnitLabel}</div>
+                            {unitOptions.length > 1 ? (
+                              <label className="cart-unit-control" onClick={(event) => event.stopPropagation()}>
+                                <i className="fas fa-layer-group"></i>
+                                <select
+                                  value={selectedUnitLabel}
+                                  aria-label={`Change quantity option for ${translatedName}`}
+                                  onChange={(event) => onChangeUnit?.(item, event.target.value)}
+                                >
+                                  {unitOptions.map((unit) => (
+                                    <option key={unit.label} value={unit.label}>
+                                      {unit.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                            ) : null}
                             <div className="cart-item-badges">
-                              {item.selectedUnit ? <span className="cart-item-chip">{item.selectedUnit}</span> : null}
+                              {selectedUnitLabel ? <span className="cart-item-chip">{selectedUnitLabel}</span> : null}
                               <span className="cart-item-chip subtle">{item.quantity} {item.quantity === 1 ? "item" : "items"}</span>
                               {lineSavings > 0 ? <span className="cart-item-chip save">Save {formatCurrency(lineSavings, region)}</span> : null}
                             </div>
@@ -1449,7 +1531,7 @@ export default function CartPage({
                               <button
                                 type="button"
                                 className="cart-item-link"
-                                onClick={() => onRemove(item._uid, item.selectedUnit)}
+                                onClick={() => onRemove(item._uid, selectedUnitLabel)}
                               >
                                 {t.cart.remove}
                               </button>
@@ -1458,11 +1540,11 @@ export default function CartPage({
 
                           <div className="cart-item-side">
                             <div className="cart-qty-pill">
-                              <button type="button" onClick={() => onUpdateQty(item._uid, item.selectedUnit, item.quantity - 1)}>
+                              <button type="button" onClick={() => onUpdateQty(item._uid, selectedUnitLabel, item.quantity - 1)}>
                                 -
                               </button>
                               <span>{item.quantity}</span>
-                              <button type="button" onClick={() => onUpdateQty(item._uid, item.selectedUnit, item.quantity + 1)}>
+                              <button type="button" onClick={() => onUpdateQty(item._uid, selectedUnitLabel, item.quantity + 1)}>
                                 +
                               </button>
                             </div>

@@ -32,6 +32,10 @@ export default function ProductCard({
   const prices = useMemo(() => getProductPrices(p, selectedUnit), [p, selectedUnit]);
   const translatedName = getLocalizedProductName(p.name, t);
   const productImage = resolveProductImage(p);
+
+  useEffect(() => {
+    setSelectedUnit(p.baseUnit);
+  }, [p._uid, p.baseUnit]);
   
   // Find item in cart based on both product ID AND selected unit
   const cartItem = cart.find(c => c._uid === p._uid && c.selectedUnit === selectedUnit);

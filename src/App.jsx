@@ -16,7 +16,7 @@ import HomePage from "./pages/HomePage";
 import { translations } from "./i18n/translations";
 import { useTracking } from "./context/TrackingContext";
 import TrackingPopup from "./components/TrackingPopup";
-import { formatCurrency, handleProductImageError, parsePrice, resolveProductImage } from "./utils/productUtils";
+import { enhanceProduct, formatCurrency, getProductPrices, handleProductImageError, parsePrice, resolveProductImage } from "./utils/productUtils";
 
 const AccountPage = lazy(() => import("./pages/AccountPage"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
@@ -886,6 +886,57 @@ export default function App() {
     else setCart((prev) => prev.map((i) => (i._uid === uid && (!unit || resolveCartUnit(i) === unit)) ? { ...i, quantity: qty } : i));
   };
 
+  const updateCartUnit = (cartItem, nextUnit) => {
+    if (!cartItem?._uid || !nextUnit) return;
+    const currentUnit = resolveCartUnit(cartItem);
+    const nextUnitKey = normalizeUnitKey(nextUnit);
+    if (currentUnit === nextUnitKey) return;
+
+    setCart((prev) => {
+      const currentIndex = prev.findIndex((item) => item._uid === cartItem._uid && resolveCartUnit(item) === currentUnit);
+      if (currentIndex === -1) return prev;
+
+      const currentItem = prev[currentIndex];
+      const enhanced = enhanceProduct({ ...currentItem, selectedUnit: nextUnit }, region);
+      const prices = getProductPrices(enhanced, nextUnit);
+      const nextLine = {
+        ...currentItem,
+        ...enhanced,
+        selectedUnit: nextUnit,
+        price: prices.price,
+        oldPrice: prices.originalPrice,
+        quantity: Number(currentItem.quantity) > 0 ? Number(currentItem.quantity) : 1,
+      };
+
+      const targetIndex = prev.findIndex((item, index) =>
+        index !== currentIndex &&
+        item._uid === currentItem._uid &&
+        resolveCartUnit(item) === nextUnitKey
+      );
+
+      if (targetIndex !== -1) {
+        return prev
+          .map((item, index) => {
+            if (index !== targetIndex) return item;
+            return {
+              ...item,
+              ...nextLine,
+              quantity: (Number(item.quantity) || 0) + (Number(currentItem.quantity) || 1),
+              wishlistOrigin: Boolean(item.wishlistOrigin || nextLine.wishlistOrigin),
+              wishlistRestoreEligible:
+                item.wishlistRestoreEligible !== false &&
+                nextLine.wishlistRestoreEligible !== false,
+              wishlistOriginSnapshot:
+                item.wishlistOriginSnapshot || nextLine.wishlistOriginSnapshot || null,
+            };
+          })
+          .filter((_, index) => index !== currentIndex);
+      }
+
+      return prev.map((item, index) => (index === currentIndex ? nextLine : item));
+    });
+  };
+
   const clearCart = () => {
     cart.forEach((item) => restoreWishlistProductFromCart(item, { silent: true }));
     setCart([]);
@@ -1197,6 +1248,7 @@ export default function App() {
         <CartPage
           cart={cart}
           onUpdateQty={updateCartQty}
+          onChangeUnit={updateCartUnit}
           onRemove={removeFromCart}
           onOpenProduct={openProduct}
           onContinueShopping={goHome}
