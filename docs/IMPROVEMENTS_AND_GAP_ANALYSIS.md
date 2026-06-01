@@ -2,6 +2,17 @@
 
 ## Latest Stability Pass
 
+- Fixed notification dropdown stacking so desktop notifications float above the second navbar/search row instead of being visually covered by header chrome
+- Added internal scrolling and cleaner sizing to the notification dropdown so larger notification sets remain usable
+- Expanded home curated shelves so `Top Selling`, `Trending`, `Recently Added`, and `Top Rated` backfill from the full active-region catalog instead of showing only two or three products
+- Improved home shelf compatibility with smoother native horizontal scrolling, lighter snap behavior, and safer mobile card width calculations
+- Added product-aware unit inference for product cards and detail pages so units match the item type instead of defaulting to generic kg choices
+- Added cart-level unit switching so users can change pack/weight/volume directly from the cart
+- Hardened cart unit switching to update prices/totals and merge duplicate product/unit rows safely
+- Fixed cart last-item remove/decrement behavior by normalizing display unit labels before matching cart rows
+- Fixed mobile `Browse All Categories` visibility by turning the menu into a viewport-safe fixed dropdown sheet with internal scrolling
+- Tightened mobile curated shelf card padding, title sizing, and rail overflow handling to reduce clipping on narrow devices
+- Revalidated the latest pass with `npm run build`; targeted ESLint checks have `0 errors` with only existing hook-dependency warnings
 - Removed oversized desktop header marketing/trust chips and compacted the fixed header command row
 - Corrected desktop and mobile fixed-header offsets so the home hero/slideshow starts below the navbar
 - Constrained the desktop `Browse All Categories` dropdown to a smaller viewport-safe scrollable panel

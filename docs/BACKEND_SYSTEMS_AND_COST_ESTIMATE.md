@@ -1,6 +1,7 @@
 # Backend Systems And Cost Estimate
 
 Date prepared: 2026-05-29
+Last updated: 2026-06-01
 
 ## Purpose
 
@@ -17,7 +18,9 @@ Frontend readiness note:
 
 - The current Prime Basket frontend can begin staged backend integration.
 - `npm run build` passes.
-- `npm run lint` passes with `0 errors`.
+- Latest targeted ESLint checks on touched frontend files report `0 errors`; known hook-dependency warnings remain for a separate cleanup pass.
+- The frontend now has product-aware unit selectors across product cards, product detail, and cart rows, so backend catalog data should include variant/unit metadata per SKU.
+- Cart unit switching and duplicate product/unit merging are already handled on the frontend and should map to backend cart item variant IDs during integration.
 - Backend work should still include real-device QA, API contract testing, payment webhook validation, OTP rate limiting, and production monitoring before public release.
 
 ## Short Recommendation

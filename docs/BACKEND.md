@@ -4,7 +4,7 @@ Prime Basket has several backend planning documents, but they now have separate 
 
 ## Current Backend Status
 
-The frontend is ready to begin staged backend integration. It already has working UI flows for region/language selection, catalog browsing, product detail, cart, wishlist, checkout, account, order tracking, refunds, notifications, and chatbot interactions.
+The frontend is ready to begin staged backend integration. It already has working UI flows for region/language selection, catalog browsing, product detail, product-aware unit selection, cart unit/quantity editing, wishlist, checkout, account, order tracking, refunds, notifications, and chatbot interactions.
 
 The production gap is that many flows still rely on Firebase reads, local fallback data, frontend demo state, and `localStorage`. A real backend should own authentication, catalog, cart, wishlist, address, checkout, orders, payments, refunds, notifications, admin operations, and chatbot proxying.
 
@@ -27,6 +27,7 @@ Recommended first milestone:
 - Region-safe catalog API for India and Kenya.
 - Persistent cart and wishlist APIs.
 - Backend address book and checkout quote.
+- Product/SKU unit metadata for pack, kg, gram, ml, litre, and count-based variants so the frontend cart/detail selectors can be backed by real catalog data.
 
 After that, move into:
 
@@ -72,4 +73,5 @@ Prime Basket should not be treated as production-ready for real customer payment
 Latest frontend state before backend integration:
 
 - `npm run build` passes.
-- `npm run lint` passes with `0 errors`; remaining warnings are known hook/Fast Refresh follow-ups.
+- Latest targeted ESLint checks on touched frontend files report `0 errors`; remaining warnings are known hook/Fast Refresh follow-ups.
+- June 1 frontend hardening added richer home merchandising rails, notification overlay fixes, mobile browse-category fixes, product-aware unit options, cart unit switching, and safer final-item cart removal.

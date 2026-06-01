@@ -109,6 +109,15 @@ Primary production domain: `https://prime-basket.in`
 - The desktop `Browse All Categories` dropdown is now constrained to a smaller scrollable premium panel that stays inside the viewport
 - Dark-mode header visuals were refined with clearer blue-tinted surfaces, stronger contrast, and compact action buttons
 - Category entry now resets stale filters before paint, preventing the temporary `0-10%` discount auto-filter glitch when opening categories
+- Notification dropdown layering was fixed so the panel floats above the second navbar/search row with its own internal scroll instead of being hidden under the header chrome
+- Home `Top Selling`, `Trending`, `Recently Added`, and `Top Rated` shelves now backfill from the full regional catalog so rails do not stop at only two or three products
+- Home curated shelves now use smoother native horizontal scrolling with lighter snap behavior and safer mobile card sizing to prevent edge clipping
+- Product unit selection is now product-type aware across cards and detail pages, so drinks show ml/L, rice shows kg bags, cleaning liquids show ml/L, toothpaste/baby powder show grams, and packs stay as packs
+- Cart rows now include product-aware unit selection, letting users switch pack/weight/volume directly from cart while prices and totals update
+- Cart unit changes now merge duplicate product/unit lines safely instead of creating inconsistent rows
+- Cart remove/decrement matching now normalizes display unit labels, fixing the last-item removal issue when only one cart row remains
+- Mobile `Browse All Categories` now opens as a viewport-safe fixed dropdown sheet with internal scrolling instead of getting clipped by the second navbar
+- Mobile home curated cards were tightened for better fit across narrow screens while preserving the premium rail/card look
 
 ## Tech Stack
 

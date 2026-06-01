@@ -76,6 +76,13 @@ Recent storefront hardening also added:
 - native mobile swipe-first curated home rails with scroll-snap behavior and synced shelf arrows
 - full-shell error-boundary protection to reduce occasional blank-screen boot failures
 - fresh category entry now resets stale filter state before paint, preventing the brief `0-10%` discount auto-filter flash
+- notification dropdown layering now stays above the second navbar/search row and scrolls internally
+- home curated shelves now backfill from the full active-region catalog so top-selling/trending/recently-added/top-rated rails do not end after only a few products
+- product-aware unit selection now covers product cards, product detail, and cart rows
+- cart unit switching now updates price/totals and merges duplicate product/unit rows safely
+- cart remove/decrement matching now normalizes unit labels so the final cart item can always be removed
+- mobile browse-category dropdown now opens as a viewport-safe fixed sheet instead of being clipped by header overflow
+- mobile curated shelf cards now fit narrow screens more reliably without clipped edges
 - a dedicated lint workflow through `npm run lint`, currently passing with `0 errors`
 - frontend cleanup across unused imports/props/state, duplicate translation keys, payment validation regexes, and stale catch bindings
 
@@ -121,6 +128,8 @@ Other important state is currently stored in the browser through `localStorage`,
 - Dark-mode header surfaces now have stronger contrast, cleaner blue-tinted depth, and compact account action buttons
 - Mobile and desktop hero offsets now better respect the fixed header so primary content is not hidden behind the navbar
 - The latest hardening pass added ESLint coverage and removed current lint errors while keeping the production build green
+- Shopping units now feel closer to real ecommerce behavior because pack, weight, and volume variants are inferred by product type instead of falling back to generic kg choices
+- Cart editing is stronger because users can change both item count and unit/pack size directly from the cart
 
 ## Current Limitations
 

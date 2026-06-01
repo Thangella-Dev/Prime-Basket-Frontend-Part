@@ -114,6 +114,13 @@ Frontend areas:
 - `src/pages/CartPage.jsx`
 - `src/components/ProductCard.jsx`
 
+Important cart payload notes:
+
+- Cart items should include a stable product ID and variant/unit ID when the backend owns catalog data.
+- Until variant IDs exist, the frontend currently uses `selectedUnit` labels such as `1kg`, `500ml`, `1L`, or `1 pack`.
+- Backend cart APIs should support quantity changes and unit/variant changes without creating duplicate rows.
+- If a user changes a cart item to a unit/variant already present in cart, the backend should merge quantities just like the frontend now does.
+
 ### Wishlist
 
 - `GET /wishlist`

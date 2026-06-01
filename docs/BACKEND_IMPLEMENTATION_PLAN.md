@@ -19,6 +19,9 @@ What is already useful for backend integration:
 - Region model already supports `India` and `Kenya`.
 - Auth flow already has phone/OTP UI.
 - Cart, wishlist, checkout, orders, refunds, address, account, notifications, and product browsing flows already exist.
+- Product cards, product detail, and cart rows now support product-aware unit choices such as packs, kg, grams, ml, and litres.
+- Cart unit changes now update totals and merge duplicate product/unit rows in the frontend, which gives the backend a clear future API contract for cart item variants.
+- Home merchandising rails now preserve active-region context and can consume richer backend home-section payloads when available.
 - Environment variable pattern already exists through `VITE_API_BASE_URL`.
 - Firebase catalog fallback and local demo state can remain as backup during migration.
 
