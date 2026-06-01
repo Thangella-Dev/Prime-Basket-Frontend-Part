@@ -866,15 +866,16 @@ export default function App() {
   };
 
   const removeFromCart = (uid, unit) => {
+    const normalizedUnit = unit ? normalizeUnitKey(unit) : null;
     let removedItem = null;
     setCart((prev) => {
-      removedItem = prev.find((i) => i._uid === uid && (!unit || resolveCartUnit(i) === unit)) || null;
+      removedItem = prev.find((i) => i._uid === uid && (!normalizedUnit || resolveCartUnit(i) === normalizedUnit)) || null;
       if (removedItem) {
         showCartRemovedToast(removedItem);
       } else {
         setCartToast(null);
       }
-      return prev.filter((i) => !(i._uid === uid && (!unit || resolveCartUnit(i) === unit)));
+      return prev.filter((i) => !(i._uid === uid && (!normalizedUnit || resolveCartUnit(i) === normalizedUnit)));
     });
     if (removedItem) {
       restoreWishlistProductFromCart(removedItem);
@@ -882,8 +883,9 @@ export default function App() {
   };
 
   const updateCartQty = (uid, unit, qty) => {
+    const normalizedUnit = unit ? normalizeUnitKey(unit) : null;
     if (qty <= 0) removeFromCart(uid, unit);
-    else setCart((prev) => prev.map((i) => (i._uid === uid && (!unit || resolveCartUnit(i) === unit)) ? { ...i, quantity: qty } : i));
+    else setCart((prev) => prev.map((i) => (i._uid === uid && (!normalizedUnit || resolveCartUnit(i) === normalizedUnit)) ? { ...i, quantity: qty } : i));
   };
 
   const updateCartUnit = (cartItem, nextUnit) => {
