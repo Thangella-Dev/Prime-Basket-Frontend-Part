@@ -1518,7 +1518,7 @@ export default function App() {
       </Layout>
 
       {/* ── Zepto-style Cart Preview Panel ── */}
-      <div style={{
+      <div className="cart-toast-panel" style={{
         position: "fixed", top: "16px", right: "16px",
         transform: cartToast ? "translateY(0)" : "translateY(calc(-100% - 30px))",
         transition: "transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1)",

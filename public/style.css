@@ -10450,3 +10450,117 @@ body[data-theme="dark"] .pdp-trust-badges {
     transform: translateY(0) scale(1);
   }
 }
+
+/* June 3 mobile overlay safety layer: keep all popups above header and bottom dock. */
+@media (max-width: 768px) {
+  :root {
+    --pb-mobile-chrome-z: 120000;
+    --pb-mobile-overlay-z: 260000;
+    --pb-mobile-overlay-content-z: 260010;
+    --pb-mobile-toast-z: 260020;
+    --pb-mobile-dock-clearance: calc(104px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .phone-login-overlay,
+  .modal-overlay,
+  .account-confirm-overlay,
+  .ret-overlay,
+  .help-modal-overlay,
+  .cp-filter-overlay.open,
+  .unit-modal-overlay,
+  .pdp-lightbox-overlay,
+  .rating-modal-overlay,
+  .address-map-overlay,
+  #navbar .mobile-language-menu,
+  #navbar .mobile-header-notes-dropdown,
+  #navbar .mobile-browse-menu,
+  .search-overlay-backdrop,
+  .search-overlay-shell,
+  .search-overlay-shell .sb-dropdown,
+  #navbar .sb-dropdown {
+    z-index: var(--pb-mobile-overlay-z) !important;
+  }
+
+  .search-overlay-shell,
+  .search-overlay-shell .sb-dropdown,
+  #navbar .sb-dropdown {
+    z-index: calc(var(--pb-mobile-overlay-z) + 10) !important;
+  }
+
+  #navbar .mobile-language-picker,
+  #navbar .mobile-header-notes-wrap,
+  #navbar .mobile-browse-wrapper {
+    z-index: calc(var(--pb-mobile-overlay-z) + 20) !important;
+  }
+
+  .phone-login-modal,
+  .modal-content,
+  .account-confirm-dialog,
+  .ret-modal,
+  .help-modal,
+  .unit-modal-content,
+  .pdp-lightbox-shell,
+  .rating-modal-card {
+    position: relative !important;
+    z-index: var(--pb-mobile-overlay-content-z) !important;
+  }
+
+  .phone-login-overlay,
+  .account-confirm-overlay,
+  .help-modal-overlay,
+  .rating-modal-overlay,
+  .pdp-lightbox-overlay {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 14px) !important;
+    padding-bottom: var(--pb-mobile-dock-clearance) !important;
+  }
+
+  .modal-overlay,
+  .ret-overlay,
+  .unit-modal-overlay,
+  .cp-filter-overlay.open,
+  .address-map-overlay {
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+
+  .modal-content,
+  .ret-modal,
+  .help-modal,
+  .unit-modal-content,
+  .rating-modal-card {
+    max-height: calc(100svh - 26px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .cart-toast-panel,
+  #simple-toast,
+  .demo-toast {
+    z-index: var(--pb-mobile-toast-z) !important;
+  }
+
+  .cart-toast-panel {
+    top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+    right: 10px !important;
+    left: auto !important;
+    width: min(312px, calc(100vw - 20px)) !important;
+  }
+
+  #simple-toast {
+    top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+    width: min(430px, calc(100vw - 22px)) !important;
+  }
+
+  .demo-toast {
+    bottom: var(--pb-mobile-dock-clearance) !important;
+  }
+
+  #navbar .mobile-language-menu,
+  #navbar .mobile-header-notes-dropdown,
+  #navbar .mobile-browse-menu {
+    max-height: min(62svh, calc(100svh - var(--pb-mobile-overlay-top, 118px) - var(--pb-mobile-dock-clearance))) !important;
+    overscroll-behavior: contain !important;
+  }
+
+  .country-dropdown,
+  .unit-desktop-popover {
+    z-index: calc(var(--pb-mobile-overlay-z) + 30) !important;
+  }
+}
