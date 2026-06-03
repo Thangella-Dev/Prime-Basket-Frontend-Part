@@ -1,7 +1,7 @@
 # Backend Systems And Cost Estimate
 
 Date prepared: 2026-05-29
-Last updated: 2026-06-01
+Last updated: 2026-06-03
 
 ## Purpose
 
@@ -18,7 +18,8 @@ Frontend readiness note:
 
 - The current Prime Basket frontend can begin staged backend integration.
 - `npm run build` passes.
-- Latest targeted ESLint checks on touched frontend files report `0 errors`; known hook-dependency warnings remain for a separate cleanup pass.
+- `npm run lint` reports `0 errors`; known hook-dependency and Fast Refresh warnings remain for a separate cleanup pass.
+- Built `dist/` output was served locally and returned HTTP 200.
 - The frontend now has product-aware unit selectors across product cards, product detail, and cart rows, so backend catalog data should include variant/unit metadata per SKU.
 - Cart unit switching and duplicate product/unit merging are already handled on the frontend and should map to backend cart item variant IDs during integration.
 - Backend work should still include real-device QA, API contract testing, payment webhook validation, OTP rate limiting, and production monitoring before public release.
@@ -43,6 +44,29 @@ For Prime Basket, the best practical production stack is:
 - Uptime/log monitoring: `Better Stack`
 
 This keeps the app production-friendly without making infrastructure too complex.
+
+## Temporary Free-First Setup
+
+For the first backend build, use free or sandbox services wherever possible, then move to paid plans only after the API contracts and business flow are stable.
+
+Recommended temporary stack:
+
+- Backend local development: `Node.js + Express` in a `backend/` folder.
+- Database: Supabase free tier or Neon free tier.
+- Cache/rate limit: Upstash Redis free tier if OTP cooldowns are added early.
+- File uploads: local dev storage first; Cloudflare R2 or Supabase Storage later for return proof images/videos.
+- OTP: dev/generated OTP first; MSG91 and Africa's Talking/Twilio/Infobip after verification flows are stable.
+- Payments: Razorpay test mode for India, M-PESA sandbox for Kenya, Stripe test mode only if global card support is needed.
+- Email: Resend free tier for development notifications.
+- Monitoring: Sentry free tier and Better Stack/UptimeRobot free uptime checks after the first deployed API.
+
+Move to paid plans when:
+
+- real users start signing in
+- OTP delivery must be reliable
+- payments move from test mode to live mode
+- return proof uploads need durable cloud storage
+- admin/order operations need stronger logging and monitoring
 
 ## Recommended Architecture
 

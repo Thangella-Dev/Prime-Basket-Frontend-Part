@@ -4,6 +4,12 @@
 
 - Fixed notification dropdown stacking so desktop notifications float above the second navbar/search row instead of being visually covered by header chrome
 - Added internal scrolling and cleaner sizing to the notification dropdown so larger notification sets remain usable
+- Fixed mobile country/language, notification, and search-suggestion overlays so they open below the full mobile header stack instead of being covered by the header or secondary navbar
+- Added page-aware mobile overlay offsets for standard pages, delivery-location pages, and category pages
+- Completed a June 3 quality-gate pass: lint has `0 errors`, production build passes, and static built output returns HTTP 200
+- Updated backend-start documentation so the next phase can begin in a dedicated `backend/` folder with auth, catalog, and cart APIs first
+- Reworked desktop `My Account` into a more compact aligned dashboard shell with tighter sidebar navigation, profile fields, buttons, and dark-mode-safe account cards
+- Completed a second desktop account fit pass that removes the left-menu scroll trap and tightens profile/order density after screenshot review
 - Expanded home curated shelves so `Top Selling`, `Trending`, `Recently Added`, and `Top Rated` backfill from the full active-region catalog instead of showing only two or three products
 - Improved home shelf compatibility with smoother native horizontal scrolling, lighter snap behavior, and safer mobile card width calculations
 - Added product-aware unit inference for product cards and detail pages so units match the item type instead of defaulting to generic kg choices
@@ -157,7 +163,7 @@ The following improvements were implemented during the recent Prime Basket front
 
 - Dark mode completeness across every subsection, though it is now much closer to consistent
 - Mixed styling approach between CSS files and inline styles
-- Some account/cart sections still depend on page-local style blocks
+- Some account/cart sections still depend on page-local style blocks, although the desktop account shell is now much more compact and consistent
 - Some demo-oriented flows still need production-grade logic
 - Payment and product detail are stronger now, but still rely on large page-local style sections that should be reduced over time
 

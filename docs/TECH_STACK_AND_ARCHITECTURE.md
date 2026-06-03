@@ -48,7 +48,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
   Wraps the shared page shell, mobile glass bottom dock, pull-to-refresh handling, connectivity surfaces, and shared overlay-aware dock suppression.
 
 - `src/components/Header.jsx`
-  Handles header behavior, region/language UI, notification dropdown, search overlay, mobile drawer, compact desktop command-row behavior, dark-mode header polish, notification overlay layering, and browse-category dropdown dismissal/sizing behavior.
+  Handles header behavior, region/language UI, notification dropdown, search overlay, mobile drawer, compact desktop command-row behavior, dark-mode header polish, full-header-aware mobile overlay positioning, notification overlay layering, and browse-category dropdown dismissal/sizing behavior.
 
 - `src/components/ChatbotWidget.jsx`
   Handles the floating assistant launcher, mobile/desktop chat panel behavior, home-only launcher visibility, footer-aware floating controls, and quantity/auth overlay suppression.
@@ -79,7 +79,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
   Handles cart, product-aware unit switching, mobile checkout presentation, promo flow, address selection, and recommended/special-deal product surfaces.
 - `src/pages/PaymentPage.jsx`
 - `src/pages/AccountPage.jsx`
-  Handles account dashboard flows including orders, buy-again, wallet, notifications, help, and the staged refund/return request lifecycle with proof uploads and order-style refund timeline tracking.
+  Handles account dashboard flows including the compact desktop account shell, denser profile/order card presentation, orders, buy-again, wallet, notifications, help, and the staged refund/return request lifecycle with proof uploads and order-style refund timeline tracking.
 - `src/components/PhoneAuthModal.jsx`
   Handles phone sign-in, OTP verification, generated-OTP choice prompting, segmented OTP autofill/paste behavior, and verification UI state.
 - `src/pages/WishlistPage.jsx`
@@ -91,7 +91,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 ### Supporting Systems
 
 - `docs/BACKEND.md`
-  Canonical backend integration README with service-layer guidance, API endpoint map, localStorage migration plan, validation rules, environment variables, and production checklist.
+  Canonical backend integration README with service-layer guidance, API endpoint map, localStorage migration plan, validation rules, environment variables, production checklist, and June 3 backend-start recommendation.
 
 - `docs/BACKEND_Integration_Modeule.md`
   Detailed backend integration module for auth, catalog, cart, wishlist, checkout, orders, payments, refunds, notifications, wallet, and chatbot proxy migration.

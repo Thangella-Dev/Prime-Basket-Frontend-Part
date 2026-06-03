@@ -77,13 +77,18 @@ Recent storefront hardening also added:
 - full-shell error-boundary protection to reduce occasional blank-screen boot failures
 - fresh category entry now resets stale filter state before paint, preventing the brief `0-10%` discount auto-filter flash
 - notification dropdown layering now stays above the second navbar/search row and scrolls internally
+- mobile country/language selection, notification dropdowns, and search suggestions now respect the full mobile header height so they no longer open behind the header or secondary navbar
 - home curated shelves now backfill from the full active-region catalog so top-selling/trending/recently-added/top-rated rails do not end after only a few products
 - product-aware unit selection now covers product cards, product detail, and cart rows
 - cart unit switching now updates price/totals and merges duplicate product/unit rows safely
 - cart remove/decrement matching now normalizes unit labels so the final cart item can always be removed
 - mobile browse-category dropdown now opens as a viewport-safe fixed sheet instead of being clipped by header overflow
 - mobile curated shelf cards now fit narrow screens more reliably without clipped edges
+- desktop `My Account` now uses a more compact aligned dashboard shell with tighter sidebar navigation, profile cards, action buttons, and dark-mode-safe surfaces
+- the latest desktop account fit pass removes the trapped menu scrollbar and tightens order rows, thumbnails, status chips, profile fields, and section padding to reduce wasted space
 - a dedicated lint workflow through `npm run lint`, currently passing with `0 errors`
+- June 3 QA confirmed `npm run build` passes and the generated `dist/` entry returns HTTP 200 when served locally
+- backend scaffolding can now begin from the staged plan in `BACKEND.md`, starting with auth, catalog, and cart APIs
 - frontend cleanup across unused imports/props/state, duplicate translation keys, payment validation regexes, and stale catch bindings
 
 Other important state is currently stored in the browser through `localStorage`, including:
@@ -130,6 +135,7 @@ Other important state is currently stored in the browser through `localStorage`,
 - The latest hardening pass added ESLint coverage and removed current lint errors while keeping the production build green
 - Shopping units now feel closer to real ecommerce behavior because pack, weight, and volume variants are inferred by product type instead of falling back to generic kg choices
 - Cart editing is stronger because users can change both item count and unit/pack size directly from the cart
+- Desktop account UX is now closer to real ecommerce account dashboards, with less wasted space, no normal desktop menu scroll trap, denser order cards, and better sidebar/content alignment
 
 ## Current Limitations
 
@@ -143,6 +149,7 @@ This is still not a fully production-backed commerce system yet. The main limita
 - Some pages still rely on inline styles and demo data
 - Remaining lint warnings should be reviewed as part of a deliberate hook-dependency/Fast Refresh cleanup instead of quick patching
 - Live browser/device QA is still needed outside this sandbox because local preview startup is blocked here by Windows `spawn EPERM`
+- Headless Chrome DOM smoke testing is also blocked in this local Windows sandbox by Chrome access permissions, so visual QA should be done manually on real browsers/devices
 
 ## Overall Quality Assessment
 

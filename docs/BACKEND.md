@@ -20,6 +20,42 @@ The production gap is that many flows still rely on Firebase reads, local fallba
 
 Use a staged migration. Do not replace every demo/local frontend flow at once.
 
+## June 3 Backend Start Recommendation
+
+The backend can start now. For the first implementation phase, keep it inside this repository as a separate `backend/` folder so frontend and backend contracts can be developed together. If the backend grows large later, it can be moved into a separate repository without changing the frontend API contract.
+
+Recommended temporary/free-first path:
+
+- Create `backend/` in this project.
+- Use `Node.js + Express` for the first API MVP if speed matters most.
+- Use `NestJS` only if the team wants stricter module structure from day one.
+- Use `PostgreSQL` through Supabase free tier or Neon free tier for early development.
+- Use local/dev OTP codes first, then connect MSG91 for India and Africa's Talking/Twilio/Infobip for Kenya after API flows are stable.
+- Use Razorpay test mode and M-PESA sandbox before enabling live payment credentials.
+- Keep Groq and any other AI/provider secrets on the backend, not in the frontend.
+
+First backend setup commands to run when implementation begins:
+
+```bash
+mkdir backend
+cd backend
+npm init -y
+npm install express cors dotenv zod jsonwebtoken bcryptjs prisma @prisma/client
+npm install -D nodemon
+npx prisma init
+```
+
+First APIs to build:
+
+- `GET /health`
+- `POST /auth/send-otp`
+- `POST /auth/verify-otp`
+- `GET /auth/me`
+- `GET /catalog/home?country=IN`
+- `GET /catalog/products?country=IN&category=rice`
+- `GET /cart`
+- `POST /cart/items`
+
 Recommended first milestone:
 
 - Real phone OTP auth and session refresh.
@@ -73,5 +109,8 @@ Prime Basket should not be treated as production-ready for real customer payment
 Latest frontend state before backend integration:
 
 - `npm run build` passes.
-- Latest targeted ESLint checks on touched frontend files report `0 errors`; remaining warnings are known hook/Fast Refresh follow-ups.
+- `npm run lint` reports `0 errors`; remaining warnings are known hook/Fast Refresh follow-ups.
+- Built `dist/` output was served locally with Python static server and returned HTTP 200.
+- Headless Chrome DOM smoke testing is still blocked in this Windows sandbox by local Chrome access permissions, so real browser/device QA should be done manually before release.
 - June 1 frontend hardening added richer home merchandising rails, notification overlay fixes, mobile browse-category fixes, product-aware unit options, cart unit switching, and safer final-item cart removal.
+- June 3 QA confirmed the current frontend build remains stable enough to begin backend scaffolding.

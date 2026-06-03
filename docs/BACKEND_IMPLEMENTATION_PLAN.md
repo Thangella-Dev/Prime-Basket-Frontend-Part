@@ -25,6 +25,14 @@ What is already useful for backend integration:
 - Environment variable pattern already exists through `VITE_API_BASE_URL`.
 - Firebase catalog fallback and local demo state can remain as backup during migration.
 
+June 3 readiness note:
+
+- `npm run build` passes.
+- `npm run lint` has `0 errors`; current output is warnings only.
+- Built `dist/` output responds with HTTP 200 through a local static server.
+- Backend scaffolding can begin now, preferably in a `backend/` folder inside this repo for the first phase.
+- Real browser/device QA is still required separately because local headless Chrome is blocked by Windows access permissions in this sandbox.
+
 What should be improved during backend integration:
 
 - Move cart, wishlist, orders, refunds, wallet, notifications, and addresses from localStorage to backend APIs.
@@ -48,6 +56,12 @@ Why:
 Alternative: `Node.js + Express`
 
 Use Express only if the goal is fastest MVP and a smaller codebase.
+
+Practical start decision:
+
+- Start with `Node.js + Express` if the priority is to connect frontend APIs quickly this week.
+- Move to `NestJS` if the team wants a stricter long-term module architecture before API development begins.
+- Either path should expose the same REST contract, so the frontend integration guide remains valid.
 
 ### Database
 

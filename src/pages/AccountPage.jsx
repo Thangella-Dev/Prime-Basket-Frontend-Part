@@ -405,11 +405,19 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
     </>
   );
 
+  const activeMeta = sectionMeta[section] || sectionMeta.profile;
+  const primaryMenuItems = menuItems.filter((item) => item.key !== "logout");
+  const logoutMenuItem = menuItems.find((item) => item.key === "logout");
+  const displayName = user?.name || "User";
+  const firstName = displayName.split(" ")[0] || "User";
+  const accountInitial = (displayName || user?.phone || "U").trim().charAt(0).toUpperCase();
+  const deliveredOrdersCount = propOrders.filter((order) => order.status === "Delivered").length;
+
   if (isDesktopLayout) {
     return (
       <>
-        <div className="account-container account-desktop-layout">
-          <aside className="account-sidebar">
+        <div className="account-container account-desktop-layout account-dashboard-v2">
+          <aside className="account-sidebar account-sidebar-v2">
             <div className="account-sidebar-header">
               <div className="account-title-row">
                 <h2>{t.account.title}</h2>
@@ -418,13 +426,18 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
                   <span>{t.cart?.breadcrumbHome || "Home"}</span>
                 </button>
               </div>
-              <p className="account-sidebar-subtitle">
-                {user?.name ? `${user.name.split(" ")[0]}, manage everything from one place.` : "Manage everything from one place."}
-              </p>
+              <div className="account-sidebar-profile">
+                <div className="account-sidebar-avatar" aria-hidden="true">{accountInitial}</div>
+                <div className="account-sidebar-copy">
+                  <span>Signed in as</span>
+                  <strong>{firstName}</strong>
+                  <small>{user?.phone || (user?.email || "Prime Basket member")}</small>
+                </div>
+              </div>
             </div>
 
-            <div className="account-menu">
-              {menuItems.map((item) => (
+            <nav className="account-menu account-menu-v2" aria-label="Account sections">
+              {primaryMenuItems.map((item) => (
                 <button
                   key={item.key}
                   type="button"
@@ -442,11 +455,39 @@ function AccountPage({ onGoHome, onLogout, initialSection = "profile", onSection
                   <span>{item.label}</span>
                 </button>
               ))}
-            </div>
+            </nav>
+
+            {logoutMenuItem && (
+              <div className="account-sidebar-footer account-sidebar-footer-v2">
+                <button
+                  type="button"
+                  className="account-item account-logout-rail logout"
+                  onClick={() => setLogoutConfirmOpen(true)}
+                >
+                  <i className={`fas ${logoutMenuItem.icon}`}></i>
+                  <span>{logoutMenuItem.label}</span>
+                </button>
+              </div>
+            )}
           </aside>
 
           <main className="account-content">
             <div className="account-desktop-panel">
+              <div className="account-desktop-section-hero">
+                <div className="account-section-kicker">
+                  <i className={`fas ${menuItems.find((item) => item.key === section)?.icon || "fa-user"}`}></i>
+                  <span>Account center</span>
+                </div>
+                <div className="account-section-copy">
+                  <h1>{activeMeta.title}</h1>
+                  <p>{activeMeta.subtitle}</p>
+                </div>
+                <div className="account-section-stats" aria-label="Account summary">
+                  <span><strong>{propOrders.length}</strong> Orders</span>
+                  <span><strong>{deliveredOrdersCount}</strong> Delivered</span>
+                  <span><strong>{notifications.length}</strong> Updates</span>
+                </div>
+              </div>
               <div className="account-detail-content">
                 {renderSectionContent()}
               </div>

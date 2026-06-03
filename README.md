@@ -110,6 +110,7 @@ Primary production domain: `https://prime-basket.in`
 - Dark-mode header visuals were refined with clearer blue-tinted surfaces, stronger contrast, and compact action buttons
 - Category entry now resets stale filters before paint, preventing the temporary `0-10%` discount auto-filter glitch when opening categories
 - Notification dropdown layering was fixed so the panel floats above the second navbar/search row with its own internal scroll instead of being hidden under the header chrome
+- Mobile country/language selection, notification dropdowns, and search suggestions now use full-header-aware top-layer offsets so they no longer open behind the mobile header or secondary navbar
 - Home `Top Selling`, `Trending`, `Recently Added`, and `Top Rated` shelves now backfill from the full regional catalog so rails do not stop at only two or three products
 - Home curated shelves now use smoother native horizontal scrolling with lighter snap behavior and safer mobile card sizing to prevent edge clipping
 - Product unit selection is now product-type aware across cards and detail pages, so drinks show ml/L, rice shows kg bags, cleaning liquids show ml/L, toothpaste/baby powder show grams, and packs stay as packs
@@ -118,6 +119,10 @@ Primary production domain: `https://prime-basket.in`
 - Cart remove/decrement matching now normalizes display unit labels, fixing the last-item removal issue when only one cart row remains
 - Mobile `Browse All Categories` now opens as a viewport-safe fixed dropdown sheet with internal scrolling instead of getting clipped by the second navbar
 - Mobile home curated cards were tightened for better fit across narrow screens while preserving the premium rail/card look
+- June 3 frontend QA confirmed `npm run lint` has `0 errors`, `npm run build` passes, and the generated `dist/` entry responds with HTTP 200 from a local static server
+- Backend scaffolding is now ready to start in a separate `backend/` folder using the staged API plan documented in `docs/BACKEND.md`
+- Desktop `My Account` now uses a more compact, aligned dashboard shell with tighter sidebar navigation, profile details, buttons, and dark-mode-safe account surfaces
+- A follow-up desktop account fit pass removed the sidebar scroll trap and tightened order cards, order item rows, status chips, thumbnails, profile fields, and action buttons to reduce empty space on laptop and desktop screens
 
 ## Tech Stack
 
@@ -195,8 +200,10 @@ What is already strong:
 - Broad feature coverage for a frontend ecommerce demo
 - Region-aware shopping foundation
 - Stable build output
-- Dedicated lint command now runs successfully with `0 errors`
+- Dedicated lint command now runs successfully with `0 errors`, with only known hook/Fast Refresh warnings remaining
 - Stronger account/help/payment UX than the earlier baseline
+- More production-like desktop account layout with reduced oversized spacing and clearer sidebar/content alignment
+- More compact desktop account order/profile density with less wasted whitespace and no trapped left-menu scroll in normal desktop layouts
 - Better dark-mode coverage across shared navigation and key account flows
 - More polished checkout presentation and order-review flow
 - More stable overlay/modal behavior in cart and account flows
@@ -213,6 +220,7 @@ What still needs work:
 - More cleanup of inline page-level styles
 - Review remaining hook-dependency and Fast Refresh warnings before final production release
 - Final dark-mode consistency review across every subsection
+- Manual real-device/browser QA outside this Windows sandbox, because local headless Chrome is blocked by access permissions here
 
 ## Improvements Completed In This Implementation Cycle
 
