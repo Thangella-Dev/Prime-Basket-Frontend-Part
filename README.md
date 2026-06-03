@@ -123,6 +123,8 @@ Primary production domain: `https://prime-basket.in`
 - Backend scaffolding is now ready to start in a separate `backend/` folder using the staged API plan documented in `docs/BACKEND.md`
 - Desktop `My Account` now uses a more compact, aligned dashboard shell with tighter sidebar navigation, profile details, buttons, and dark-mode-safe account surfaces
 - A follow-up desktop account fit pass removed the sidebar scroll trap and tightened order cards, order item rows, status chips, thumbnails, profile fields, and action buttons to reduce empty space on laptop and desktop screens
+- Desktop `My Account` now uses a dedicated `v2` account rail so the signed-in identity card, scrollable menu, pinned logout footer, and right content area align more cleanly
+- Mobile popups now use a global overlay safety layer so auth, address, rating, return/refund, category filters, product unit selection, lightbox, notification, language/country, search, cart-toast, and simple-toast surfaces stay above the header and bottom dock
 
 ## Tech Stack
 
@@ -204,6 +206,7 @@ What is already strong:
 - Stronger account/help/payment UX than the earlier baseline
 - More production-like desktop account layout with reduced oversized spacing and clearer sidebar/content alignment
 - More compact desktop account order/profile density with less wasted whitespace and no trapped left-menu scroll in normal desktop layouts
+- More reliable mobile overlay stacking across portal modals, header dropdowns, toasts, and bottom-dock layouts
 - Better dark-mode coverage across shared navigation and key account flows
 - More polished checkout presentation and order-review flow
 - More stable overlay/modal behavior in cart and account flows

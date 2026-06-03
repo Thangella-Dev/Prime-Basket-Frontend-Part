@@ -42,7 +42,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 ### App Shell
 
 - `src/App.jsx`
-  Controls top-level state such as page navigation, region, language, theme, cart, wishlist, checkout state, orders, login modal state, locale enforcement by phone-region, mobile dock visibility rules, context-aware cart toast behavior, cart unit/quantity mutation, and shared page-level error-boundary wrapping.
+  Controls top-level state such as page navigation, region, language, theme, cart, wishlist, checkout state, orders, login modal state, locale enforcement by phone-region, mobile dock visibility rules, context-aware cart toast behavior, cart unit/quantity mutation, mobile toast stacking hooks, and shared page-level error-boundary wrapping.
 
 - `src/components/Layout.jsx`
   Wraps the shared page shell, mobile glass bottom dock, pull-to-refresh handling, connectivity surfaces, and shared overlay-aware dock suppression.
@@ -79,9 +79,11 @@ This means the current visual system is powerful but mixed. A future cleanup cou
   Handles cart, product-aware unit switching, mobile checkout presentation, promo flow, address selection, and recommended/special-deal product surfaces.
 - `src/pages/PaymentPage.jsx`
 - `src/pages/AccountPage.jsx`
-  Handles account dashboard flows including the compact desktop account shell, denser profile/order card presentation, orders, buy-again, wallet, notifications, help, and the staged refund/return request lifecycle with proof uploads and order-style refund timeline tracking.
+  Handles account dashboard flows including the compact desktop account shell, dedicated `v2` account rail, denser profile/order card presentation, orders, buy-again, wallet, notifications, help, and the staged refund/return request lifecycle with proof uploads and order-style refund timeline tracking.
 - `src/components/PhoneAuthModal.jsx`
   Handles phone sign-in, OTP verification, generated-OTP choice prompting, segmented OTP autofill/paste behavior, and verification UI state.
+- `public/style.css`
+  Contains the shared visual system, header/mobile shell styling, and the global mobile overlay safety layer that keeps modals, sheets, dropdowns, lightboxes, and toasts above the mobile header and bottom dock.
 - `src/pages/WishlistPage.jsx`
 - `src/pages/OrderSuccessPage.jsx`
 - `src/pages/OrderTrackingPage.jsx`

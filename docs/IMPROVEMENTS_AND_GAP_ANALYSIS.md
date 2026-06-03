@@ -10,6 +10,8 @@
 - Updated backend-start documentation so the next phase can begin in a dedicated `backend/` folder with auth, catalog, and cart APIs first
 - Reworked desktop `My Account` into a more compact aligned dashboard shell with tighter sidebar navigation, profile fields, buttons, and dark-mode-safe account cards
 - Completed a second desktop account fit pass that removes the left-menu scroll trap and tightens profile/order density after screenshot review
+- Added a dedicated desktop account rail `v2` with signed-in identity, isolated middle menu scroll, pinned logout footer, and better left/right dashboard height matching
+- Added a global mobile overlay safety layer so modals, popups, sheets, header dropdowns, product unit selectors, lightboxes, and toasts stay above the mobile header and bottom dock
 - Expanded home curated shelves so `Top Selling`, `Trending`, `Recently Added`, and `Top Rated` backfill from the full active-region catalog instead of showing only two or three products
 - Improved home shelf compatibility with smoother native horizontal scrolling, lighter snap behavior, and safer mobile card width calculations
 - Added product-aware unit inference for product cards and detail pages so units match the item type instead of defaulting to generic kg choices
@@ -163,7 +165,7 @@ The following improvements were implemented during the recent Prime Basket front
 
 - Dark mode completeness across every subsection, though it is now much closer to consistent
 - Mixed styling approach between CSS files and inline styles
-- Some account/cart sections still depend on page-local style blocks, although the desktop account shell is now much more compact and consistent
+- Some account/cart sections still depend on page-local style blocks, although the desktop account shell and mobile overlay layer are now much more consistent
 - Some demo-oriented flows still need production-grade logic
 - Payment and product detail are stronger now, but still rely on large page-local style sections that should be reduced over time
 

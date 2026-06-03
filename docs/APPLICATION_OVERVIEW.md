@@ -86,6 +86,8 @@ Recent storefront hardening also added:
 - mobile curated shelf cards now fit narrow screens more reliably without clipped edges
 - desktop `My Account` now uses a more compact aligned dashboard shell with tighter sidebar navigation, profile cards, action buttons, and dark-mode-safe surfaces
 - the latest desktop account fit pass removes the trapped menu scrollbar and tightens order rows, thumbnails, status chips, profile fields, and section padding to reduce wasted space
+- the desktop account page now has a dedicated `v2` account rail with a signed-in identity card, scrollable menu area, pinned logout footer, and better left/right height alignment
+- a global mobile overlay safety layer now keeps auth, address, rating, return/refund, category filter, product unit, lightbox, notification, language/country, search, cart-toast, and simple-toast surfaces above the header and bottom dock
 - a dedicated lint workflow through `npm run lint`, currently passing with `0 errors`
 - June 3 QA confirmed `npm run build` passes and the generated `dist/` entry returns HTTP 200 when served locally
 - backend scaffolding can now begin from the staged plan in `BACKEND.md`, starting with auth, catalog, and cart APIs
@@ -136,6 +138,7 @@ Other important state is currently stored in the browser through `localStorage`,
 - Shopping units now feel closer to real ecommerce behavior because pack, weight, and volume variants are inferred by product type instead of falling back to generic kg choices
 - Cart editing is stronger because users can change both item count and unit/pack size directly from the cart
 - Desktop account UX is now closer to real ecommerce account dashboards, with less wasted space, no normal desktop menu scroll trap, denser order cards, and better sidebar/content alignment
+- Mobile popup reliability is stronger because body-level portals, header dropdowns, and toast-style notices share a higher overlay layer above the mobile chrome
 
 ## Current Limitations
 
