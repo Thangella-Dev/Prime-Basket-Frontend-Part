@@ -80,6 +80,7 @@ Recent storefront hardening also added:
 - mobile country/language selection, notification dropdowns, and search suggestions now respect the full mobile header height so they no longer open behind the header or secondary navbar
 - home curated shelves now backfill from the full active-region catalog so top-selling/trending/recently-added/top-rated rails do not end after only a few products
 - product-aware unit selection now covers product cards, product detail, and cart rows
+- the shared product-card unit picker now opens with viewport-aware desktop placement and safer mobile sheet behavior, including the `Deals Of The Day` cards
 - cart unit switching now updates price/totals and merges duplicate product/unit rows safely
 - cart remove/decrement matching now normalizes unit labels so the final cart item can always be removed
 - mobile browse-category dropdown now opens as a viewport-safe fixed sheet instead of being clipped by header overflow

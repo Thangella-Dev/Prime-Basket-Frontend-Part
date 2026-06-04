@@ -28,6 +28,7 @@ export default function ProductCard({
   const desktopPopoverRef = useRef(null);
   const [isDesktopPopover, setIsDesktopPopover] = useState(false);
   const [desktopPopoverStyle, setDesktopPopoverStyle] = useState(null);
+  const [desktopPopoverDirection, setDesktopPopoverDirection] = useState("down");
 
   const prices = useMemo(() => getProductPrices(p, selectedUnit), [p, selectedUnit]);
   const translatedName = getLocalizedProductName(p.name, t);
@@ -65,7 +66,8 @@ export default function ProductCard({
     setShowModal(true);
   };
 
-  const selectUnit = (unitLabel) => {
+  const selectUnit = (unitLabel, event) => {
+    event?.stopPropagation();
     setSelectedUnit(unitLabel);
   };
 
@@ -85,15 +87,27 @@ export default function ProductCard({
     const width = Math.min(Math.max(rect.width, 228), 320);
     const maxLeft = window.innerWidth - width - viewportPadding;
     const left = Math.max(viewportPadding, Math.min(rect.left, maxLeft));
-    const top = Math.min(rect.bottom + 10, window.innerHeight - viewportPadding);
+    const estimatedHeight =
+      desktopPopoverRef.current?.offsetHeight ||
+      Math.min(420, 150 + Math.max(1, p.units?.length || 1) * 54);
+    const belowSpace = window.innerHeight - rect.bottom - viewportPadding;
+    const aboveSpace = rect.top - viewportPadding;
+    const openAbove = belowSpace < Math.min(estimatedHeight, 260) && aboveSpace > belowSpace;
+    const availableSpace = Math.max(190, Math.min(420, (openAbove ? aboveSpace : belowSpace) - 10));
+    const top = openAbove
+      ? Math.max(viewportPadding, rect.top - Math.min(estimatedHeight, availableSpace) - 10)
+      : Math.min(rect.bottom + 10, window.innerHeight - availableSpace - viewportPadding);
+    setDesktopPopoverDirection(openAbove ? "up" : "down");
     setDesktopPopoverStyle({
       position: "fixed",
       top,
       left,
       width,
+      maxHeight: availableSpace,
+      transformOrigin: openAbove ? "left bottom" : "left top",
       zIndex: 100070,
     });
-  }, []);
+  }, [p.units?.length]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -175,7 +189,16 @@ export default function ProductCard({
             <div
               key={u.label}
               className={`unit-item ${isSelected ? "selected" : ""}`}
-              onClick={() => selectUnit(u.label)}
+              role="button"
+              tabIndex={0}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => selectUnit(u.label, event)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  selectUnit(u.label, event);
+                }
+              }}
             >
               <div className="unit-item-info">
                 <span className="unit-item-label">{u.label}</span>
@@ -198,7 +221,7 @@ export default function ProductCard({
         })}
       </div>
 
-      <div className="unit-modal-footer">
+      <div className="unit-modal-footer" onPointerDown={(event) => event.stopPropagation()}>
         <button className="unit-done-btn" type="button" onClick={closeUnitModal}>{t.product.done || "Done"}</button>
         <button
           className="unit-add-btn"
@@ -271,15 +294,31 @@ export default function ProductCard({
 
       {/* Unit Selector */}
       <div className="unit-selector-wrap">
-        <div ref={unitTriggerRef} className="unit-selector-btn" onClick={openUnitModal}>
+        <div
+          ref={unitTriggerRef}
+          className="unit-selector-btn"
+          role="button"
+          tabIndex={0}
+          aria-haspopup="dialog"
+          aria-expanded={showModal}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={openUnitModal}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openUnitModal(e);
+            }
+          }}
+        >
           <span>{selectedUnit}</span>
           <ChevronDown size={10} strokeWidth={2} />
         </div>
         {showModal && isDesktopPopover && desktopPopoverStyle ? createPortal(
           <div
             ref={desktopPopoverRef}
-            className="unit-desktop-popover"
+            className={`unit-desktop-popover open-${desktopPopoverDirection}`}
             style={desktopPopoverStyle}
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
             {quantityPicker}

@@ -56,6 +56,9 @@ This means the current visual system is powerful but mixed. A future cleanup cou
 - `src/components/Footer.jsx`
   Shared footer.
 
+- `src/components/ProductCard.jsx`
+  Shared product-card presentation and product-aware unit/quantity picker used across home, Deals, category grids, related products, and card-based merchandising surfaces. The picker uses viewport-aware desktop placement and a mobile sheet fallback.
+
 - `src/utils/translationUtils.js`
   Shared product-name localization normalization and search-hint helpers.
 

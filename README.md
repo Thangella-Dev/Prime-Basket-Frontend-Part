@@ -32,6 +32,7 @@ Primary production domain: `https://prime-basket.in`
 - Shared product image rendering now sanitizes malformed remote URLs such as accidental `hhttps://...` entries
 - Desktop home-category sidebar now has an internal scroll area with a fuller category list instead of ending early with empty space
 - Home `Deals Of The Day` now supports a denser 3-column mobile layout and pads to six cards when the available deal pool is smaller
+- Home `Deals Of The Day` product cards now use the hardened shared quantity picker with edge-aware desktop placement, safer mobile sheet scrolling, and no accidental product-navigation taps while choosing units
 - Cart removal/decrement actions now clear top-right cart feedback immediately when the removed item no longer exists in cart
 - Mobile glass bottom navigation is now smaller, theme-aware, and visually better integrated with the app shell
 - The mobile glass bottom dock was tuned down slightly again so it feels lighter on small screens without losing the premium shell treatment
@@ -114,6 +115,7 @@ Primary production domain: `https://prime-basket.in`
 - Home `Top Selling`, `Trending`, `Recently Added`, and `Top Rated` shelves now backfill from the full regional catalog so rails do not stop at only two or three products
 - Home curated shelves now use smoother native horizontal scrolling with lighter snap behavior and safer mobile card sizing to prevent edge clipping
 - Product unit selection is now product-type aware across cards and detail pages, so drinks show ml/L, rice shows kg bags, cleaning liquids show ml/L, toothpaste/baby powder show grams, and packs stay as packs
+- Shared product-card unit selection now has better truncation, keyboard support, touch isolation, and viewport-aware dropdown positioning across Deals, home grids, category grids, and related products
 - Cart rows now include product-aware unit selection, letting users switch pack/weight/volume directly from cart while prices and totals update
 - Cart unit changes now merge duplicate product/unit lines safely instead of creating inconsistent rows
 - Cart remove/decrement matching now normalizes display unit labels, fixing the last-item removal issue when only one cart row remains

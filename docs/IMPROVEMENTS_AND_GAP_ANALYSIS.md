@@ -2,6 +2,10 @@
 
 ## Latest Stability Pass
 
+- Fixed the `Deals Of The Day` quantity/unit picker by hardening the shared product-card selector instead of patching only one section
+- Added viewport-aware desktop unit-popover placement so product-card quantity menus can open above or below the card without falling off screen
+- Improved mobile unit-picker behavior with safer touch isolation, internal scrolling, sticky actions, and compact option spacing
+- Added selector text truncation and keyboard/tap guards so unit selection no longer accidentally opens product detail from dense grids
 - Fixed notification dropdown stacking so desktop notifications float above the second navbar/search row instead of being visually covered by header chrome
 - Added internal scrolling and cleaner sizing to the notification dropdown so larger notification sets remain usable
 - Fixed mobile country/language, notification, and search-suggestion overlays so they open below the full mobile header stack instead of being covered by the header or secondary navbar
