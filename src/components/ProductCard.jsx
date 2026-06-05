@@ -160,8 +160,14 @@ export default function ProductCard({
     if (typeof document === "undefined") return undefined;
     const shouldHideChatbot = showModal && !isDesktopPopover;
     document.body.classList.toggle("prime-quantity-open", shouldHideChatbot);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("prime-quantity-overlay", { detail: { open: shouldHideChatbot } }));
+    }
     return () => {
       document.body.classList.remove("prime-quantity-open");
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("prime-quantity-overlay", { detail: { open: false } }));
+      }
     };
   }, [showModal, isDesktopPopover]);
 

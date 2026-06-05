@@ -3,6 +3,8 @@
 ## Latest Stability Pass
 
 - Fixed pull-to-refresh spinner layering so the indicator stays below the fixed header/secondary navbar stack instead of sliding behind it on mobile
+- Upgraded pull-to-refresh into a branded status pill with visible `Pull to refresh`, `Release to refresh`, and `Refreshing` states
+- Added layout-level quantity-overlay coordination so mobile product unit sheets hide the bottom dock across Deals, home, category, and related-product cards
 - Ran a June 5 code-level QA pass across pull refresh, mobile overlay stacking, home/category state restore, cart quantity/unit handling, checkout/address, account/refund, and product-card selector behavior
 - Fixed the shared product-card quantity picker memo dependency that caused the lint/compiler preservation check to fail
 - Revalidated the app with `npm run lint` and `npm run build`; lint now has `0 errors` with known warnings only, and the production build passes

@@ -76,12 +76,14 @@ Recent storefront hardening also added:
 - native mobile swipe-first curated home rails with scroll-snap behavior and synced shelf arrows
 - full-shell error-boundary protection to reduce occasional blank-screen boot failures
 - pull-to-refresh indicator layering now respects the fixed header and secondary navbar stack, keeping the spinner visible on mobile
+- pull-to-refresh now has a branded status pill with clear pull, release, and refreshing states, improving mobile feedback without a full-page loader
 - fresh category entry now resets stale filter state before paint, preventing the brief `0-10%` discount auto-filter flash
 - notification dropdown layering now stays above the second navbar/search row and scrolls internally
 - mobile country/language selection, notification dropdowns, and search suggestions now respect the full mobile header height so they no longer open behind the header or secondary navbar
 - home curated shelves now backfill from the full active-region catalog so top-selling/trending/recently-added/top-rated rails do not end after only a few products
 - product-aware unit selection now covers product cards, product detail, and cart rows
 - the shared product-card unit picker now opens with viewport-aware desktop placement and safer mobile sheet behavior, including the `Deals Of The Day` cards
+- shared product-card unit sheets now signal the layout shell so the mobile bottom dock hides during unit selection instead of overlapping the chooser
 - the shared product-card unit picker now also satisfies the lint/compiler memoization check after the June 5 QA pass
 - cart unit switching now updates price/totals and merges duplicate product/unit rows safely
 - cart remove/decrement matching now normalizes unit labels so the final cart item can always be removed

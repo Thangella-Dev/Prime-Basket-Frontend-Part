@@ -3175,29 +3175,90 @@ html {
   position: fixed;
   left: 50%;
   top: var(--pb-pull-indicator-top);
-  width: 40px;
-  height: 40px;
+  min-width: 44px;
+  height: 42px;
+  padding: 0 14px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
+  gap: 9px;
   justify-content: center;
   color: #1f5ca1;
-  background: rgba(255,255,255,0.94);
-  border: 1px solid rgba(148,163,184,0.18);
-  box-shadow: 0 12px 26px rgba(15,23,42,0.12);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(236,246,255,0.94)),
+    radial-gradient(circle at 20% 0%, rgba(68,196,212,0.18), transparent 42%);
+  border: 1px solid rgba(84, 137, 205, 0.22);
+  box-shadow:
+    0 14px 30px rgba(15,23,42,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  backdrop-filter: blur(16px) saturate(145%);
+  -webkit-backdrop-filter: blur(16px) saturate(145%);
   z-index: 130020;
   pointer-events: none;
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition: opacity 0.18s ease, transform 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.page-pull-indicator i {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-pull-label {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .page-pull-indicator.ready {
   color: #124f93;
+  box-shadow:
+    0 18px 36px rgba(15,91,215,0.16),
+    inset 0 1px 0 rgba(255,255,255,0.92);
 }
 
 .page-pull-indicator.refreshing {
   color: #0f5bd7;
+}
+
+body[data-theme="dark"] .page-pull-indicator {
+  color: #d9eaff;
+  background:
+    linear-gradient(180deg, rgba(18, 32, 53, 0.96), rgba(10, 23, 39, 0.94)),
+    radial-gradient(circle at 20% 0%, rgba(68,196,212,0.18), transparent 42%);
+  border-color: rgba(126, 170, 228, 0.24);
+  box-shadow:
+    0 18px 36px rgba(0,0,0,0.34),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+body[data-theme="dark"] .page-pull-indicator.ready,
+body[data-theme="dark"] .page-pull-indicator.refreshing {
+  color: #83c9ff;
+}
+
+@media (max-width: 768px) {
+  body.prime-quantity-open .prime-mobile-glass-dock {
+    opacity: 0 !important;
+    transform: translateX(-50%) translateY(18px) scale(0.98) !important;
+    pointer-events: none !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-pull-indicator {
+    height: 38px;
+    padding: 0 12px;
+    gap: 7px;
+  }
+
+  .page-pull-label {
+    font-size: 11px;
+  }
 }
 
 #navbar + .page-shell {

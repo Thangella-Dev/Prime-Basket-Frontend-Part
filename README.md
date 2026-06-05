@@ -25,6 +25,7 @@ Primary production domain: `https://prime-basket.in`
 - App navigation and scroll persistence across browser refreshes
 - Mobile pull-to-refresh support for core shopping pages with a content-only refresh indicator
 - Pull-to-refresh indicator positioning is now header-aware, so the spinner stays below the fixed header and secondary bar instead of hiding behind them
+- Pull-to-refresh now renders as a Prime Basket themed status pill with `Pull to refresh`, `Release to refresh`, and `Refreshing` states instead of a bare spinner
 - Premium mobile delivery-location bar under the header on home, replacing the raw detected-location text treatment
 - Category-page filter-mode separation so desktop uses the right refine sidebar and mobile uses the bottom-sheet flow
 - Mobile category-search blur handling to reduce unwanted scroll jumps after leaving the search field
@@ -34,6 +35,7 @@ Primary production domain: `https://prime-basket.in`
 - Desktop home-category sidebar now has an internal scroll area with a fuller category list instead of ending early with empty space
 - Home `Deals Of The Day` now supports a denser 3-column mobile layout and pads to six cards when the available deal pool is smaller
 - Home `Deals Of The Day` product cards now use the hardened shared quantity picker with edge-aware desktop placement, safer mobile sheet scrolling, and no accidental product-navigation taps while choosing units
+- Product-card quantity sheets now signal the shared app shell, so the mobile dock hides while users choose pack/weight/volume options from Deals, home, category, and related-product cards
 - Cart removal/decrement actions now clear top-right cart feedback immediately when the removed item no longer exists in cart
 - Mobile glass bottom navigation is now smaller, theme-aware, and visually better integrated with the app shell
 - The mobile glass bottom dock was tuned down slightly again so it feels lighter on small screens without losing the premium shell treatment

@@ -40,6 +40,7 @@ export default function Layout({
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [addressOverlayOpen, setAddressOverlayOpen] = useState(false);
+  const [quantityOverlayOpen, setQuantityOverlayOpen] = useState(false);
   const [networkBanner, setNetworkBanner] = useState(() => ({
     visible: false,
     mode: typeof navigator !== "undefined" && navigator.onLine === false ? "offline" : "online",
@@ -47,7 +48,8 @@ export default function Layout({
   const showMobileGlassDock =
     ["home", "category", "product", "cart", "wishlist", "account"].includes(currentPage) &&
     !hideMobileGlassDock &&
-    !addressOverlayOpen;
+    !addressOverlayOpen &&
+    !quantityOverlayOpen;
   const mobileDockBadge = (count) => (
     count > 0 ? <span className="prime-mobile-dock-badge">{count > 99 ? "99+" : count}</span> : null
   );
@@ -82,6 +84,16 @@ export default function Layout({
     window.addEventListener("prime-address-overlay", handleAddressOverlay);
     return () => {
       window.removeEventListener("prime-address-overlay", handleAddressOverlay);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleQuantityOverlay = (event) => {
+      setQuantityOverlayOpen(Boolean(event?.detail?.open));
+    };
+    window.addEventListener("prime-quantity-overlay", handleQuantityOverlay);
+    return () => {
+      window.removeEventListener("prime-quantity-overlay", handleQuantityOverlay);
     };
   }, []);
 
@@ -191,6 +203,12 @@ export default function Layout({
     };
   }, [enablePullRefresh, handleTouchMove, handleTouchStart, endPull]);
 
+  const pullRefreshLabel = isRefreshing
+    ? "Refreshing"
+    : pullDistance >= triggerPull
+      ? "Release to refresh"
+      : "Pull to refresh";
+
   return (
     <>
       <style>{`
@@ -206,6 +224,7 @@ export default function Layout({
           z-index: 99988;
           display: none;
           pointer-events: none;
+          transition: opacity .22s ease, transform .22s ease;
         }
         .prime-mobile-glass-dock-shell {
           pointer-events: auto;
@@ -541,9 +560,12 @@ export default function Layout({
           <div
             className={`page-pull-indicator${isRefreshing ? " refreshing" : ""}${pullDistance >= triggerPull ? " ready" : ""}`}
             style={{ opacity: pullDistance > 0 || isRefreshing ? 1 : 0, transform: `translate(-50%, ${Math.max(0, pullDistance - 22)}px)` }}
-            aria-hidden="true"
+            role={pullDistance > 0 || isRefreshing ? "status" : undefined}
+            aria-live={isRefreshing ? "polite" : "off"}
+            aria-hidden={pullDistance > 0 || isRefreshing ? undefined : true}
           >
             <i className={`fas ${isRefreshing ? "fa-spinner fa-spin" : "fa-rotate-right"}`}></i>
+            <span className="page-pull-label">{pullRefreshLabel}</span>
           </div>
         )}
         <div

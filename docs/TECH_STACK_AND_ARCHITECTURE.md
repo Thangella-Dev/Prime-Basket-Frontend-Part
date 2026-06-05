@@ -45,7 +45,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
   Controls top-level state such as page navigation, region, language, theme, cart, wishlist, checkout state, orders, login modal state, locale enforcement by phone-region, mobile dock visibility rules, context-aware cart toast behavior, cart unit/quantity mutation, mobile toast stacking hooks, and shared page-level error-boundary wrapping.
 
 - `src/components/Layout.jsx`
-  Wraps the shared page shell, mobile glass bottom dock, pull-to-refresh handling, header-aware refresh indicator positioning, connectivity surfaces, and shared overlay-aware dock suppression.
+  Wraps the shared page shell, mobile glass bottom dock, pull-to-refresh handling, branded refresh status feedback, header-aware refresh indicator positioning, connectivity surfaces, and shared overlay-aware dock suppression for address and product quantity sheets.
 
 - `src/components/Header.jsx`
   Handles header behavior, region/language UI, notification dropdown, search overlay, mobile drawer, compact desktop command-row behavior, dark-mode header polish, full-header-aware mobile overlay positioning, notification overlay layering, and browse-category dropdown dismissal/sizing behavior.
@@ -57,7 +57,7 @@ This means the current visual system is powerful but mixed. A future cleanup cou
   Shared footer.
 
 - `src/components/ProductCard.jsx`
-  Shared product-card presentation and product-aware unit/quantity picker used across home, Deals, category grids, related products, and card-based merchandising surfaces. The picker uses viewport-aware desktop placement, compiler-safe memoization, and a mobile sheet fallback.
+  Shared product-card presentation and product-aware unit/quantity picker used across home, Deals, category grids, related products, and card-based merchandising surfaces. The picker uses viewport-aware desktop placement, compiler-safe memoization, a mobile sheet fallback, and shared overlay signaling so the bottom dock does not overlap unit selection.
 
 - `src/utils/translationUtils.js`
   Shared product-name localization normalization and search-hint helpers.
