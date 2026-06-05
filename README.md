@@ -24,6 +24,7 @@ Primary production domain: `https://prime-basket.in`
 - Category-page search/filter runtime stabilization for desktop refine-panel interactions
 - App navigation and scroll persistence across browser refreshes
 - Mobile pull-to-refresh support for core shopping pages with a content-only refresh indicator
+- Pull-to-refresh indicator positioning is now header-aware, so the spinner stays below the fixed header and secondary bar instead of hiding behind them
 - Premium mobile delivery-location bar under the header on home, replacing the raw detected-location text treatment
 - Category-page filter-mode separation so desktop uses the right refine sidebar and mobile uses the bottom-sheet flow
 - Mobile category-search blur handling to reduce unwanted scroll jumps after leaving the search field
@@ -116,12 +117,13 @@ Primary production domain: `https://prime-basket.in`
 - Home curated shelves now use smoother native horizontal scrolling with lighter snap behavior and safer mobile card sizing to prevent edge clipping
 - Product unit selection is now product-type aware across cards and detail pages, so drinks show ml/L, rice shows kg bags, cleaning liquids show ml/L, toothpaste/baby powder show grams, and packs stay as packs
 - Shared product-card unit selection now has better truncation, keyboard support, touch isolation, and viewport-aware dropdown positioning across Deals, home grids, category grids, and related products
+- Shared product-card quantity picker memoization now passes the React lint/compiler quality gate after the June 5 QA pass
 - Cart rows now include product-aware unit selection, letting users switch pack/weight/volume directly from cart while prices and totals update
 - Cart unit changes now merge duplicate product/unit lines safely instead of creating inconsistent rows
 - Cart remove/decrement matching now normalizes display unit labels, fixing the last-item removal issue when only one cart row remains
 - Mobile `Browse All Categories` now opens as a viewport-safe fixed dropdown sheet with internal scrolling instead of getting clipped by the second navbar
 - Mobile home curated cards were tightened for better fit across narrow screens while preserving the premium rail/card look
-- June 3 frontend QA confirmed `npm run lint` has `0 errors`, `npm run build` passes, and the generated `dist/` entry responds with HTTP 200 from a local static server
+- June 5 frontend QA confirmed `npm run lint` has `0 errors`, `npm run build` passes, and the generated `dist` entry/assets are produced successfully
 - Backend scaffolding is now ready to start in a separate `backend/` folder using the staged API plan documented in `docs/BACKEND.md`
 - Desktop `My Account` now uses a more compact, aligned dashboard shell with tighter sidebar navigation, profile details, buttons, and dark-mode-safe account surfaces
 - A follow-up desktop account fit pass removed the sidebar scroll trap and tightened order cards, order item rows, status chips, thumbnails, profile fields, and action buttons to reduce empty space on laptop and desktop screens

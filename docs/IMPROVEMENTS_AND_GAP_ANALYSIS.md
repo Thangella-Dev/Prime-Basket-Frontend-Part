@@ -2,6 +2,10 @@
 
 ## Latest Stability Pass
 
+- Fixed pull-to-refresh spinner layering so the indicator stays below the fixed header/secondary navbar stack instead of sliding behind it on mobile
+- Ran a June 5 code-level QA pass across pull refresh, mobile overlay stacking, home/category state restore, cart quantity/unit handling, checkout/address, account/refund, and product-card selector behavior
+- Fixed the shared product-card quantity picker memo dependency that caused the lint/compiler preservation check to fail
+- Revalidated the app with `npm run lint` and `npm run build`; lint now has `0 errors` with known warnings only, and the production build passes
 - Fixed the `Deals Of The Day` quantity/unit picker by hardening the shared product-card selector instead of patching only one section
 - Added viewport-aware desktop unit-popover placement so product-card quantity menus can open above or below the card without falling off screen
 - Improved mobile unit-picker behavior with safer touch isolation, internal scrolling, sticky actions, and compact option spacing

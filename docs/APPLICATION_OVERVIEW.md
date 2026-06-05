@@ -75,12 +75,14 @@ Recent storefront hardening also added:
 - staged refund and return tracking with requested, review, pickup, refund-processing, and completed phases
 - native mobile swipe-first curated home rails with scroll-snap behavior and synced shelf arrows
 - full-shell error-boundary protection to reduce occasional blank-screen boot failures
+- pull-to-refresh indicator layering now respects the fixed header and secondary navbar stack, keeping the spinner visible on mobile
 - fresh category entry now resets stale filter state before paint, preventing the brief `0-10%` discount auto-filter flash
 - notification dropdown layering now stays above the second navbar/search row and scrolls internally
 - mobile country/language selection, notification dropdowns, and search suggestions now respect the full mobile header height so they no longer open behind the header or secondary navbar
 - home curated shelves now backfill from the full active-region catalog so top-selling/trending/recently-added/top-rated rails do not end after only a few products
 - product-aware unit selection now covers product cards, product detail, and cart rows
 - the shared product-card unit picker now opens with viewport-aware desktop placement and safer mobile sheet behavior, including the `Deals Of The Day` cards
+- the shared product-card unit picker now also satisfies the lint/compiler memoization check after the June 5 QA pass
 - cart unit switching now updates price/totals and merges duplicate product/unit rows safely
 - cart remove/decrement matching now normalizes unit labels so the final cart item can always be removed
 - mobile browse-category dropdown now opens as a viewport-safe fixed sheet instead of being clipped by header overflow
@@ -90,7 +92,7 @@ Recent storefront hardening also added:
 - the desktop account page now has a dedicated `v2` account rail with a signed-in identity card, scrollable menu area, pinned logout footer, and better left/right height alignment
 - a global mobile overlay safety layer now keeps auth, address, rating, return/refund, category filter, product unit, lightbox, notification, language/country, search, cart-toast, and simple-toast surfaces above the header and bottom dock
 - a dedicated lint workflow through `npm run lint`, currently passing with `0 errors`
-- June 3 QA confirmed `npm run build` passes and the generated `dist/` entry returns HTTP 200 when served locally
+- June 5 QA confirmed `npm run lint` has `0 errors`, `npm run build` passes, and the generated `dist` entry/assets are produced successfully
 - backend scaffolding can now begin from the staged plan in `BACKEND.md`, starting with auth, catalog, and cart APIs
 - frontend cleanup across unused imports/props/state, duplicate translation keys, payment validation regexes, and stale catch bindings
 

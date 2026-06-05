@@ -33,6 +33,7 @@ export default function ProductCard({
   const prices = useMemo(() => getProductPrices(p, selectedUnit), [p, selectedUnit]);
   const translatedName = getLocalizedProductName(p.name, t);
   const productImage = resolveProductImage(p);
+  const unitCount = Array.isArray(p.units) ? p.units.length : 0;
 
   useEffect(() => {
     setSelectedUnit(p.baseUnit);
@@ -89,7 +90,7 @@ export default function ProductCard({
     const left = Math.max(viewportPadding, Math.min(rect.left, maxLeft));
     const estimatedHeight =
       desktopPopoverRef.current?.offsetHeight ||
-      Math.min(420, 150 + Math.max(1, p.units?.length || 1) * 54);
+      Math.min(420, 150 + Math.max(1, unitCount) * 54);
     const belowSpace = window.innerHeight - rect.bottom - viewportPadding;
     const aboveSpace = rect.top - viewportPadding;
     const openAbove = belowSpace < Math.min(estimatedHeight, 260) && aboveSpace > belowSpace;
@@ -107,7 +108,7 @@ export default function ProductCard({
       transformOrigin: openAbove ? "left bottom" : "left top",
       zIndex: 100070,
     });
-  }, [p.units?.length]);
+  }, [unitCount]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
