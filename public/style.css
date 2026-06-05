@@ -3157,6 +3157,7 @@ html {
 }
 
 .page-shell {
+  --pb-pull-indicator-top: calc(env(safe-area-inset-top, 0px) + 104px);
   min-height: calc(100vh - 140px);
   width: 100%;
   max-width: 100%;
@@ -3173,7 +3174,7 @@ html {
 .page-pull-indicator {
   position: fixed;
   left: 50%;
-  top: 92px;
+  top: var(--pb-pull-indicator-top);
   width: 40px;
   height: 40px;
   border-radius: 999px;
@@ -3186,7 +3187,7 @@ html {
   box-shadow: 0 12px 26px rgba(15,23,42,0.12);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  z-index: 9500;
+  z-index: 130020;
   pointer-events: none;
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
@@ -3201,6 +3202,15 @@ html {
 
 #navbar + .page-shell {
   padding-top: 126px;
+  --pb-pull-indicator-top: calc(env(safe-area-inset-top, 0px) + 104px);
+}
+
+#navbar.has-mobile-location-bar + .page-shell {
+  --pb-pull-indicator-top: calc(env(safe-area-inset-top, 0px) + 164px);
+}
+
+#navbar.page-category + .page-shell {
+  --pb-pull-indicator-top: calc(env(safe-area-inset-top, 0px) + 74px);
 }
 
 .page-shell section {

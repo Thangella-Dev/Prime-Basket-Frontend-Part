@@ -540,7 +540,7 @@ export default function Layout({
         {enablePullRefresh && (
           <div
             className={`page-pull-indicator${isRefreshing ? " refreshing" : ""}${pullDistance >= triggerPull ? " ready" : ""}`}
-            style={{ opacity: pullDistance > 0 || isRefreshing ? 1 : 0, transform: `translate(-50%, ${Math.max(-12, pullDistance - 26)}px)` }}
+            style={{ opacity: pullDistance > 0 || isRefreshing ? 1 : 0, transform: `translate(-50%, ${Math.max(0, pullDistance - 22)}px)` }}
             aria-hidden="true"
           >
             <i className={`fas ${isRefreshing ? "fa-spinner fa-spin" : "fa-rotate-right"}`}></i>
